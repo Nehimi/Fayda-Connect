@@ -1,0 +1,100 @@
+Flutter assets will be downloaded from https://storage.flutter-io.cn. Make sure you trust this source!
+Analyzing Fayda-Connect...                                      
+
+warning - Unused import: '../models/service_model.dart' - lib\providers\order_provider.dart:5:8 - unused_import
+warning - Unused import: '../widgets/app_drawer.dart' - lib\screens\academy_screen.dart:5:8 - unused_import
+warning - Unused import: '../theme/l10n.dart' - lib\screens\academy_screen.dart:8:8 - unused_import
+warning - The value of the local variable 'lang' isn't used - lib\screens\academy_screen.dart:15:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\academy_screen.dart:78:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\academy_screen.dart:99:78 - deprecated_member_use
+   info - Unnecessary use of 'toList' in a spread - lib\screens\admin_dashboard_screen.dart:189:16 - unnecessary_to_list_in_spreads
+warning - Unused import: 'package:firebase_auth/firebase_auth.dart' - lib\screens\auth\login_screen.dart:2:8 - unused_import
+warning - Unused import: '../../services/sync_service.dart' - lib\screens\auth\login_screen.dart:9:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:152:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:193:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:195:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\login_screen.dart:208:57 - deprecated_member_use
+warning - Unused import: 'package:firebase_auth/firebase_auth.dart' - lib\screens\auth\otp_verification_screen.dart:3:8 - unused_import
+warning - Unused import: '../home_screen.dart' - lib\screens\auth\otp_verification_screen.dart:7:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\otp_verification_screen.dart:130:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\otp_verification_screen.dart:193:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\otp_verification_screen.dart:202:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\otp_verification_screen.dart:211:92 - deprecated_member_use
+warning - Unused import: 'otp_verification_screen.dart' - lib\screens\auth\signup_screen.dart:10:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\signup_screen.dart:162:52 - deprecated_member_use
+warning - Unused import: '../providers/language_provider.dart' - lib\screens\bank_comparison_screen.dart:6:8 - unused_import
+   info - Unnecessary use of 'toList' in a spread - lib\screens\bank_comparison_screen.dart:54:14 - unnecessary_to_list_in_spreads
+warning - Unused import: 'payment_screen.dart' - lib\screens\bank_detail_screen.dart:7:8 - unused_import
+   info - Unnecessary use of 'toList' in a spread - lib\screens\bank_detail_screen.dart:125:22 - unnecessary_to_list_in_spreads
+warning - Unused import: '../widgets/app_drawer.dart' - lib\screens\bank_list_screen.dart:8:8 - unused_import
+warning - Unused import: '../widgets/app_drawer.dart' - lib\screens\help_support_screen.dart:5:8 - unused_import
+warning - Unused import: 'package:intl/intl.dart' - lib\screens\home_screen.dart:4:8 - unused_import
+warning - Unused import: 'auth/login_screen.dart' - lib\screens\home_screen.dart:25:8 - unused_import
+warning - The value of the local variable 'activeOrders' isn't used - lib\screens\home_screen.dart:33:11 - unused_local_variable
+   info - Unnecessary use of multiple underscores - lib\screens\home_screen.dart:112:40 - unnecessary_underscores
+   info - Unnecessary use of 'toList' in a spread - lib\screens\home_screen.dart:323:28 - unnecessary_to_list_in_spreads
+warning - The declaration '_BlurBlob' isn't referenced - lib\screens\home_screen.dart:550:7 - unused_element
+warning - The declaration '_StatusIndicator' isn't referenced - lib\screens\home_screen.dart:576:7 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_screen.dart:599:48 - deprecated_member_use
+warning - The declaration '_IdentityPlaceholder' isn't referenced - lib\screens\home_screen.dart:605:7 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_screen.dart:611:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_screen.dart:613:23 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\home_screen.dart:614:23 - deprecated_member_use
+warning - Unused import: '../theme/colors.dart' - lib\screens\home_screen_widgets.dart:3:8 - unused_import
+warning - The declaration '_StatusIndicator' isn't referenced - lib\screens\home_screen_widgets.dart:5:7 - unused_element
+warning - Unused import: '../../widgets/glass_card.dart' - lib\screens\onboarding_screen.dart:4:8 - unused_import
+warning - Unused import: '../../screens/home_screen.dart' - lib\screens\onboarding_screen.dart:6:8 - unused_import
+warning - Unused import: '../../providers/user_provider.dart' - lib\screens\onboarding_screen.dart:7:8 - unused_import
+warning - Unused import: '../../widgets/custom_snackbar.dart' - lib\screens\onboarding_screen.dart:9:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\onboarding_screen.dart:55:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\onboarding_screen.dart:59:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\onboarding_screen.dart:89:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\onboarding_screen.dart:91:72 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\onboarding_screen.dart:167:58 - deprecated_member_use
+warning - Unused import: '../widgets/app_drawer.dart' - lib\screens\order_history_screen.dart:6:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\payment_screen.dart:110:37 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\screens\payment_screen.dart:114:79 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\payment_screen.dart:114:83 - unnecessary_underscores
+warning - Unused import: '../widgets/glass_card.dart' - lib\screens\placeholder_screens.dart:4:8 - unused_import
+warning - Unused import: '../widgets/app_drawer.dart' - lib\screens\premium_screen.dart:5:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\premium_screen.dart:126:54 - deprecated_member_use
+   info - The variable name '_PlanTab' isn't a lowerCamelCase identifier - lib\screens\premium_screen.dart:151:10 - non_constant_identifier_names
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\premium_screen.dart:161:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_edit_screen.dart:56:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_edit_screen.dart:58:67 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\profile_edit_screen.dart:106:43 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\profile_edit_screen.dart:107:37 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\profile_edit_screen.dart:111:43 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\reminders_list_screen.dart:52:47 - deprecated_member_use
+warning - Unused import: 'payment_screen.dart' - lib\screens\service_detail_screen.dart:7:8 - unused_import
+   info - Unnecessary use of 'toList' in a spread - lib\screens\service_detail_screen.dart:117:22 - unnecessary_to_list_in_spreads
+warning - Unused import: '../models/service_model.dart' - lib\screens\service_form_screen.dart:3:8 - unused_import
+warning - Unused import: '../widgets/glass_card.dart' - lib\screens\service_form_screen.dart:5:8 - unused_import
+warning - Unused import: '../theme/l10n.dart' - lib\screens\service_form_screen.dart:9:8 - unused_import
+warning - Unused import: '../widgets/app_drawer.dart' - lib\screens\service_list_screen.dart:7:8 - unused_import
+warning - Unused import: '../widgets/app_drawer.dart' - lib\screens\settings_screen.dart:5:8 - unused_import
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\screens\settings_screen.dart:116:15 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\status_tracker_screen.dart:193:76 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\status_tracker_screen.dart:211:88 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\success_screen.dart:29:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\success_screen.dart:41:46 - deprecated_member_use
+warning - Unused import: '../widgets/app_drawer.dart' - lib\screens\vault_screen.dart:5:8 - unused_import
+warning - Unused import: 'package:flutter/foundation.dart' - lib\services\auth_service.dart:2:8 - unused_import
+warning - Unused import: 'package:flutter_riverpod/flutter_riverpod.dart' - lib\theme\l10n.dart:1:8 - unused_import
+warning - Unused import: '../screens/bank_list_screen.dart' - lib\widgets\app_drawer.dart:8:8 - unused_import
+warning - Unused import: '../screens/auth/login_screen.dart' - lib\widgets\app_drawer.dart:22:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\app_drawer.dart:83:66 - deprecated_member_use
+   info - The variable name '_DrawerItem' isn't a lowerCamelCase identifier - lib\widgets\app_drawer.dart:116:10 - non_constant_identifier_names
+warning - Unused import: 'package:lucide_icons/lucide_icons.dart' - lib\widgets\category_card.dart:2:8 - unused_import
+   info - Statements in an if should be enclosed in a block - lib\widgets\category_card.dart:25:38 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\widgets\category_card.dart:26:44 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\widgets\category_card.dart:27:44 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\widgets\category_card.dart:28:45 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\widgets\category_card.dart:29:42 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\widgets\category_card.dart:30:43 - curly_braces_in_flow_control_structures
+warning - Unused import: 'dart:math' - lib\widgets\three_d_card.dart:1:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\three_d_card.dart:57:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\three_d_card.dart:62:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\three_d_card.dart:75:46 - deprecated_member_use
+
+95 issues found. (ran in 6.4s)

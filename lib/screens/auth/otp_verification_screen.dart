@@ -112,10 +112,12 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textMain),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: Navigator.canPop(context) 
+          ? IconButton(
+              icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textMain),
+              onPressed: () => Navigator.pop(context),
+            )
+          : null,
       ),
       body: SafeArea(
         child: Padding(
@@ -127,7 +129,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                Container(
                  padding: const EdgeInsets.all(24),
                  decoration: BoxDecoration(
-                   color: AppColors.primary.withOpacity(0.1),
+                   color: AppColors.primary.withValues(alpha: 0.1),
                    shape: BoxShape.circle,
                  ),
                  child: const Icon(LucideIcons.mail, size: 64, color: AppColors.primary),
@@ -190,7 +192,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                    minimumSize: const Size(double.infinity, 56),
                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                    elevation: 8,
-                   shadowColor: AppColors.primary.withOpacity(0.5),
+                   shadowColor: AppColors.primary.withValues(alpha: 0.5),
                  ),
                  child: const Text('I Have Verified', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                ),
@@ -199,7 +201,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                
                Text(
                  "Didn't receive the email?",
-                 style: TextStyle(color: AppColors.textDim.withOpacity(0.7)),
+                 style: TextStyle(color: AppColors.textDim.withValues(alpha: 0.7)),
                ),
                TextButton(
                  onPressed: _handleResendEmail,
@@ -208,7 +210,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                const SizedBox(height: 8),
                TextButton(
                  onPressed: () => ref.read(authServiceProvider).signOut(),
-                 child: Text("Cancel & Sign Out", style: TextStyle(color: Colors.redAccent.withOpacity(0.8))),
+                 child: Text("Cancel & Sign Out", style: TextStyle(color: Colors.redAccent.withValues(alpha: 0.8))),
                ),
                const SizedBox(height: 16),
             ],

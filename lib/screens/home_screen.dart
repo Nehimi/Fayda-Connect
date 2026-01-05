@@ -596,7 +596,7 @@ class _StatusIndicator extends StatelessWidget {
         boxShadow: [
           BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, spreadRadius: 1),
         ],
-        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1.5),
       ),
     );
   }
@@ -608,10 +608,10 @@ class _IdentityPlaceholder extends ConsumerWidget {
     return InkWell(
       onTap: () => ref.read(showLoginProvider.notifier).state = true,
       child: GlassCard(
-      borderColor: Colors.orange.withOpacity(0.3),
+      borderColor: Colors.orange.withValues(alpha: 0.3),
       gradientColors: [
-        Colors.orange.withOpacity(0.1),
-        Colors.orange.withOpacity(0.05),
+        Colors.orange.withValues(alpha: 0.1),
+        Colors.orange.withValues(alpha: 0.05),
       ],
       child: const Row(
         children: [

@@ -39,6 +39,16 @@ class SyncService {
     });
   }
 
+  // Delete family member from cloud
+  Future<void> deleteFamilyMember(String userId, String memberId) async {
+    await _db
+        .collection('users')
+        .doc(userId)
+        .collection('family')
+        .doc(memberId)
+        .delete();
+  }
+
   // Fetch from cloud
   Stream<List<FamilyMember>> watchFamily(String userId) {
     return _db
@@ -56,4 +66,13 @@ class SyncService {
                 ))
             .toList());
   }
+
+  // Watch user profile
+  Stream<Map<String, dynamic>?> watchUserProfile(String userId) {
+    return _db.collection('users').doc(userId).snapshots().map((doc) => doc.data());
+  }
 }
+
+final userProfileProvider = StreamProvider.family<Map<String, dynamic>?, String>((ref, userId) {
+  return ref.watch(syncServiceProvider).watchUserProfile(userId);
+});

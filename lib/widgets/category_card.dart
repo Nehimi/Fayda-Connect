@@ -22,12 +22,19 @@ class CategoryCard extends ConsumerWidget {
     final lang = ref.watch(languageProvider);
     
     String localizedTitle = category.title;
-    if (category.title == 'Banking') localizedTitle = L10n.get(lang, 'banking');
-    else if (category.title == 'Passport') localizedTitle = L10n.get(lang, 'passport');
-    else if (category.title == 'Business') localizedTitle = L10n.get(lang, 'business');
-    else if (category.title == 'Education') localizedTitle = L10n.get(lang, 'education');
-    else if (category.title == 'Public') localizedTitle = L10n.get(lang, 'public');
-    else if (category.title == 'Telecom') localizedTitle = L10n.get(lang, 'telecom');
+    if (category.title == 'Banking') {
+      localizedTitle = L10n.get(lang, 'banking');
+    } else if (category.title == 'Passport') {
+      localizedTitle = L10n.get(lang, 'passport');
+    } else if (category.title == 'Business') {
+      localizedTitle = L10n.get(lang, 'business');
+    } else if (category.title == 'Education') {
+      localizedTitle = L10n.get(lang, 'education');
+    } else if (category.title == 'Public') {
+      localizedTitle = L10n.get(lang, 'public');
+    } else if (category.title == 'Telecom') {
+      localizedTitle = L10n.get(lang, 'telecom');
+    }
     return GlassCard(
       padding: EdgeInsets.zero,
       child: InkWell(

@@ -125,7 +125,8 @@ class AppDrawer extends ConsumerWidget {
           Navigator.pop(context); // Close drawer
           
           if (route == 'home') {
-             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen(), settings: const RouteSettings(name: 'home')), (route) => false);
+             // Home is our root via AuthGate, just go back to first route
+             Navigator.popUntil(context, (route) => route.isFirst);
           } else if (route == 'pro') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen(), settings: const RouteSettings(name: 'pro')));
           } else if (route == 'vault') {
@@ -154,6 +155,8 @@ class AppDrawer extends ConsumerWidget {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const ReferralScreen(), settings: const RouteSettings(name: 'referral')));
           } else if (route == 'logout') {
              CustomSnackBar.show(context, message: 'Logging out...');
+             // AuthGate will handle the UI switch automatically
+             Navigator.popUntil(context, (route) => route.isFirst);
              ref.read(authServiceProvider).signOut();
           }
         },

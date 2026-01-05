@@ -52,11 +52,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     blurRadius: 100,
                     spreadRadius: 20,
                   ),
@@ -86,9 +86,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             Container(
                               padding: const EdgeInsets.all(32),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.05),
+                                color: Colors.white.withValues(alpha: 0.05),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                               ),
                               child: Icon(
                                 _contents[index].icon,
@@ -164,7 +164,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           minimumSize: const Size(double.infinity, 60),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                           elevation: 8,
-                          shadowColor: AppColors.primary.withOpacity(0.5),
+                          shadowColor: AppColors.primary.withValues(alpha: 0.5),
                         ),
                         child: Text(
                           _currentPage == _contents.length - 1 ? 'Get Started' : 'Next',

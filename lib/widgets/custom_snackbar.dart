@@ -5,13 +5,17 @@ import '../theme/colors.dart';
 
 class CustomSnackBar {
   static void show(BuildContext context, {required String message, bool isError = false, Color? color}) {
-    ScaffoldMessenger.of(context).clearSnackBars(); // Clear existing
-    
-    final accentColor = color ?? (isError ? AppColors.error : AppColors.success);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
+    try {
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      if (messenger == null) return;
+
+      messenger.clearSnackBars(); // Clear existing
+      
+      final accentColor = color ?? (isError ? AppColors.error : AppColors.success);
+      
+      messenger.showSnackBar(
+        SnackBar(
+          content: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
@@ -53,5 +57,8 @@ class CustomSnackBar {
         duration: const Duration(seconds: 3),
       ),
     );
+    } catch (e) {
+      debugPrint('Error showing SnackBar: $e');
+    }
   }
 }

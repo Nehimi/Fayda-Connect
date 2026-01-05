@@ -51,35 +51,30 @@ class AuthGate extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
     final showLogin = ref.watch(showLoginProvider);
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 400),
-      child: authState.when(
-        data: (user) {
-          if (user != null) {
-            // Check if email is verified
-            if (user.emailVerified) {
-              return const HomeScreen(key: ValueKey('HomeScreen'));
-            } else {
-              // Show verification screen as a gateway
-              return OtpVerificationScreen(
-                key: const ValueKey('OtpVerificationScreen'),
-                phoneNumber: user.email ?? 'Email',
-                verificationId: 'EMAIL_LINK_FLOW',
-                isSignUp: false, // Firestore profile is already created
-              );
-            }
+    return authState.when(
+      data: (user) {
+        if (user != null) {
+          // Check if email is verified
+          if (user.emailVerified) {
+            return const HomeScreen();
+          } else {
+            // Show verification screen as a gateway
+            return OtpVerificationScreen(
+              phoneNumber: user.email ?? 'Email',
+              verificationId: 'EMAIL_LINK_FLOW',
+              isSignUp: false, // Firestore profile is already created
+            );
           }
-          if (showLogin) {
-            return const LoginScreen(key: ValueKey('LoginScreen'));
-          }
-          return const OnboardingScreen(key: ValueKey('OnboardingScreen'));
-        },
-        loading: () => const Scaffold(
-          key: ValueKey('Loading'),
-          body: Center(child: CircularProgressIndicator()),
-        ),
-        error: (e, _) => const OnboardingScreen(key: ValueKey('Error')),
+        }
+        if (showLogin) {
+          return const LoginScreen();
+        }
+        return const OnboardingScreen();
+      },
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
       ),
+      error: (e, _) => const OnboardingScreen(),
     );
   }
 }

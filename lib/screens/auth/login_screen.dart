@@ -53,7 +53,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _emailController.text,
         _passwordController.text,
       );
-      // Navigation is handled by AuthGate in main.dart
+      if (mounted) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -149,7 +151,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                              padding: const EdgeInsets.symmetric(vertical: 18),
                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                              elevation: 8,
-                             shadowColor: AppColors.primary.withOpacity(0.5),
+                             shadowColor: AppColors.primary.withValues(alpha: 0.5),
                            ),
                            child: Text(_isLoading ? 'Authenticating...' : 'Sign In', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                          ),
@@ -190,9 +192,9 @@ class _CircularGlow extends StatelessWidget {
     return Container(
       width: 300, height: 300,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         shape: BoxShape.circle,
-        boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 100, spreadRadius: 20)],
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 100, spreadRadius: 20)],
       ),
     );
   }
@@ -205,7 +207,7 @@ class _LogoHeader extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), shape: BoxShape.circle, border: Border.all(color: Colors.white12)),
+          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), shape: BoxShape.circle, border: Border.all(color: Colors.white12)),
           child: const Icon(LucideIcons.fingerprint, size: 56, color: AppColors.primary),
         ),
         const SizedBox(height: 24),

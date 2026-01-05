@@ -1,31 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/family_member.dart';
+import '../services/sync_service.dart';
+import '../services/auth_service.dart';
 
-final familyProvider = StateNotifierProvider<FamilyNotifier, List<FamilyMember>>((ref) {
-  return FamilyNotifier();
+final familyProvider = StreamProvider<List<FamilyMember>>((ref) {
+  final user = ref.watch(authStateProvider).asData?.value;
+  if (user == null) {
+     return Stream.value([]);
+  }
+  return ref.watch(syncServiceProvider).watchFamily(user.uid);
 });
-
-class FamilyNotifier extends StateNotifier<List<FamilyMember>> {
-  FamilyNotifier() : super([
-    FamilyMember(
-      id: '1',
-      name: 'Marta Abebe',
-      relationship: 'Spouse',
-      fin: 'FIN-5566-7788',
-    ),
-    FamilyMember(
-      id: '2',
-      name: 'Dawit Abebe',
-      relationship: 'Son',
-      fin: 'FIN-9900-1122',
-    ),
-  ]);
-
-  void addMember(FamilyMember member) {
-    state = [...state, member];
-  }
-
-  void removeMember(String id) {
-    state = state.where((m) => m.id != id).toList();
-  }
-}

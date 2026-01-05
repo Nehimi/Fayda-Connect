@@ -50,7 +50,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       
       if (mounted) {
         setState(() => _isLoading = false);
-        // 3. Navigation is now handled naturally by AuthGate in main.dart
+        // Clear stack to let AuthGate handle the transition to Verification/Home
+        Navigator.popUntil(context, (route) => route.isFirst);
       }
     } catch (e) {
       if (mounted) {
@@ -159,7 +160,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     elevation: 8,
-                    shadowColor: AppColors.primary.withOpacity(0.5),
+                    shadowColor: AppColors.primary.withValues(alpha: 0.5),
                   ),
                   child: _isLoading 
                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
