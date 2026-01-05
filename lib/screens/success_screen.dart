@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/language_provider.dart';
+import '../theme/l10n.dart';
 
-class SuccessScreen extends StatelessWidget {
+class SuccessScreen extends ConsumerWidget {
   final String bankName;
   const SuccessScreen({super.key, required this.bankName});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: Stack(
@@ -44,9 +48,9 @@ class SuccessScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                const Text(
-                  'Order Confirmed!',
-                  style: TextStyle(
+                Text(
+                  L10n.get(lang, 'confirmed'),
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
                     color: AppColors.textMain,
@@ -55,7 +59,9 @@ class SuccessScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Expert assistance for $bankName has been initiated. Our team will contact you shortly.',
+                  lang == AppLanguage.english 
+                    ? 'Expert assistance for $bankName has been initiated. Our team will contact you shortly.'
+                    : 'ለ $bankName የባለሙያ እርዳታ ተጀምሯል። ቡድናችን በቅርቡ ያነጋግርዎታል።',
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 16, color: AppColors.textDim, height: 1.5),
                 ),
@@ -65,14 +71,17 @@ class SuccessScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Next Steps',
-                        style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.textMain, fontSize: 18),
+                      Text(
+                        L10n.get(lang, 'next_steps'),
+                        style: const TextStyle(fontWeight: FontWeight.w900, color: AppColors.textMain, fontSize: 18),
                       ),
                       const SizedBox(height: 20),
-                      _buildStep(LucideIcons.smartphone, 'Keep your phone nearby for OTP verification.'),
-                      _buildStep(LucideIcons.bell, 'Real-time status updates will be sent via SMS.'),
-                      _buildStep(LucideIcons.clock, 'Estimated completion: 15-20 minutes.'),
+                      _buildStep(LucideIcons.smartphone, 
+                        lang == AppLanguage.english ? 'Keep your phone nearby for OTP verification.' : 'ለልዩ የይለፍ ቃል (OTP) ማረጋገጫ ስልክዎን አጠገብዎ ያድርጉ።'),
+                      _buildStep(LucideIcons.bell, 
+                        lang == AppLanguage.english ? 'Real-time status updates will be sent via SMS.' : 'የአሁናዊ የሁኔታ ዝመናዎች በኤስኤምኤስ (SMS) ይላካሉ።'),
+                      _buildStep(LucideIcons.clock, 
+                        lang == AppLanguage.english ? 'Estimated completion: 15-20 minutes.' : 'ግምታዊ የማጠናቀቂያ ጊዜ፡ ከ15-20 ደቂቃዎች።'),
                     ],
                   ),
                 ),
@@ -85,7 +94,7 @@ class SuccessScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   ),
                   onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
-                  child: const Text('Back to Workspace', style: TextStyle(fontWeight: FontWeight.w800)),
+                  child: Text(L10n.get(lang, 'back_workspace'), style: const TextStyle(fontWeight: FontWeight.w800)),
                 ),
               ],
             ),

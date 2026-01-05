@@ -138,22 +138,6 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
       assistanceFee: 50.0,
     ),
     GeneralService(
-      id: 'pub_sim',
-      category: 'Telecom',
-      name: 'SIM Card Re-registration',
-      description: 'Link your Ethio Telecom or Safaricom SIM to Fayda.',
-      logo: 'https://cdn-icons-png.flaticon.com/512/3415/3415077.png',
-      type: ServiceType.online,
-      instructionSteps: [
-        'Dial *804# or visit mobile operator app.',
-        'Enter your 12-digit Fayda FIN.',
-        'Upload a photo of your Fayda card if requested.',
-        'Receive confirmation SMS.'
-      ],
-      requirements: ['Active SIM', 'Fayda ID', '12-digit FIN'],
-      assistanceFee: 20.0,
-    ),
-    GeneralService(
       id: 'pub_vital',
       category: 'Vital Events',
       name: 'Birth Certificate Sync',
@@ -168,6 +152,43 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
       ],
       requirements: ['Physical ID', 'Birth Certificate', 'Woreda Appointment'],
       assistanceFee: 150.0,
+    ),
+    GeneralService(
+      id: 'pub_pension',
+      category: 'Social Security',
+      name: 'Pensioner Verification',
+      description: 'Annual proof-of-life verification for POESSA pensioners.',
+      logo: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+      type: ServiceType.inPerson,
+      instructionSteps: [
+        'Visit the nearest POESSA office or partner bank.',
+        'Bring your Pensioner Book and Fayda ID.',
+        'Scan your fingerprints to verify identity.',
+        'Update your contact information in the system.'
+      ],
+      requirements: ['Pensioner Book', 'Fayda ID', 'Fingerprint Scan'],
+      assistanceFee: 30.0,
+    ),
+  ];
+});
+
+final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
+  return [
+    GeneralService(
+      id: 'tel_sim',
+      category: 'Telecom',
+      name: 'SIM Card Re-registration',
+      description: 'Link your Ethio Telecom or Safaricom SIM to Fayda.',
+      logo: 'https://cdn-icons-png.flaticon.com/512/3415/3415077.png',
+      type: ServiceType.online,
+      instructionSteps: [
+        'Dial *804# or visit mobile operator app.',
+        'Enter your 12-digit Fayda FIN.',
+        'Upload a photo of your Fayda card if requested.',
+        'Receive confirmation SMS.'
+      ],
+      requirements: ['Active SIM', 'Fayda ID', '12-digit FIN'],
+      assistanceFee: 20.0,
     ),
   ];
 });

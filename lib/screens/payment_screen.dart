@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/order_provider.dart';
 import '../models/order_model.dart';
 import 'success_screen.dart';
+import '../providers/language_provider.dart';
+import '../theme/l10n.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
   final String bankName;
@@ -21,10 +23,11 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       appBar: AppBar(
-        title: const Text('Secure Checkout'),
+        title: Text(L10n.get(ref.watch(languageProvider), 'checkout')),
         backgroundColor: Colors.transparent,
       ),
       body: Padding(
@@ -33,14 +36,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            const Text(
-              'Select Method',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.textMain, letterSpacing: -0.5),
+            Text(
+              L10n.get(lang, 'select_method'),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppColors.textMain, letterSpacing: -0.5),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Total Amount: 50.00 ETB',
-              style: TextStyle(color: AppColors.textDim, fontSize: 16),
+            Text(
+              '${L10n.get(lang, 'total_amount')}: 50.00 ETB',
+              style: const TextStyle(color: AppColors.textDim, fontSize: 16),
             ),
             const SizedBox(height: 32),
             _buildPaymentMethod(
@@ -64,13 +67,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 64),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
               onPressed: selectedMethod == null ? null : () {
                 _showPaymentDialog();
               },
-              child: const Text('Proceed to Payment', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+              child: Text(L10n.get(lang, 'proceed_payment'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
             ),
             const SizedBox(height: 48),
           ],
@@ -130,13 +134,13 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Confirm Identity', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.textMain)),
+               Text(L10n.get(ref.watch(languageProvider), 'confirm_identity'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.textMain)),
               const SizedBox(height: 24),
               TextField(
                 controller: _phoneController,
                 style: const TextStyle(color: AppColors.textMain),
                 decoration: InputDecoration(
-                  hintText: 'Enter Phone Number',
+                  hintText: L10n.get(ref.watch(languageProvider), 'enter_phone'),
                   hintStyle: const TextStyle(color: AppColors.textDim),
                   filled: true,
                   fillColor: AppColors.card,
@@ -148,6 +152,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 60),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
@@ -155,7 +160,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                   Navigator.pop(context);
                   _processPayment();
                 },
-                child: const Text('Confirm & Pay Now', style: TextStyle(fontWeight: FontWeight.w800)),
+                child: Text(L10n.get(ref.watch(languageProvider), 'confirm_pay'), style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
             ],
           ),

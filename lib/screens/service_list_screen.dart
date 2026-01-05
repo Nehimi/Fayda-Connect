@@ -4,6 +4,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../models/service_model.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
+import '../widgets/app_drawer.dart';
+import '../providers/language_provider.dart';
+import '../theme/l10n.dart';
 import 'service_detail_screen.dart';
 
 class ServiceListScreen extends ConsumerWidget {
@@ -19,12 +22,20 @@ class ServiceListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final services = ref.watch(serviceProvider);
+    final currentLang = ref.watch(languageProvider);
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
+      drawer: const AppDrawer(),
       appBar: AppBar(
-        title: Text(title),
+        title: Text(_getLocalizedTitle(ref.watch(languageProvider), title)),
         backgroundColor: Colors.transparent,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(LucideIcons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -35,7 +46,7 @@ class ServiceListScreen extends ConsumerWidget {
               borderRadius: 20,
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: 'Search for a service...',
+                  hintText: currentLang == AppLanguage.english ? 'Search for a service...' : 'አገልግሎት ፈልግ...',
                   hintStyle: const TextStyle(color: AppColors.textDim),
                   prefixIcon: const Icon(LucideIcons.search, color: AppColors.textDim, size: 20),
                   border: InputBorder.none,
@@ -109,5 +120,13 @@ class ServiceListScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+  String _getLocalizedTitle(AppLanguage lang, String currentTitle) {
+    if (currentTitle.toLowerCase().contains('passport')) return L10n.get(lang, 'passport');
+    if (currentTitle.toLowerCase().contains('business')) return L10n.get(lang, 'business');
+    if (currentTitle.toLowerCase().contains('education')) return L10n.get(lang, 'education');
+    if (currentTitle.toLowerCase().contains('public')) return L10n.get(lang, 'public');
+    if (currentTitle.toLowerCase().contains('telecom')) return L10n.get(lang, 'telecom');
+    return currentTitle;
   }
 }
