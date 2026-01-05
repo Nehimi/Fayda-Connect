@@ -1,0 +1,14 @@
+Flutter assets will be downloaded from https://storage.flutter-io.cn. Make sure you trust this source!
+Analyzing Fayda-Connect...                                      
+
+   info - Unnecessary use of 'toList' in a spread - lib\screens\bank_detail_screen.dart:109:22 - unnecessary_to_list_in_spreads
+   info - Unnecessary use of 'toList' in a spread - lib\screens\home_screen.dart:153:28 - unnecessary_to_list_in_spreads
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\payment_screen.dart:96:37 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\screens\payment_screen.dart:100:79 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\payment_screen.dart:100:83 - unnecessary_underscores
+   info - Unnecessary use of 'toList' in a spread - lib\screens\service_detail_screen.dart:108:22 - unnecessary_to_list_in_spreads
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\success_screen.dart:25:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\success_screen.dart:37:46 - deprecated_member_use
+warning - Unused import: 'package:lucide_icons/lucide_icons.dart' - lib\widgets\category_card.dart:2:8 - unused_import
+
+9 issues found. (ran in 5.3s)
