@@ -1,0 +1,54 @@
+
+import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import '../theme/colors.dart';
+
+class CustomSnackBar {
+  static void show(BuildContext context, {required String message, bool isError = false}) {
+    ScaffoldMessenger.of(context).clearSnackBars(); // Clear existing
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isError ? AppColors.error.withValues(alpha: 0.2) : AppColors.success.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isError ? LucideIcons.alertCircle : LucideIcons.checkCircle2,
+                color: isError ? AppColors.error : AppColors.success,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.card,
+        elevation: 0,
+         margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: isError ? AppColors.error.withValues(alpha: 0.5) : AppColors.success.withValues(alpha: 0.5),
+            width: 1,
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+}

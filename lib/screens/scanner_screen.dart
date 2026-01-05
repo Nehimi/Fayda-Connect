@@ -7,11 +7,43 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 
-class ScannerScreen extends ConsumerWidget {
+import 'scanner_result_screen.dart';
+import 'dart:async';
+
+class ScannerScreen extends ConsumerStatefulWidget {
   const ScannerScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ScannerScreen> createState() => _ScannerScreenState();
+}
+
+class _ScannerScreenState extends ConsumerState<ScannerScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Simulate scan after 3 seconds
+    Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ScannerResultScreen(
+              scannedData: {
+                'Full Name': 'Abenezer Kebede',
+                'Fayda ID': 'FIN-1234-5678',
+                'Date of Birth': '12 Oct 1990',
+                'Nationality': 'Ethiopian',
+                'Expiry Date': '01 Jan 2030',
+              },
+            ),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final lang = ref.watch(languageProvider);
     return Scaffold(
       backgroundColor: AppColors.scaffold,

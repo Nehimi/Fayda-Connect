@@ -12,12 +12,15 @@ import '../widgets/category_card.dart';
 import '../widgets/glass_card.dart';
 import 'bank_list_screen.dart';
 import 'service_list_screen.dart';
+import 'reminders_list_screen.dart';
 import '../providers/service_provider.dart';
 import '../providers/order_provider.dart';
+import '../models/order_model.dart';
 import '../providers/language_provider.dart';
 import '../providers/reminder_provider.dart';
 import 'bank_comparison_screen.dart';
 import 'scanner_screen.dart';
+import '../widgets/custom_snackbar.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -125,55 +128,6 @@ class HomeScreen extends ConsumerWidget {
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                if (activeOrders.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Active Requests',
-                          style: TextStyle(color: AppColors.textMain, fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 16),
-                        ...activeOrders.map((order) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: GlassCard(
-                            padding: const EdgeInsets.all(16),
-                            borderColor: AppColors.primary.withValues(alpha: 0.3),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(LucideIcons.clock, color: AppColors.primary, size: 20),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(order.serviceName, style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold)),
-                                      Text(order.statusLabel, style: TextStyle(color: AppColors.primary.withValues(alpha: 0.8), fontSize: 12)),
-                                    ],
-                                  ),
-                                ),
-                                Text(
-                                  DateFormat('HH:mm').format(order.orderDate),
-                                  style: const TextStyle(color: AppColors.textDim, fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )).toList(),
-                      ],
-                    ),
-                  ),
-                ),
               
               SliverToBoxAdapter(
                 child: Padding(
@@ -294,12 +248,22 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          L10n.get(currentLang, 'alerts'),
-                          style: const TextStyle(color: AppColors.textMain, fontSize: 18, fontWeight: FontWeight.bold),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              L10n.get(currentLang, 'alerts'),
+                              style: const TextStyle(color: AppColors.textMain, fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RemindersListScreen())),
+                              child: Text(currentLang == AppLanguage.english ? 'View All' : 'ሁሉንም አስስ', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                            ),
+                          ],
                         ),
+                        
                         const SizedBox(height: 16),
-                        ...reminders.map((reminder) => Padding(
+                        ...reminders.reversed.take(2).map((reminder) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: GlassCard(
                             padding: const EdgeInsets.all(20),
@@ -479,14 +443,7 @@ class _LanguageToggle extends ConsumerWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       onSelected: (AppLanguage lang) {
         ref.read(languageProvider.notifier).state = lang;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Language changed to ${lang.name}'),
-            duration: const Duration(seconds: 1),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: AppColors.primary,
-          ),
-        );
+        CustomSnackBar.show(context, message: 'Language changed to ${lang.name}');
       },
       itemBuilder: (context) => AppLanguage.values.map((lang) {
         return PopupMenuItem(
@@ -594,6 +551,35 @@ class _BlurBlob extends StatelessWidget {
             colors: [color, color.withValues(alpha: 0)],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _StatusIndicator extends StatelessWidget {
+  final OrderStatus status;
+  const _StatusIndicator({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    Color color = Colors.grey;
+    switch (status) {
+      case OrderStatus.pending: color = Colors.orange; break;
+      case OrderStatus.processing: color = Colors.blue; break;
+      case OrderStatus.completed: color = Colors.green; break;
+      case OrderStatus.actionRequired: color = Colors.red; break;
+    }
+
+    return Container(
+      width: 12,
+      height: 12,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 4, spreadRadius: 1),
+        ],
+        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
       ),
     );
   }
