@@ -15,16 +15,9 @@ class HelpSupportScreen extends ConsumerWidget {
     final lang = ref.watch(languageProvider);
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text(L10n.get(lang, 'help')),
         backgroundColor: Colors.transparent,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(LucideIcons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),

@@ -8,6 +8,7 @@ class GlassCard extends StatelessWidget {
   final EdgeInsets padding;
   final Color? borderColor;
   final List<Color>? gradientColors;
+  final double? width;
 
   const GlassCard({
     super.key,
@@ -16,6 +17,7 @@ class GlassCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(20),
     this.borderColor,
     this.gradientColors,
+    this.width,
   });
 
   @override
@@ -25,6 +27,7 @@ class GlassCard extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
+          width: width,
           padding: padding,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(borderRadius),

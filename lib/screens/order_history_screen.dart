@@ -16,16 +16,9 @@ class OrderHistoryScreen extends ConsumerWidget {
     final lang = ref.watch(languageProvider);
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text(L10n.get(lang, 'history')),
         backgroundColor: Colors.transparent,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(LucideIcons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(24),
