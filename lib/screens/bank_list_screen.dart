@@ -5,6 +5,9 @@ import '../providers/bank_provider.dart';
 import '../models/bank_model.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
+import '../widgets/app_drawer.dart';
+import '../providers/language_provider.dart';
+import '../theme/l10n.dart';
 import 'bank_detail_screen.dart';
 
 class BankListScreen extends ConsumerWidget {
@@ -16,9 +19,16 @@ class BankListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
+      drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Partner Banks'),
+        title: Text(L10n.get(ref.watch(languageProvider), 'banking')),
         backgroundColor: Colors.transparent,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(LucideIcons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
       ),
       body: Stack(
         children: [

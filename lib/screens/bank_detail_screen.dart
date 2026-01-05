@@ -5,13 +5,16 @@ import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'payment_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/language_provider.dart';
+import '../theme/l10n.dart';
 
-class BankDetailScreen extends StatelessWidget {
+class BankDetailScreen extends ConsumerWidget {
   final BankService bank;
 
   const BankDetailScreen({super.key, required this.bank});
 
-  Future<void> _launchUrl() async {
+  Future<void> _launchUrl(BankService bank) async {
     if (bank.officialLink == null) return;
     final Uri url = Uri.parse(bank.officialLink!);
     if (!await launchUrl(url)) {
@@ -20,7 +23,8 @@ class BankDetailScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: CustomScrollView(
@@ -92,7 +96,9 @@ class BankDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Sync your Fayda ID with ${bank.name}',
+                              lang == AppLanguage.english 
+                                ? 'Sync your Fayda ID with ${bank.name}'
+                                : '${bank.name}ን ከፋይዳ መታወቂያዎ ጋር ያገናኙ',
                               style: const TextStyle(color: AppColors.textDim, fontSize: 14),
                             ),
                           ],
@@ -101,28 +107,29 @@ class BankDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 32),
-                  const _SectionHeader(title: 'What you need'),
+                  _SectionHeader(title: L10n.get(lang, 'what_need')),
                   const SizedBox(height: 16),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
-                    children: bank.requirements.map((req) => _PremiumChip(label: req)).toList(),
+                    children: bank.requirements.map((req) => _PremiumChip(label: L10n.getLocalized(lang, req))).toList(),
                   ),
                   const SizedBox(height: 40),
-                  const _SectionHeader(title: 'Steps to Complete'),
+                  _SectionHeader(title: L10n.get(lang, 'steps')),
                   const SizedBox(height: 24),
                   ...bank.instructionSteps.asMap().entries.map((entry) {
-                    return _StepItem(index: entry.key, title: entry.value, isLast: entry.key == bank.instructionSteps.length - 1);
+                    return _StepItem(index: entry.key, title: L10n.getLocalized(lang, entry.value), isLast: entry.key == bank.instructionSteps.length - 1);
                   }).toList(),
                   const SizedBox(height: 48),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 64),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     ),
-                    onPressed: _launchUrl,
-                    child: const Text('Start Official Sync', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+                    onPressed: () => _launchUrl(bank),
+                    child: Text(L10n.get(lang, 'start_sync'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
                   ),
                   const SizedBox(height: 24),
                   GlassCard(
@@ -136,13 +143,13 @@ class BankDetailScreen extends StatelessWidget {
                       children: [
                         const Icon(LucideIcons.sparkles, color: AppColors.accent, size: 32),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Skip the Queue',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
+                        Text(
+                          L10n.get(lang, 'skip_queue'),
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'We can handle the entire verification for you. Fast, secure, and error-free.',
+                          L10n.get(lang, 'skip_desc'),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
                         ),
@@ -157,7 +164,11 @@ class BankDetailScreen extends StatelessWidget {
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen(bankName: bank.name)));
                           },
-                          child: const Text('Get Priority Service (50 ETB)', style: TextStyle(fontWeight: FontWeight.w800)),
+                          child: Text(
+                            lang == AppLanguage.english 
+                              ? 'Get Priority Service (50 ETB)' 
+                              : 'ቅድሚያ አገልግሎት ያግኙ (50 ብር)', 
+                            style: const TextStyle(fontWeight: FontWeight.w800)),
                         ),
                       ],
                     ),

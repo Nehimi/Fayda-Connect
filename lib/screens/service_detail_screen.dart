@@ -5,13 +5,16 @@ import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'payment_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/language_provider.dart';
+import '../theme/l10n.dart';
 
-class ServiceDetailScreen extends StatelessWidget {
+class ServiceDetailScreen extends ConsumerWidget {
   final GeneralService service;
 
   const ServiceDetailScreen({super.key, required this.service});
 
-  Future<void> _launchUrl() async {
+  Future<void> _launchUrl(GeneralService service) async {
     if (service.officialLink == null) return;
     final Uri url = Uri.parse(service.officialLink!);
     if (!await launchUrl(url)) {
@@ -20,7 +23,8 @@ class ServiceDetailScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: CustomScrollView(
@@ -89,20 +93,20 @@ class ServiceDetailScreen extends StatelessWidget {
                     style: const TextStyle(color: AppColors.textDim, fontSize: 16, height: 1.4),
                   ),
                   const SizedBox(height: 32),
-                  const _SectionHeader(title: 'What you need'),
+                  _SectionHeader(title: L10n.get(lang, 'what_need')),
                   const SizedBox(height: 16),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
-                    children: service.requirements.map((req) => _PremiumChip(label: req)).toList(),
+                    children: service.requirements.map((req) => _PremiumChip(label: L10n.getLocalized(lang, req))).toList(),
                   ),
                   const SizedBox(height: 40),
-                  const _SectionHeader(title: 'Process Guide'),
+                  _SectionHeader(title: lang == AppLanguage.english ? 'Process Guide' : 'የሂደት መመሪያ'),
                   const SizedBox(height: 24),
                   ...service.instructionSteps.asMap().entries.map((entry) {
                     return _StepItem(
                       index: entry.key,
-                      title: entry.value,
+                      title: L10n.getLocalized(lang, entry.value),
                       isLast: entry.key == service.instructionSteps.length - 1,
                     );
                   }).toList(),
@@ -111,14 +115,19 @@ class ServiceDetailScreen extends StatelessWidget {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
                         minimumSize: const Size(double.infinity, 64),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       ),
-                      onPressed: _launchUrl,
-                      child: Text('Visit Official ${service.category} Site', style: const TextStyle(fontWeight: FontWeight.w800)),
+                      onPressed: () => _launchUrl(service),
+                      child: Text(
+                        lang == AppLanguage.english 
+                          ? 'Visit Official ${service.category} Site' 
+                          : 'ይፋዊ የ${service.category} ድረ-ገጽ ይጎብኙ', 
+                        style: const TextStyle(fontWeight: FontWeight.w800)),
                     ),
                   const SizedBox(height: 24),
-                  _buildAssistanceCard(context),
+                  _buildAssistanceCard(context, lang),
                   const SizedBox(height: 60),
                 ],
               ),
@@ -129,7 +138,7 @@ class ServiceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAssistanceCard(BuildContext context) {
+  Widget _buildAssistanceCard(BuildContext context, AppLanguage lang) {
     return GlassCard(
       padding: const EdgeInsets.all(28),
       gradientColors: [
@@ -141,13 +150,15 @@ class ServiceDetailScreen extends StatelessWidget {
         children: [
           const Icon(LucideIcons.sparkles, color: AppColors.accent, size: 32),
           const SizedBox(height: 16),
-          const Text(
-            'Need Expert Help?',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
+          Text(
+            lang == AppLanguage.english ? 'Need Expert Help?' : 'የባለሙያ እርዳታ ይፈልጋሉ?',
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
           ),
           const SizedBox(height: 8),
           Text(
-            'Our certified experts can handle this entire application securely for you.',
+            lang == AppLanguage.english 
+              ? 'Our certified experts can handle this entire application securely for you.'
+              : 'የእኛ የተረጋገጡ ባለሙያዎች ይህንን አጠቃላይ ማመልከቻ ለእርስዎ ደህንነቱ በተጠበቀ ሁኔታ ማስተናገድ ይችላሉ።',
             textAlign: TextAlign.center,
             style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
           ),
@@ -165,7 +176,11 @@ class ServiceDetailScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => PaymentScreen(bankName: service.name)),
               );
             },
-            child: Text('Pay ${service.assistanceFee.toStringAsFixed(0)} ETB & Start Now', style: const TextStyle(fontWeight: FontWeight.w800)),
+            child: Text(
+              lang == AppLanguage.english 
+                ? 'Pay ${service.assistanceFee.toStringAsFixed(0)} ETB & Start Now' 
+                : '${service.assistanceFee.toStringAsFixed(0)} ብር ይክፈሉ እና አሁኑኑ ይጀምሩ', 
+              style: const TextStyle(fontWeight: FontWeight.w800)),
           ),
         ],
       ),
