@@ -21,6 +21,9 @@ import '../providers/reminder_provider.dart';
 import 'bank_comparison_screen.dart';
 import 'scanner_screen.dart';
 import '../widgets/custom_snackbar.dart';
+import '../services/auth_service.dart';
+import 'auth/login_screen.dart';
+import '../providers/auth_ui_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -30,41 +33,48 @@ class HomeScreen extends ConsumerWidget {
     final activeOrders = ref.watch(ordersProvider);
     final currentLang = ref.watch(languageProvider);
     final reminders = ref.watch(remindersProvider);
+    final userAsync = ref.watch(authStateProvider);
     
     final categories = [
       ServiceCategory(
-        title: 'Banking',
-        description: 'Link Fayda to your accounts',
+        id: 'banking',
+        title: L10n.get(currentLang, 'banking'),
+        description: L10n.get(currentLang, 'desc_banking'),
         icon: LucideIcons.landmark,
         color: const Color(0xFF6366F1),
       ),
       ServiceCategory(
-        title: 'Passport',
-        description: 'New app & Expire renewal',
+        id: 'passport',
+        title: L10n.get(currentLang, 'passport'),
+        description: L10n.get(currentLang, 'desc_passport'),
         icon: LucideIcons.contact,
         color: const Color(0xFF10B981),
       ),
       ServiceCategory(
-        title: 'Business',
-        description: 'TIN & Trade licensing',
+        id: 'business',
+        title: L10n.get(currentLang, 'business'),
+        description: L10n.get(currentLang, 'desc_business'),
         icon: LucideIcons.briefcase,
         color: const Color(0xFFF59E0B),
       ),
       ServiceCategory(
-        title: 'Education',
-        description: 'Exam & University link',
+        id: 'education',
+        title: L10n.get(currentLang, 'education'),
+        description: L10n.get(currentLang, 'desc_education'),
         icon: LucideIcons.graduationCap,
         color: const Color(0xFFEC4899),
       ),
       ServiceCategory(
-        title: 'Public',
-        description: 'Gov & Legal paperwork',
+        id: 'public',
+        title: L10n.get(currentLang, 'public'),
+        description: L10n.get(currentLang, 'desc_public'),
         icon: LucideIcons.shieldCheck,
         color: const Color(0xFF06B6D4),
       ),
       ServiceCategory(
-        title: 'Telecom',
-        description: 'SIM Card registration',
+        id: 'telecom',
+        title: L10n.get(currentLang, 'telecom'),
+        description: L10n.get(currentLang, 'desc_telecom'),
         icon: LucideIcons.smartphone,
         color: const Color(0xFF8B5CF6),
       ),
@@ -87,14 +97,20 @@ class HomeScreen extends ConsumerWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          _getGreeting(currentLang),
-                          style: const TextStyle(
-                            color: AppColors.textDim,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                          userAsync.when(
+                            data: (user) => Text(
+                              user != null 
+                                ? '${_getGreetingPrefix(currentLang)}, ${user.displayName ?? 'User'}'
+                                : _getGreetingPrefix(currentLang),
+                              style: const TextStyle(
+                                color: AppColors.textDim,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            loading: () => const Text('Loading...', style: TextStyle(color: AppColors.textDim, fontSize: 14)),
+                            error: (_, __) => Text(_getGreetingPrefix(currentLang), style: const TextStyle(color: AppColors.textDim, fontSize: 14)),
                           ),
-                        ),
                         const SizedBox(height: 4),
                         Text(
                           _getAppName(currentLang),
@@ -129,9 +145,10 @@ class HomeScreen extends ConsumerWidget {
               physics: const BouncingScrollPhysics(),
               slivers: [
               
+
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                   child: InkWell(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen())),
                     child: GlassCard(
@@ -380,27 +397,27 @@ class HomeScreen extends ConsumerWidget {
 }
 
   void _handleNavigation(BuildContext context, ServiceCategory category) {
-    if (category.title == 'Banking') {
+    if (category.id == 'banking') {
       Navigator.push(context, MaterialPageRoute(builder: (context) => const BankListScreen()));
-    } else if (category.title == 'Passport') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: 'Passports', serviceProvider: passportServiceProvider)));
-    } else if (category.title == 'Business') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: 'Business', serviceProvider: businessServiceProvider)));
-    } else if (category.title == 'Education') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: 'Education', serviceProvider: educationServiceProvider)));
-    } else if (category.title == 'Public') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: 'Public Services', serviceProvider: publicServiceServiceProvider)));
-    } else if (category.title == 'Telecom') {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: 'Telecom Services', serviceProvider: telecomServiceProvider)));
+    } else if (category.id == 'passport') {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: category.title, serviceProvider: passportServiceProvider)));
+    } else if (category.id == 'business') {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: category.title, serviceProvider: businessServiceProvider)));
+    } else if (category.id == 'education') {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: category.title, serviceProvider: educationServiceProvider)));
+    } else if (category.id == 'public') {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: category.title, serviceProvider: publicServiceServiceProvider)));
+    } else if (category.id == 'telecom') {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ServiceListScreen(title: category.title, serviceProvider: telecomServiceProvider)));
     }
   }
 
-  String _getGreeting(AppLanguage lang) {
+  String _getGreetingPrefix(AppLanguage lang) {
     switch (lang) {
-      case AppLanguage.amharic: return 'ሰላም፣ ተጠቃሚ';
-      case AppLanguage.oromiffa: return 'Akkam, Fayyadamaa';
-      case AppLanguage.tigrigna: return 'ሰላም፣ ተጠቃሚ';
-      default: return 'Hello, User';
+      case AppLanguage.amharic: return 'ሰላም';
+      case AppLanguage.oromiffa: return 'Akkam';
+      case AppLanguage.tigrigna: return 'ሰላም';
+      default: return 'Hello';
     }
   }
 
@@ -582,5 +599,42 @@ class _StatusIndicator extends StatelessWidget {
         border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
       ),
     );
+  }
+}
+
+class _IdentityPlaceholder extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return InkWell(
+      onTap: () => ref.read(showLoginProvider.notifier).state = true,
+      child: GlassCard(
+      borderColor: Colors.orange.withOpacity(0.3),
+      gradientColors: [
+        Colors.orange.withOpacity(0.1),
+        Colors.orange.withOpacity(0.05),
+      ],
+      child: const Row(
+        children: [
+          Icon(LucideIcons.alertTriangle, color: Colors.orange),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Identity Not Linked',
+                  style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Text(
+                  'Connect your Fayda ID to unlock all services.',
+                  style: TextStyle(color: AppColors.textDim, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          Icon(LucideIcons.arrowRight, color: Colors.orange, size: 20),
+        ],
+      ),
+    ));
   }
 }

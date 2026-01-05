@@ -4,8 +4,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/colors.dart';
 
 class CustomSnackBar {
-  static void show(BuildContext context, {required String message, bool isError = false}) {
+  static void show(BuildContext context, {required String message, bool isError = false, Color? color}) {
     ScaffoldMessenger.of(context).clearSnackBars(); // Clear existing
+    
+    final accentColor = color ?? (isError ? AppColors.error : AppColors.success);
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -13,12 +16,12 @@ class CustomSnackBar {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isError ? AppColors.error.withValues(alpha: 0.2) : AppColors.success.withValues(alpha: 0.2),
+                color: accentColor.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 isError ? LucideIcons.alertCircle : LucideIcons.checkCircle2,
-                color: isError ? AppColors.error : AppColors.success,
+                color: accentColor,
                 size: 20,
               ),
             ),
@@ -38,11 +41,11 @@ class CustomSnackBar {
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.card,
         elevation: 0,
-         margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: isError ? AppColors.error.withValues(alpha: 0.5) : AppColors.success.withValues(alpha: 0.5),
+            color: accentColor.withValues(alpha: 0.5),
             width: 1,
           ),
         ),

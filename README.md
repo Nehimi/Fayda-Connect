@@ -70,7 +70,7 @@ lib/
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/YourUsername/Fayda-Connect.git
+    git clone https://github.com/Nehimi/Fayda-Connect.git
     ```
 
 2.  **Install dependencies**
@@ -118,3 +118,63 @@ To bridge the gap between National ID (Fayda) issuance and practical utility acr
 
 ## 📄 License
 This project is proprietary.
+
+📄 Fayda-Connect: Revised Project Documentation (2026 Strategy)
+1. Project Overview
+Fayda-Connect iyetebale yemitekawekew yih app, be Ethiopia yefayda (National ID) agelglot ena be bankoch, be immigration ena be education mehal yalewun kefitet lemedfegn yetezegaje digital assistant new::
+
+2. Core Vision & Objectives
+Simplicity: "Grandmother-level" liron yemichil kelal aserrar::
+
+Security: Be biometric (ashara) yetetebeke yegel dehennet::
+
+Efficiency: Be camera (OCR) berekettalu mereja memulat::
+
+Accessibility: Offline misrat ena be hager wist kuankuwoch tederash mehon::
+
+3. Key Features (Yetekatitu Hasaboch)
+A. Smart Interaction & AI
+OCR-Quick Fill (Offline): Be camera yefayda kutrnin ena yebank accountn scan adrgo rasu yemimula (100% free & offline)::
+
+AI Photo Validator: Le passport ena le fayda yemihonun photo tirat be AI check yemiyadrg::
+
+Voice Instructions: Be Amharigna ena be Oromigna demts yemitasagezu memeriyawoch::
+
+B. Security & Privacy
+Biometric Lock: Appu siyekeft be ashara weyim be fit mewecha yemikutleper (Offline)::
+
+Digital Document Vault: ID, Passport ena luloch senedochin be encrypted melk appu wist mekazen::
+
+Emergency QR-Code: Slik sayekeft le accident gize yemihon yemeleyiya QR code::
+
+C. Services & Utilities
+Bank & Immigration Connect: Fayda IDn ke bank account gar mayayez (Be 50 birr agelglot):: Deadline: March 2026::
+
+Status Tracker: Yepassport ena yefayda id dersetual weyim aldershum yemilutin meketatila::
+
+Family Profile Management: Be and app wist yebeteseebn mereja mekazen::
+
+D. Business & Growth
+Agent Mode: Wotatoch lelochin bememezgep commission yemiyagenyubet aserrar (Multi-level growth)::
+
+Referral System: Sewu liyagabizu ye mobile card shilmat yemiyagenyubet::
+
+Telegram Bot Integration: Appun lemayichilu sewu be bot tomisay agelglot meshet::
+
+4. Tech Stack (Technical Side)
+Frontend: Flutter (Dart) - Cross-platform::
+
+Backend: Firebase (Firestore, Cloud Functions, Auth)::
+
+AI Engine: Google ML Kit (Text Recognition & Face Detection)::
+
+Storage: Hive weyim SQLite (Offline secure storage)::
+
+Payment: Chapa / Telebirr Integration::
+
+5. Revenue Model (Gebi Megniya)
+Service Fee: Le and mizuun weyim mayayez 50 birr mekpeel::
+
+Commission: Ke Agent-based regestration yemigeny terf::
+
+Ads: Google AdMob (Tebekamiw siyibez)::

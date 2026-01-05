@@ -1,57 +1,107 @@
-
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../theme/colors.dart';
 import '../../widgets/glass_card.dart';
 import '../home_screen.dart';
 import '../../widgets/custom_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/user_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/sync_service.dart';
 
 class OtpVerificationScreen extends ConsumerStatefulWidget {
   final String phoneNumber;
+  final String verificationId;
   final bool isSignUp;
   final String? name;
+  final String? email;
+  final String? password;
 
-  const OtpVerificationScreen({super.key, required this.phoneNumber, this.isSignUp = false, this.name});
+  const OtpVerificationScreen({
+    super.key, 
+    required this.phoneNumber, 
+    required this.verificationId,
+    this.isSignUp = false, 
+    this.name,
+    this.email,
+    this.password,
+  });
 
   @override
   ConsumerState<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
+
 class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
-  final List<TextEditingController> _controllers = List.generate(4, (index) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
+  bool _isVerifying = false;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Auto-check status every 2 seconds for a snappier experience
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      _checkVerificationStatus();
+    });
+  }
 
   @override
   void dispose() {
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
+    _timer?.cancel();
     super.dispose();
   }
 
-  void _verifyOtp() {
-    String otp = _controllers.map((c) => c.text).join();
-    if (otp.length == 4) {
-      // Simulate verification
+  void _checkVerificationStatus() async {
+    final authService = ref.read(authServiceProvider);
+    
+    // UI Feedback for manual click
+    if (mounted) setState(() => _isVerifying = true);
+
+    try {
+      await authService.reloadUser();
+      final user = authService.currentUser;
+      
+      debugPrint("Checking verification for: ${user?.email}");
+      debugPrint("Status code: ${user?.emailVerified}");
+
+      if (user != null && user.emailVerified) {
+        _timer?.cancel();
+      
       if (widget.isSignUp && widget.name != null) {
-          // Update user name in provider if signing up (mock)
-          // Ideally we'd call an API here
+        // Sync to Firestore once verified
+        await ref.read(syncServiceProvider).createUserProfile(
+          user.uid, 
+          widget.name!, 
+          widget.email!
+        );
       }
-      
-      CustomSnackBar.show(context, message: 'Verification Successful!');
-      
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-        (route) => false,
-      );
-    } else {
-       CustomSnackBar.show(context, message: 'Please enter a valid 4-digit code', isError: true);
+
+        if (mounted) {
+          CustomSnackBar.show(context, message: 'Email Verified Successfully!');
+        }
+      } else {
+        if (_isVerifying && mounted) {
+           CustomSnackBar.show(context, message: 'Still waiting for verification... Make sure you clicked the link.', isError: true);
+        }
+      }
+    } catch (e) {
+      debugPrint("Verification Check Error: $e");
+    } finally {
+      if (mounted) setState(() => _isVerifying = false);
+    }
+  }
+
+  void _handleResendEmail() async {
+    try {
+      await ref.read(authServiceProvider).sendEmailVerification();
+      if (mounted) {
+        CustomSnackBar.show(context, message: 'Verification link resent!');
+      }
+    } catch (e) {
+      if (mounted) {
+        CustomSnackBar.show(context, message: 'Error resending: $e', isError: true);
+      }
     }
   }
 
@@ -73,10 +123,18 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-               const Icon(LucideIcons.messageSquare, size: 48, color: AppColors.primary),
-               const SizedBox(height: 24),
+               const SizedBox(height: 20),
+               Container(
+                 padding: const EdgeInsets.all(24),
+                 decoration: BoxDecoration(
+                   color: AppColors.primary.withOpacity(0.1),
+                   shape: BoxShape.circle,
+                 ),
+                 child: const Icon(LucideIcons.mail, size: 64, color: AppColors.primary),
+               ),
+               const SizedBox(height: 32),
                const Text(
-                 'Verification Code',
+                 'Verify Your Email',
                  style: TextStyle(
                    fontSize: 28,
                    fontWeight: FontWeight.w900,
@@ -84,59 +142,48 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                    letterSpacing: -1,
                  ),
                ),
-               const SizedBox(height: 8),
-               Text(
-                 'We sent a 4-digit code to ${widget.phoneNumber}',
+               const SizedBox(height: 16),
+               RichText(
                  textAlign: TextAlign.center,
-                 style: const TextStyle(color: AppColors.textDim, fontSize: 16),
+                 text: TextSpan(
+                   style: const TextStyle(color: AppColors.textDim, fontSize: 16, height: 1.5),
+                   children: [
+                     const TextSpan(text: 'We have sent a verification link to\n'),
+                     TextSpan(
+                       text: widget.phoneNumber,
+                       style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold),
+                     ),
+                     const TextSpan(text: '.\nPlease check your inbox and click the link to continue.'),
+                   ],
+                 ),
                ),
                
                const SizedBox(height: 48),
-               
-               // OTP Input
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                 children: List.generate(4, (index) {
-                   return SizedBox(
-                     width: 60,
-                     height: 70,
-                     child: GlassCard(
-                        padding: EdgeInsets.zero,
-                        borderRadius: 12,
-                        child: Center(
-                          child: TextField(
-                            controller: _controllers[index],
-                            focusNode: _focusNodes[index],
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textMain),
-                            maxLength: 1,
-                            decoration: const InputDecoration(
-                              counterText: '',
-                              border: InputBorder.none,
-                            ),
-                            onChanged: (value) {
-                              if (value.isNotEmpty && index < 3) {
-                                _focusNodes[index + 1].requestFocus();
-                              } else if (value.isEmpty && index > 0) {
-                                _focusNodes[index - 1].requestFocus();
-                              }
-                              
-                              if (index == 3 && value.isNotEmpty) {
-                                _verifyOtp();
-                              }
-                            },
-                          ),
-                        ),
+
+               GlassCard(
+                 padding: const EdgeInsets.all(20),
+                 child: Row(
+                   children: [
+                     const SizedBox(
+                       width: 20,
+                       height: 20,
+                       child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
                      ),
-                   );
-                 }),
+                     const SizedBox(width: 16),
+                     const Expanded(
+                       child: Text(
+                         'Waiting for verification...',
+                         style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.w600),
+                       ),
+                     ),
+                   ],
+                 ),
                ),
                
-               const SizedBox(height: 40),
+               const SizedBox(height: 32),
                
                ElevatedButton(
-                 onPressed: _verifyOtp,
+                 onPressed: _checkVerificationStatus,
                  style: ElevatedButton.styleFrom(
                    backgroundColor: AppColors.primary,
                    foregroundColor: Colors.white,
@@ -145,16 +192,23 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                    elevation: 8,
                    shadowColor: AppColors.primary.withOpacity(0.5),
                  ),
-                 child: const Text('Verify', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                 child: const Text('I Have Verified', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                ),
                
                const Spacer(),
                
+               Text(
+                 "Didn't receive the email?",
+                 style: TextStyle(color: AppColors.textDim.withOpacity(0.7)),
+               ),
                TextButton(
-                 onPressed: () {
-                    CustomSnackBar.show(context, message: 'New code sent!');
-                 },
-                 child: const Text("Didn't receive code? Resend", style: TextStyle(color: AppColors.textDim)),
+                 onPressed: _handleResendEmail,
+                 child: const Text("Resend Verification Link", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+               ),
+               const SizedBox(height: 8),
+               TextButton(
+                 onPressed: () => ref.read(authServiceProvider).signOut(),
+                 child: Text("Cancel & Sign Out", style: TextStyle(color: Colors.redAccent.withOpacity(0.8))),
                ),
                const SizedBox(height: 16),
             ],
