@@ -16,6 +16,8 @@ import '../providers/service_provider.dart';
 import '../providers/order_provider.dart';
 import '../providers/language_provider.dart';
 import '../providers/reminder_provider.dart';
+import 'bank_comparison_screen.dart';
+import 'scanner_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -67,70 +69,68 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      body: Stack(
+      body: Column(
         children: [
-          // Background mesh gradient blobs
-          Positioned(
-            top: -100,
-            right: -100,
-            child: _BlurBlob(color: AppColors.primary.withValues(alpha: 0.15), size: 400),
-          ),
-          Positioned(
-            bottom: -50,
-            left: -100,
-            child: _BlurBlob(color: AppColors.secondary.withValues(alpha: 0.1), size: 300),
+          // Fixed Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 60, 24, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    _MenuButton(),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _getGreeting(currentLang),
+                          style: const TextStyle(
+                            color: AppColors.textDim,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _getAppName(currentLang),
+                          style: const TextStyle(
+                            color: AppColors.textMain,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(LucideIcons.scanLine, color: AppColors.primary, size: 28),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ScannerScreen())),
+                    ),
+                    const SizedBox(width: 8),
+                    _LanguageToggle(),
+                  ],
+                ),
+              ],
+            ),
           ),
           
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 70, 24, 32),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          _MenuButton(),
-                          const SizedBox(width: 16),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                               Text(
-                                 _getGreeting(currentLang),
-                                 style: const TextStyle(
-                                   color: AppColors.textDim,
-                                   fontSize: 14,
-                                   fontWeight: FontWeight.w500,
-                                 ),
-                               ),
-                               const SizedBox(height: 4),
-                               Text(
-                                 _getAppName(currentLang),
-                                 style: const TextStyle(
-                                   color: AppColors.textMain,
-                                   fontSize: 28,
-                                   fontWeight: FontWeight.w900,
-                                   letterSpacing: -1,
-                                 ),
-                               ),
-                             ],
-                          ),
-                        ],
-                      ),
-                      _LanguageToggle(),
-                    ],
-                  ),
-                ),
-              ),
-
-              if (activeOrders.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          // Scrolling Content
+          Expanded(
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                if (activeOrders.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Active Requests',
@@ -236,17 +236,26 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SliverToBoxAdapter(
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(24, 40, 24, 0),
-                  child: Text(
-                    'Partner Benefits',
-                    style: TextStyle(
-                      color: AppColors.textMain,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
+                  padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Partner Benefits',
+                        style: TextStyle(
+                          color: AppColors.textMain,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
+                        child: const Text('View All', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -254,7 +263,8 @@ class HomeScreen extends ConsumerWidget {
               SliverToBoxAdapter(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.all(24),
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: Row(
                     children: [
                       _PartnerCard(
@@ -262,6 +272,7 @@ class HomeScreen extends ConsumerWidget {
                         desc: 'Get 5% Cashback on linking.',
                         color: const Color(0xFFF59E0B),
                         icon: LucideIcons.percent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
                       ),
                       const SizedBox(width: 16),
                       _PartnerCard(
@@ -269,6 +280,7 @@ class HomeScreen extends ConsumerWidget {
                         desc: 'Apply with Fayda ID today.',
                         color: const Color(0xFF6366F1),
                         icon: LucideIcons.trendingDown,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
                       ),
                     ],
                   ),
@@ -396,119 +408,12 @@ class HomeScreen extends ConsumerWidget {
               ),
             ],
           ),
-        ],
-      ),
-      drawer: const AppDrawer(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Container(
-        height: 64,
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            padding: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          ),
-          onPressed: () => _showScanDialog(context),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: AppColors.meshGradient,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.4),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(LucideIcons.scanLine, color: Colors.white, size: 24),
-                  const SizedBox(width: 12),
-                  Text(
-                    L10n.get(currentLang, 'scan_id'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
-      ),
-    );
-  }
-
-  void _showScanDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Consumer(
-        builder: (context, ref, child) {
-          final lang = ref.watch(languageProvider);
-          return GlassCard(
-            padding: const EdgeInsets.all(32),
-            borderRadius: 30,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.textDim.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(LucideIcons.scanLine, color: AppColors.primary, size: 48),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  L10n.get(lang, 'ready_scan'),
-                  style: const TextStyle(color: AppColors.textMain, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.5),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Point your camera at the Fayda QR code or FIN card to extract details automatically.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.textDim, fontSize: 16, height: 1.5),
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    minimumSize: const Size(double.infinity, 64),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(L10n.get(lang, 'access_camera'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+      ],
+    ),
+    drawer: const AppDrawer(),
+  );
+}
 
   void _handleNavigation(BuildContext context, ServiceCategory category) {
     if (category.title == 'Banking') {
@@ -632,32 +537,37 @@ class _PartnerCard extends StatelessWidget {
   final String desc;
   final Color color;
   final IconData icon;
+  final VoidCallback onTap;
 
-  const _PartnerCard({required this.title, required this.desc, required this.color, required this.icon});
+  const _PartnerCard({required this.title, required this.desc, required this.color, required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 260,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.2), shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 18),
-          ),
-          const SizedBox(height: 16),
-          Text(title, style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 4),
-          Text(desc, style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13)),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: GlassCard(
+        width: 260,
+        padding: const EdgeInsets.all(20),
+        borderColor: color.withValues(alpha: 0.3),
+        gradientColors: [
+          color.withValues(alpha: 0.1),
+          color.withValues(alpha: 0.02),
         ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.2), shape: BoxShape.circle),
+              child: Icon(icon, color: color, size: 18),
+            ),
+            const SizedBox(height: 16),
+            Text(title, style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 4),
+            Text(desc, style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13)),
+          ],
+        ),
       ),
     );
   }

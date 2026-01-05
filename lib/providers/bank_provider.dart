@@ -6,7 +6,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
     BankService(
       id: 'cbe',
       name: 'Commercial Bank of Ethiopia (CBE)',
-      logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6-6R7kGkF_-YgT_e3G0Iit9o7yq8XoO8Cqw&s',
+      logo: 'https://api.dicebear.com/7.x/initials/png?seed=CBE&backgroundColor=6366f1',
       type: BankType.online,
       officialLink: 'https://kyc.cbe.com.et',
       instructionSteps: [
@@ -21,7 +21,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
     BankService(
       id: 'boa',
       name: 'Bank of Abyssinia',
-      logo: 'https://pbs.twimg.com/profile_images/1648937748437942273/9GvX3Kqf_400x400.jpg',
+      logo: 'https://api.dicebear.com/7.x/initials/png?seed=BOA&backgroundColor=b6e3f4',
       type: BankType.online,
       officialLink: 'https://faydaconnect.bankofabyssinia.com',
       instructionSteps: [
@@ -35,7 +35,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
     BankService(
       id: 'dashen',
       name: 'Dashen Bank',
-      logo: 'https://play-lh.googleusercontent.com/B9BofpE_iVqRkP-AAnreDORm06m1_I0_9H0xGj14zR-iL7C_FvK9vXy3X_q5v-iH8r-U=w240-h480-rw',
+      logo: 'https://api.dicebear.com/7.x/initials/png?seed=Dashen&backgroundColor=ffd5dc',
       type: BankType.online,
       officialLink: 'https://fayda.dashenbanksc.com',
       instructionSteps: [

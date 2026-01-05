@@ -12,6 +12,9 @@ import '../screens/settings_screen.dart';
 import '../screens/help_support_screen.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
+import '../screens/academy_screen.dart';
+import '../screens/bank_comparison_screen.dart';
+import '../screens/scanner_screen.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -64,8 +67,9 @@ class AppDrawer extends ConsumerWidget {
             const SizedBox(height: 20),
             _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
             _DrawerItem(context, ref, LucideIcons.wallet, L10n.get(ref.watch(languageProvider), 'vault'), route: 'vault'),
-            _DrawerItem(context, ref, LucideIcons.history, L10n.get(ref.watch(languageProvider), 'history'), route: 'history'),
-            _DrawerItem(context, ref, LucideIcons.crown, L10n.get(ref.watch(languageProvider), 'pro'), color: AppColors.accent, route: 'pro'),
+            _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
+            _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
+            _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
             const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
             _DrawerItem(context, ref, LucideIcons.settings, L10n.get(ref.watch(languageProvider), 'settings'), route: 'settings'),
             _DrawerItem(context, ref, LucideIcons.helpCircle, L10n.get(ref.watch(languageProvider), 'help'), route: 'help'),
@@ -101,6 +105,12 @@ class AppDrawer extends ConsumerWidget {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsScreen(), settings: const RouteSettings(name: 'settings')));
           } else if (route == 'help') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const HelpSupportScreen(), settings: const RouteSettings(name: 'help')));
+          } else if (route == 'scanner') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ScannerScreen(), settings: const RouteSettings(name: 'scanner')));
+          } else if (route == 'academy') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const AcademyScreen(), settings: const RouteSettings(name: 'academy')));
+          } else if (route == 'comparison') {
+             Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen(), settings: const RouteSettings(name: 'comparison')));
           } else if (route == 'logout') {
              ScaffoldMessenger.of(context).showSnackBar(
                const SnackBar(

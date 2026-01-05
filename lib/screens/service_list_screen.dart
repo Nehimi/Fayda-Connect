@@ -26,16 +26,9 @@ class ServiceListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text(_getLocalizedTitle(ref.watch(languageProvider), title)),
         backgroundColor: Colors.transparent,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(LucideIcons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
       ),
       body: Column(
         children: [

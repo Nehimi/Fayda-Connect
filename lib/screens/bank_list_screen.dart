@@ -19,16 +19,9 @@ class BankListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text(L10n.get(ref.watch(languageProvider), 'banking')),
         backgroundColor: Colors.transparent,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(LucideIcons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
       ),
       body: Stack(
         children: [
