@@ -5,9 +5,11 @@ import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'payment_screen.dart';
+import 'service_form_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
+import '../providers/user_provider.dart';
 
 class BankDetailScreen extends ConsumerWidget {
   final BankService bank;
@@ -25,6 +27,7 @@ class BankDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lang = ref.watch(languageProvider);
+    final user = ref.watch(userProvider);
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: CustomScrollView(
@@ -132,47 +135,109 @@ class BankDetailScreen extends ConsumerWidget {
                     child: Text(L10n.get(lang, 'start_sync'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
                   ),
                   const SizedBox(height: 24),
-                  GlassCard(
-                    padding: const EdgeInsets.all(28),
-                    gradientColors: [
-                      AppColors.accent.withValues(alpha: 0.1),
-                      AppColors.accent.withValues(alpha: 0.05),
-                    ],
-                    borderColor: AppColors.accent.withValues(alpha: 0.3),
-                    child: Column(
-                      children: [
-                        const Icon(LucideIcons.sparkles, color: AppColors.accent, size: 32),
-                        const SizedBox(height: 16),
-                        Text(
-                          L10n.get(lang, 'skip_queue'),
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          L10n.get(lang, 'skip_desc'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.accent,
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size(double.infinity, 56),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          ),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen(bankName: bank.name)));
-                          },
-                          child: Text(
-                            lang == AppLanguage.english 
-                              ? 'Get Priority Service (50 ETB)' 
-                              : 'ቅድሚያ አገልግሎት ያግኙ (50 ብር)', 
-                            style: const TextStyle(fontWeight: FontWeight.w800)),
-                        ),
+                  const SizedBox(height: 24),
+                  if (user.isPremium)
+                    GlassCard(
+                      padding: const EdgeInsets.all(28),
+                      gradientColors: [
+                        Colors.amber.withValues(alpha: 0.1),
+                        Colors.amber.withValues(alpha: 0.05),
                       ],
+                      borderColor: Colors.amber.withValues(alpha: 0.3),
+                      child: Column(
+                        children: [
+                          const Icon(LucideIcons.crown, color: Colors.amber, size: 32),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Premium Concierge Active',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            lang == AppLanguage.english
+                                ? 'Your service fee is waived. Our experts will handle the process.'
+                                : 'የአገልግሎት ክፍያዎ ቀርቷል። ባለሙያዎቻችን ሂደቱን ያስተናግዳሉ።',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.amber,
+                              foregroundColor: Colors.black,
+                              minimumSize: const Size(double.infinity, 56),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ServiceFormScreen(
+                                    serviceName: bank.name,
+                                    category: 'Banking',
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              lang == AppLanguage.english ? 'Start Application (Free)' : 'ማመልከቻ ይጀምሩ (ነጻ)',
+                              style: const TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    GlassCard(
+                      padding: const EdgeInsets.all(28),
+                      gradientColors: [
+                        AppColors.accent.withValues(alpha: 0.1),
+                        AppColors.accent.withValues(alpha: 0.05),
+                      ],
+                      borderColor: AppColors.accent.withValues(alpha: 0.3),
+                      child: Column(
+                        children: [
+                          const Icon(LucideIcons.sparkles, color: AppColors.accent, size: 32),
+                          const SizedBox(height: 16),
+                          Text(
+                            L10n.get(lang, 'skip_queue'),
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            L10n.get(lang, 'skip_desc'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.accent,
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size(double.infinity, 56),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ServiceFormScreen(
+                                    serviceName: bank.name,
+                                    category: 'Banking',
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              lang == AppLanguage.english
+                                  ? 'Get Priority Service (50 ETB)'
+                                  : 'ቅድሚያ አገልግሎት ያግኙ (50 ብር)',
+                              style: const TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 60),
                 ],
               ),

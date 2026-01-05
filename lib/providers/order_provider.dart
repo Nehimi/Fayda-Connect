@@ -1,12 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/order_model.dart';
 
+import 'user_provider.dart';
+import '../models/service_model.dart'; // Just in case, though order_model is redundant with service_model often. Let's stick to existing.
+
 final ordersProvider = StateNotifierProvider<OrdersNotifier, List<ServiceOrder>>((ref) {
-  return OrdersNotifier();
+  return OrdersNotifier(ref);
 });
 
 class OrdersNotifier extends StateNotifier<List<ServiceOrder>> {
-  OrdersNotifier() : super([]);
+  final Ref ref;
+  OrdersNotifier(this.ref) : super([]);
 
   void addOrder(ServiceOrder order) {
     state = [order, ...state];
@@ -16,17 +20,21 @@ class OrdersNotifier extends StateNotifier<List<ServiceOrder>> {
     state = [
       for (final order in state)
         if (order.id == orderId)
-          ServiceOrder(
-            id: order.id,
-            serviceName: order.serviceName,
-            serviceCategory: order.serviceCategory,
-            customerPhone: order.customerPhone,
-            orderDate: order.orderDate,
-            status: status,
-            amountPaid: order.amountPaid,
-          )
+          order.copyWith(status: status)
         else
           order
     ];
+
+    // Check for "Premium" upgrade
+    if (status == OrderStatus.completed) {
+      final updatedOrder = state.firstWhere((order) => order.id == orderId);
+      if (updatedOrder.serviceName.contains('Premium')) {
+        ref.read(userProvider.notifier).setPremium(true);
+      }
+    }
+  }
+
+  void removeOrder(String orderId) {
+    state = state.where((order) => order.id != orderId).toList();
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'screens/home_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -20,7 +22,11 @@ class FaydaConnectApp extends StatelessWidget {
       title: 'Fayda Connect',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const HomeScreen(),
+      home: const OnboardingScreen(),
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
     );
   }
 }

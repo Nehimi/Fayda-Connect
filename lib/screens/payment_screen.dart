@@ -6,12 +6,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/order_provider.dart';
 import '../models/order_model.dart';
 import 'success_screen.dart';
-import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
+import '../providers/language_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
+import '../widgets/custom_snackbar.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
   final String bankName;
-  const PaymentScreen({super.key, required this.bankName});
+  final Map<String, String>? formData;
+  const PaymentScreen({super.key, required this.bankName, this.formData});
 
   @override
   ConsumerState<PaymentScreen> createState() => _PaymentScreenState();
@@ -62,6 +66,12 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               id: 'chapa',
               name: 'Chapa (Card/Other)',
               icon: LucideIcons.creditCard,
+            ),
+            const SizedBox(height: 16),
+            _buildPaymentMethod(
+              id: 'manual',
+              name: 'Bank Transfer (CBE/BOA)',
+              icon: LucideIcons.landmark,
             ),
             const Spacer(),
             ElevatedButton(
@@ -136,17 +146,34 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             children: [
                Text(L10n.get(ref.watch(languageProvider), 'confirm_identity'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.textMain)),
               const SizedBox(height: 24),
+              if (selectedMethod == 'manual')
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                  ),
+                  child: const Column(
+                    children: [
+                      _AccountLine(bank: 'CBE', acc: '1000123456789', name: 'Your Name/Company'),
+                      Divider(height: 20),
+                      _AccountLine(bank: 'Abyssinia', acc: '987654321', name: 'Your Name/Company'),
+                    ],
+                  ),
+                ),
               TextField(
                 controller: _phoneController,
                 style: const TextStyle(color: AppColors.textMain),
                 decoration: InputDecoration(
-                  hintText: L10n.get(ref.watch(languageProvider), 'enter_phone'),
+                  hintText: selectedMethod == 'manual' ? 'Enter Transaction ID' : L10n.get(ref.watch(languageProvider), 'enter_phone'),
                   hintStyle: const TextStyle(color: AppColors.textDim),
                   filled: true,
                   fillColor: AppColors.card,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none),
                 ),
-                keyboardType: TextInputType.phone,
+                keyboardType: selectedMethod == 'manual' ? TextInputType.text : TextInputType.phone,
               ),
               const SizedBox(height: 32),
               ElevatedButton(
@@ -160,8 +187,17 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                   Navigator.pop(context);
                   _processPayment();
                 },
-                child: Text(L10n.get(ref.watch(languageProvider), 'confirm_pay'), style: const TextStyle(fontWeight: FontWeight.w800)),
+                child: Text(
+                  selectedMethod == 'manual' ? 'Submit Receipt Info' : L10n.get(ref.watch(languageProvider), 'confirm_pay'),
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
               ),
+              if (selectedMethod == 'manual')
+                TextButton.icon(
+                  onPressed: () => _launchTelegram(),
+                  icon: const Icon(LucideIcons.send, size: 16, color: Color(0xFF229ED9)),
+                  label: const Text('Send Receipt to Admin on Telegram', style: TextStyle(fontSize: 12, color: Color(0xFF229ED9))),
+                ),
             ],
           ),
         ),
@@ -170,6 +206,11 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   }
 
   void _processPayment() {
+    if (selectedMethod == 'chapa') {
+      _showChapaSimulatedCheckout();
+      return;
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -183,10 +224,11 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       final newOrder = ServiceOrder(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         serviceName: widget.bankName,
-        serviceCategory: 'Banking', // Could be dynamic
+        serviceCategory: 'Service', 
         customerPhone: _phoneController.text,
         orderDate: DateTime.now(),
         amountPaid: 50.0,
+        formData: widget.formData,
       );
       
       ref.read(ordersProvider.notifier).addOrder(newOrder);
@@ -197,5 +239,113 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
         MaterialPageRoute(builder: (context) => SuccessScreen(bankName: widget.bankName)),
       );
     });
+  }
+
+  void _showChapaSimulatedCheckout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Row(
+          children: [
+            Icon(LucideIcons.shieldCheck, color: AppColors.primary),
+            SizedBox(width: 12),
+            Text('Chapa Payment', style: TextStyle(color: AppColors.textMain)),
+          ],
+        ),
+        content: const Text(
+          'This would normally redirect to the Chapa secure checkout page (Telebirr/M-Pesa/Card).\n\nIntegration Note: Replace the simulator with your Chapa API keys and public URL.',
+          style: TextStyle(color: AppColors.textDim),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              _simulateSuccess();
+            },
+            child: const Text('Simulate Success', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _simulateSuccess() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+    );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      _navigateToSuccess();
+    });
+  }
+
+  void _navigateToSuccess() {
+    final newOrder = ServiceOrder(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      serviceName: widget.bankName,
+      serviceCategory: 'Banking',
+      customerPhone: _phoneController.text,
+      orderDate: DateTime.now(),
+      amountPaid: 50.0,
+    );
+    ref.read(ordersProvider.notifier).addOrder(newOrder);
+    
+    if (Navigator.of(context).canPop()) {
+      Navigator.pop(context); // Close loading
+    }
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => SuccessScreen(bankName: widget.bankName)),
+    );
+  }
+
+  Future<void> _launchTelegram() async {
+    const String telegramUsername = 'YourTelegramUsername'; // TODO: Replace with your actual username
+    final Uri url = Uri.parse('https://t.me/$telegramUsername');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not open Telegram')));
+      }
+    }
+  }
+}
+
+class _AccountLine extends StatelessWidget {
+  final String bank;
+  final String acc;
+  final String name;
+
+  const _AccountLine({required this.bank, required this.acc, required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(bank, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(acc, style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.w900, fontSize: 16)),
+            Text(name, style: const TextStyle(color: AppColors.textDim, fontSize: 11)),
+          ],
+        ),
+        IconButton(
+          icon: const Icon(LucideIcons.copy, size: 18, color: AppColors.textDim),
+          onPressed: () {
+            Clipboard.setData(ClipboardData(text: acc));
+            CustomSnackBar.show(context, message: '$bank Account copied!');
+          },
+        ),
+      ],
+    );
   }
 }

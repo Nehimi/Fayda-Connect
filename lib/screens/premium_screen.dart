@@ -6,13 +6,22 @@ import '../widgets/app_drawer.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'payment_screen.dart';
 
-class PremiumScreen extends ConsumerWidget {
+class PremiumScreen extends ConsumerStatefulWidget {
   const PremiumScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PremiumScreen> createState() => _PremiumScreenState();
+}
+
+class _PremiumScreenState extends ConsumerState<PremiumScreen> {
+  bool isAnnual = true;
+
+  @override
+  Widget build(BuildContext context) {
     final lang = ref.watch(languageProvider);
+    
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       drawer: const AppDrawer(),
@@ -30,7 +39,7 @@ class PremiumScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             // Header Illustration/Icon
             Container(
               padding: const EdgeInsets.all(32),
@@ -45,9 +54,9 @@ class PremiumScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              child: const Icon(LucideIcons.crown, size: 80, color: Colors.white),
+              child: const Icon(LucideIcons.crown, size: 60, color: Colors.white),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
             const Text(
               'Go Premium',
               style: TextStyle(
@@ -63,7 +72,24 @@ class PremiumScreen extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.textDim, fontSize: 16),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 40),
+
+            // Plan Toggle
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppColors.glassSurface,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _PlanTab('Monthly', !isAnnual, () => setState(() => isAnnual = false)),
+                  _PlanTab('Yearly (Save 17%)', isAnnual, () => setState(() => isAnnual = true)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
 
             // Feature List
             _buildFeature(LucideIcons.zap, 'Zero Processing Fees', 'Skip the 50 ETB fee for individual bank linkings.'),
@@ -79,18 +105,18 @@ class PremiumScreen extends ConsumerWidget {
               borderColor: AppColors.primary.withValues(alpha: 0.5),
               child: Column(
                 children: [
-                  const Text(
-                    'ANNUAL PLAN',
-                    style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 12),
+                   Text(
+                    isAnnual ? 'ANNUAL PLAN' : 'MONTHLY PLAN',
+                    style: const TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 12),
                   ),
                   const SizedBox(height: 16),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('ETB ', style: TextStyle(fontSize: 18, color: AppColors.textMain, fontWeight: FontWeight.bold, height: 2)),
-                      Text('499', style: TextStyle(fontSize: 48, color: AppColors.textMain, fontWeight: FontWeight.w900, letterSpacing: -2)),
-                      Text('/yr', style: TextStyle(fontSize: 16, color: AppColors.textDim, height: 3)),
+                      const Text('ETB ', style: TextStyle(fontSize: 18, color: AppColors.textMain, fontWeight: FontWeight.bold, height: 2)),
+                      Text(isAnnual ? '499' : '50', style: const TextStyle(fontSize: 48, color: AppColors.textMain, fontWeight: FontWeight.w900, letterSpacing: -2)),
+                      Text(isAnnual ? '/yr' : '/mo', style: const TextStyle(fontSize: 16, color: AppColors.textDim, height: 3)),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -100,17 +126,54 @@ class PremiumScreen extends ConsumerWidget {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 64),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      shadowColor: AppColors.primary.withOpacity(0.4),
+                      elevation: 10,
                     ),
                     onPressed: () {
-                      // Navigate to payment
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaymentScreen(
+                            bankName: isAnnual ? 'Premium (Yearly)' : 'Premium (Monthly)',
+                          ),
+                        ),
+                      );
                     },
-                    child: const Text('Unlock Everything', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+                    child: Text(isAnnual ? 'Save & Subscribe' : 'Subscribe Now', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 40),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _PlanTab(String title, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ] : null,
+        ),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppColors.textDim,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
         ),
       ),
     );

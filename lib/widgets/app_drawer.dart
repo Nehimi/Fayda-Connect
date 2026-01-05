@@ -15,12 +15,18 @@ import '../theme/l10n.dart';
 import '../screens/academy_screen.dart';
 import '../screens/bank_comparison_screen.dart';
 import '../screens/scanner_screen.dart';
+import '../screens/admin_dashboard_screen.dart';
+import '../widgets/custom_snackbar.dart';
+import '../providers/user_provider.dart';
+import '../screens/profile_edit_screen.dart';
+import '../screens/auth/login_screen.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider);
     return Drawer(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -33,47 +39,62 @@ class AppDrawer extends ConsumerWidget {
         ],
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(24, 80, 24, 40),
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: AppColors.meshGradient,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
                 children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 4),
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileEditScreen()));
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(24, 80, 24, 40),
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        gradient: AppColors.meshGradient,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 4),
+                            ),
+                            child: const Icon(LucideIcons.user, color: AppColors.primary, size: 32),
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            user.name,
+                            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+                          ),
+                          Text(
+                            user.isPremium ? 'Premium Member' : 'Standard Member',
+                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: const Icon(LucideIcons.user, color: AppColors.primary, size: 32),
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    'Abenezer Kebede',
-                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
-                  ),
-                  Text(
-                    L10n.get(ref.watch(languageProvider), 'premium'),
-                    style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600),
-                  ),
+                  _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
+                  _DrawerItem(context, ref, LucideIcons.wallet, L10n.get(ref.watch(languageProvider), 'vault'), route: 'vault'),
+                  _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
+                  _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
+                  _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
+                  _DrawerItem(context, ref, LucideIcons.history, 'Order History', route: 'history'),
+                  const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
+                  _DrawerItem(context, ref, LucideIcons.layoutDashboard, 'Admin Panel', route: 'admin', color: AppColors.accent),
+                  _DrawerItem(context, ref, LucideIcons.settings, L10n.get(ref.watch(languageProvider), 'settings'), route: 'settings'),
+                  _DrawerItem(context, ref, LucideIcons.helpCircle, L10n.get(ref.watch(languageProvider), 'help'), route: 'help'),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
-            _DrawerItem(context, ref, LucideIcons.wallet, L10n.get(ref.watch(languageProvider), 'vault'), route: 'vault'),
-            _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
-            _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
-            _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
-            const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
-            _DrawerItem(context, ref, LucideIcons.settings, L10n.get(ref.watch(languageProvider), 'settings'), route: 'settings'),
-            _DrawerItem(context, ref, LucideIcons.helpCircle, L10n.get(ref.watch(languageProvider), 'help'), route: 'help'),
-            const Spacer(),
             _DrawerItem(context, ref, LucideIcons.logOut, L10n.get(ref.watch(languageProvider), 'sign_out'), color: Colors.redAccent, route: 'logout'),
             const SizedBox(height: 40),
           ],
@@ -111,14 +132,11 @@ class AppDrawer extends ConsumerWidget {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const AcademyScreen(), settings: const RouteSettings(name: 'academy')));
           } else if (route == 'comparison') {
              Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen(), settings: const RouteSettings(name: 'comparison')));
+          } else if (route == 'admin') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen(), settings: const RouteSettings(name: 'admin')));
           } else if (route == 'logout') {
-             ScaffoldMessenger.of(context).showSnackBar(
-               const SnackBar(
-                 content: Text('Logging out...'),
-                 behavior: SnackBarBehavior.floating,
-                 backgroundColor: AppColors.primary,
-               )
-             );
+             CustomSnackBar.show(context, message: 'Logging out...');
+             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginScreen()), (route) => false);
           }
         },
         leading: Icon(icon, color: color ?? (isActive ? AppColors.primary : AppColors.textDim), size: 22),
