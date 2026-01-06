@@ -105,6 +105,8 @@ class ServiceDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 40),
                   _SectionHeader(title: lang == AppLanguage.english ? 'Process Guide' : 'የሂደት መመሪያ'),
+                  const SizedBox(height: 12),
+                  _VoiceGuide(steps: service.instructionSteps, lang: lang),
                   const SizedBox(height: 24),
                   ...service.instructionSteps.asMap().entries.map((entry) {
                     return _StepItem(
@@ -339,6 +341,138 @@ class _StepItem extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VoiceGuide extends StatefulWidget {
+  final List<String> steps;
+  final AppLanguage lang;
+
+  const _VoiceGuide({required this.steps, required this.lang});
+
+  @override
+  State<_VoiceGuide> createState() => _VoiceGuideState();
+}
+
+class _VoiceGuideState extends State<_VoiceGuide> with SingleTickerProviderStateMixin {
+  bool _isPlaying = false;
+  int _currentStepIndex = -1;
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _togglePlay() async {
+    setState(() {
+      _isPlaying = !_isPlaying;
+      if (_isPlaying) {
+        _currentStepIndex = 0;
+        _controller.repeat(reverse: true);
+        _playSequence();
+      } else {
+        _currentStepIndex = -1;
+        _controller.stop();
+      }
+    });
+  }
+
+  void _playSequence() async {
+    for (int i = 0; i < widget.steps.length; i++) {
+      if (!_isPlaying) break;
+      setState(() => _currentStepIndex = i);
+      await Future.delayed(const Duration(seconds: 3));
+    }
+    if (mounted && _isPlaying) {
+      setState(() {
+        _isPlaying = false;
+        _currentStepIndex = -1;
+        _controller.stop();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      borderRadius: 16,
+      borderColor: _isPlaying ? AppColors.primary.withValues(alpha: 0.5) : AppColors.glassBorder,
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _togglePlay,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _isPlaying ? AppColors.primary : AppColors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                _isPlaying ? LucideIcons.pause : LucideIcons.play,
+                color: _isPlaying ? Colors.white : AppColors.primary,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  L10n.get(widget.lang, 'voice_guide'),
+                  style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Text(
+                  _isPlaying 
+                    ? L10n.getLocalized(widget.lang, widget.steps[_currentStepIndex])
+                    : L10n.get(widget.lang, 'listen_instr'),
+                  style: TextStyle(
+                    color: _isPlaying ? AppColors.primary : AppColors.textDim, 
+                    fontSize: 12,
+                    fontWeight: _isPlaying ? FontWeight.bold : FontWeight.normal,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          if (_isPlaying)
+            Row(
+              children: List.generate(5, (index) {
+                return AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    double value = (_controller.value + (index * 0.2)) % 1.0;
+                    return Container(
+                      width: 3,
+                      height: 10 + (15 * (value > 0.5 ? 1.0 - value : value) * 2),
+                      margin: const EdgeInsets.symmetric(horizontal: 1),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    );
+                  },
+                );
+              }),
+            ),
         ],
       ),
     );

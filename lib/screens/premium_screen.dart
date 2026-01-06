@@ -24,15 +24,12 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
     
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      drawer: const AppDrawer(),
       appBar: AppBar(
         title: Text(L10n.get(lang, 'pro')),
         backgroundColor: Colors.transparent,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(LucideIcons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+        leading: IconButton(
+          icon: const Icon(LucideIcons.arrowLeft),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(

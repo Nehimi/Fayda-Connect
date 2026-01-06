@@ -17,16 +17,22 @@ import '../screens/bank_comparison_screen.dart';
 import '../screens/scanner_screen.dart';
 import '../screens/admin_dashboard_screen.dart';
 import '../widgets/custom_snackbar.dart';
-import '../providers/user_provider.dart';
+import '../services/auth_service.dart';
 import '../screens/profile_edit_screen.dart';
 import '../screens/auth/login_screen.dart';
+import '../screens/family_profiles_screen.dart';
+import '../screens/status_tracker_screen.dart';
+import '../screens/agent_mode_screen.dart';
+import '../screens/referral_screen.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
+    final userAsync = ref.watch(authStateProvider);
+    final user = userAsync.value;
+    final displayName = user?.displayName ?? 'Fayda User';
     return Drawer(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -69,11 +75,11 @@ class AppDrawer extends ConsumerWidget {
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            user.name,
+                            displayName,
                             style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
                           ),
                           Text(
-                            user.isPremium ? 'Premium Member' : 'Standard Member',
+                            'Standard Member',
                             style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
                           ),
                         ],
@@ -82,14 +88,18 @@ class AppDrawer extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
                   _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
-                  _DrawerItem(context, ref, LucideIcons.wallet, L10n.get(ref.watch(languageProvider), 'vault'), route: 'vault'),
-                  _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
-                  _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
-                  _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
-                  _DrawerItem(context, ref, LucideIcons.history, 'Order History', route: 'history'),
-                  const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
-                  _DrawerItem(context, ref, LucideIcons.layoutDashboard, 'Admin Panel', route: 'admin', color: AppColors.accent),
-                  _DrawerItem(context, ref, LucideIcons.settings, L10n.get(ref.watch(languageProvider), 'settings'), route: 'settings'),
+                   _DrawerItem(context, ref, LucideIcons.wallet, L10n.get(ref.watch(languageProvider), 'vault'), route: 'vault'),
+                   _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
+                   _DrawerItem(context, ref, LucideIcons.activity, L10n.get(ref.watch(languageProvider), 'status_tracker'), route: 'status'),
+                   _DrawerItem(context, ref, LucideIcons.users, L10n.get(ref.watch(languageProvider), 'family_profiles'), route: 'family'),
+                   _DrawerItem(context, ref, LucideIcons.userCheck, L10n.get(ref.watch(languageProvider), 'agent_mode'), route: 'agent'),
+                   _DrawerItem(context, ref, LucideIcons.gift, L10n.get(ref.watch(languageProvider), 'referral_program'), route: 'referral'),
+                   _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
+                   _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
+                   _DrawerItem(context, ref, LucideIcons.history, L10n.get(ref.watch(languageProvider), 'order_history'), route: 'history'),
+                   const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
+                   _DrawerItem(context, ref, LucideIcons.layoutDashboard, L10n.get(ref.watch(languageProvider), 'admin_panel'), route: 'admin', color: AppColors.accent),
+                   _DrawerItem(context, ref, LucideIcons.settings, L10n.get(ref.watch(languageProvider), 'settings'), route: 'settings'),
                   _DrawerItem(context, ref, LucideIcons.helpCircle, L10n.get(ref.watch(languageProvider), 'help'), route: 'help'),
                   const SizedBox(height: 20),
                 ],
@@ -115,7 +125,8 @@ class AppDrawer extends ConsumerWidget {
           Navigator.pop(context); // Close drawer
           
           if (route == 'home') {
-             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const HomeScreen(), settings: const RouteSettings(name: 'home')), (route) => false);
+             // Home is our root via AuthGate, just go back to first route
+             Navigator.popUntil(context, (route) => route.isFirst);
           } else if (route == 'pro') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen(), settings: const RouteSettings(name: 'pro')));
           } else if (route == 'vault') {
@@ -134,9 +145,19 @@ class AppDrawer extends ConsumerWidget {
              Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen(), settings: const RouteSettings(name: 'comparison')));
           } else if (route == 'admin') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen(), settings: const RouteSettings(name: 'admin')));
+          } else if (route == 'family') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const FamilyProfilesScreen(), settings: const RouteSettings(name: 'family')));
+          } else if (route == 'status') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const StatusTrackerScreen(), settings: const RouteSettings(name: 'status')));
+          } else if (route == 'agent') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const AgentModeScreen(), settings: const RouteSettings(name: 'agent')));
+          } else if (route == 'referral') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ReferralScreen(), settings: const RouteSettings(name: 'referral')));
           } else if (route == 'logout') {
              CustomSnackBar.show(context, message: 'Logging out...');
-             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const LoginScreen()), (route) => false);
+             // AuthGate will handle the UI switch automatically
+             Navigator.popUntil(context, (route) => route.isFirst);
+             ref.read(authServiceProvider).signOut();
           }
         },
         leading: Icon(icon, color: color ?? (isActive ? AppColors.primary : AppColors.textDim), size: 22),

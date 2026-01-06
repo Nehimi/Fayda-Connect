@@ -7,15 +7,16 @@ import '../../screens/home_screen.dart';
 import '../../providers/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/custom_snackbar.dart';
+import '../providers/auth_ui_provider.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -51,11 +52,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withOpacity(0.3),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                     blurRadius: 100,
                     spreadRadius: 20,
                   ),
@@ -85,9 +86,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             Container(
                               padding: const EdgeInsets.all(32),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.05),
+                                color: Colors.white.withValues(alpha: 0.05),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                               ),
                               child: Icon(
                                 _contents[index].icon,
@@ -148,9 +149,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ElevatedButton(
                         onPressed: () {
                           if (_currentPage == _contents.length - 1) {
-                            // Navigate to Login/Home
-                             // For now, let's just go to main app flow (Login)
-                             Navigator.pushReplacementNamed(context, '/login'); 
+                            // Update state to show login screen
+                            ref.read(showLoginProvider.notifier).state = true;
                           } else {
                             _pageController.nextPage(
                               duration: const Duration(milliseconds: 300),
@@ -164,7 +164,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           minimumSize: const Size(double.infinity, 60),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                           elevation: 8,
-                          shadowColor: AppColors.primary.withOpacity(0.5),
+                          shadowColor: AppColors.primary.withValues(alpha: 0.5),
                         ),
                         child: Text(
                           _currentPage == _contents.length - 1 ? 'Get Started' : 'Next',

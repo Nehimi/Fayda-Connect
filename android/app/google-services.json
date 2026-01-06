@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "287031022202",
+    "project_id": "fayda-connect",
+    "storage_bucket": "fayda-connect.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287031022202:android:2ba2dfbd89c0cb001a21c3",
+        "android_client_info": {
+          "package_name": "com.example.fayda_connect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8JeqpJ9fYFvG01BbM0UVMTmPvpdQcgRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

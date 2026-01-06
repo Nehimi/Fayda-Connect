@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'emergency_screen.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
@@ -8,25 +9,25 @@ import '../theme/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/digital_id.dart';
 import '../widgets/three_d_card.dart';
+import '../providers/vault_provider.dart';
+import '../widgets/custom_snackbar.dart';
 
-class VaultScreen extends ConsumerWidget {
+class VaultScreen extends ConsumerStatefulWidget {
   const VaultScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final lang = ref.watch(languageProvider);
-    
-    // Mock ID for demonstration
-    final mockId = DigitalID(
-      fullName: 'Abebe Bikila',
-      fin: '1234 5678 9012',
-      dob: '12 OCT 1990',
-      gender: 'MALE',
-      issueDate: '01 JAN 2024',
-      expiryDate: '01 JAN 2034',
-      photo: '',
-    );
+  ConsumerState<VaultScreen> createState() => _VaultScreenState();
+}
 
+class _VaultScreenState extends ConsumerState<VaultScreen> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
+    final vaultItems = ref.watch(vaultProvider);
+    
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       appBar: AppBar(
@@ -44,9 +45,9 @@ class VaultScreen extends ConsumerWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Digital ID Vault',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.textMain, letterSpacing: -1),
+                    Text(
+                      L10n.get(lang, 'id_vault'),
+                      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: AppColors.textMain, letterSpacing: -1),
                     ),
                     Row(
                       children: [
@@ -54,25 +55,63 @@ class VaultScreen extends ConsumerWidget {
                         const SizedBox(width: 6),
                         Text(
                           'Offline Mode Active',
-                          style: TextStyle(color: AppColors.success.withOpacity(0.8), fontSize: 12, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppColors.success.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(LucideIcons.shieldCheck, color: AppColors.primary),
+                IconButton(
+                  icon: const Icon(LucideIcons.plusCircle, color: AppColors.primary, size: 32),
+                  onPressed: () {
+                    // Mock add new ID
+                    ref.read(vaultProvider.notifier).addId(DigitalID(
+                      fullName: 'Almaz Bekele',
+                      fin: '9876 5432 1098',
+                      dob: '05 MAY 1995',
+                      gender: 'FEMALE',
+                      issueDate: '15 FEB 2024',
+                      expiryDate: '15 FEB 2034',
+                      photo: '',
+                    ));
+                    CustomSnackBar.show(context, message: 'New ID Imported Successfully');
+                  },
                 ),
               ],
             ),
             const SizedBox(height: 32),
             
-            ThreeDDigitalCard(id: mockId),
+            SizedBox(
+              height: 240,
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: vaultItems.length,
+                onPageChanged: (index) => setState(() => _currentPage = index),
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: ThreeDDigitalCard(id: vaultItems[index]),
+                  );
+                },
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(vaultItems.length, (index) {
+                return Container(
+                  width: _currentPage == index ? 24 : 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    color: _currentPage == index ? AppColors.primary : AppColors.textDim.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                );
+              }),
+            ),
             
             const SizedBox(height: 32),
             
@@ -82,7 +121,9 @@ class VaultScreen extends ConsumerWidget {
                   child: _VaultAction(
                     icon: LucideIcons.qrCode,
                     label: 'Show QR',
-                    onTap: () {},
+                    onTap: () {
+                      CustomSnackBar.show(context, message: 'Generating Secure QR Code...');
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -94,6 +135,29 @@ class VaultScreen extends ConsumerWidget {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const EmergencyScreen()));
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [Colors.redAccent.shade700, Colors.redAccent]),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [BoxShadow(color: Colors.redAccent.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(LucideIcons.alertCircle, color: Colors.white),
+                    SizedBox(width: 12),
+                    Text('EMERGENCY MEDICAL ID', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: 1)),
+                  ],
+                ),
+              ),
             ),
             
             const SizedBox(height: 32),
@@ -155,7 +219,7 @@ class VaultScreen extends ConsumerWidget {
               ),
               child: Stack(
                 children: [
-                   Center(child: Icon(LucideIcons.scan, size: 100, color: AppColors.primary.withOpacity(0.2))),
+                   Center(child: Icon(LucideIcons.scan, size: 100, color: AppColors.primary.withValues(alpha: 0.2))),
                    const Align(
                      alignment: Alignment.topCenter,
                      child: Padding(

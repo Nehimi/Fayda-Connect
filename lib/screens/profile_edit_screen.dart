@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
-import '../providers/user_provider.dart';
+import '../services/auth_service.dart';
 import '../widgets/custom_snackbar.dart';
 
 class ProfileEditScreen extends ConsumerStatefulWidget {
@@ -20,8 +20,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   @override
   void initState() {
     super.initState();
-    final user = ref.read(userProvider);
-    _nameController = TextEditingController(text: user.name);
+    final user = ref.read(authServiceProvider).currentUser;
+    _nameController = TextEditingController(text: user?.displayName ?? "");
   }
 
   @override
@@ -32,11 +32,15 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userAsync = ref.watch(authStateProvider);
+    final user = userAsync.value;
+
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: const Text('Profile Settings'),
         backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -49,26 +53,19 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.primary, width: 2),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 4),
                     ),
                     child: const Icon(LucideIcons.user, color: AppColors.primary, size: 50),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(LucideIcons.camera, color: Colors.white, size: 16),
-                    ),
-                  ),
                 ],
               ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              user?.email ?? 'No Email',
+              style: const TextStyle(color: AppColors.textDim, fontSize: 14),
             ),
             const SizedBox(height: 32),
             GlassCard(
@@ -85,28 +82,35 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Phone is usually not editable easily, but let's just show it as disabled
              GlassCard(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: TextFormField(
-                initialValue: '+251 911 234 567',
+                initialValue: user?.email ?? '',
                 readOnly: true,
                 style: const TextStyle(color: AppColors.textDim, fontSize: 16),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
-                  icon: Icon(LucideIcons.phone, color: AppColors.textDim),
-                  labelText: 'Phone Number',
+                  icon: Icon(LucideIcons.mail, color: AppColors.textDim),
+                  labelText: 'Email Address',
                   labelStyle: TextStyle(color: AppColors.textDim),
                 ),
               ),
             ),
             const SizedBox(height: 48),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_nameController.text.isNotEmpty) {
-                  ref.read(userProvider.notifier).updateName(_nameController.text);
-                  CustomSnackBar.show(context, message: 'Profile updated successfully!');
-                  Navigator.pop(context);
+                  try {
+                    await ref.read(authServiceProvider).updateDisplayName(_nameController.text);
+                    if (mounted) {
+                      CustomSnackBar.show(context, message: 'Profile updated successfully!');
+                      Navigator.pop(context);
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      CustomSnackBar.show(context, message: 'Update failed: $e', isError: true);
+                    }
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(
