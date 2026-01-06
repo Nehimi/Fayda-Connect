@@ -19,8 +19,6 @@ import '../widgets/custom_snackbar.dart';
 import '../services/auth_service.dart';
 import '../screens/profile_edit_screen.dart';
 import '../screens/auth/login_screen.dart';
-import '../screens/agent_mode_screen.dart';
-import '../screens/referral_screen.dart';
 import '../screens/emergency_screen.dart';
 import '../providers/user_provider.dart';
 
@@ -99,8 +97,6 @@ class AppDrawer extends ConsumerWidget {
                   _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
                    _DrawerItem(context, ref, LucideIcons.alertCircle, 'Emergency ID', route: 'emergency', color: Colors.redAccent),
                    _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
-                   _DrawerItem(context, ref, LucideIcons.userCheck, L10n.get(ref.watch(languageProvider), 'agent_mode'), route: 'agent'),
-                   _DrawerItem(context, ref, LucideIcons.gift, L10n.get(ref.watch(languageProvider), 'referral_program'), route: 'referral'),
                    _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
                    _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
                    _DrawerItem(context, ref, LucideIcons.history, L10n.get(ref.watch(languageProvider), 'order_history'), route: 'history'),
@@ -152,10 +148,6 @@ class AppDrawer extends ConsumerWidget {
              Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen(), settings: const RouteSettings(name: 'comparison')));
           } else if (route == 'admin') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen(), settings: const RouteSettings(name: 'admin')));
-          } else if (route == 'agent') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const AgentModeScreen(), settings: const RouteSettings(name: 'agent')));
-          } else if (route == 'referral') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const ReferralScreen(), settings: const RouteSettings(name: 'referral')));
           } else if (route == 'logout') {
              CustomSnackBar.show(context, message: 'Logging out...');
              // AuthGate will handle the UI switch automatically
