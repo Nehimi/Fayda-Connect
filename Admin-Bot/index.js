@@ -83,14 +83,21 @@ const newsWizard = new Scenes.WizardScene(
         ctx.reply('Enter Type (standard, premium, alert):');
         return ctx.wizard.next();
     },
+    (ctx) => {
+        ctx.wizard.state.type = ctx.message.text.toLowerCase();
+        ctx.reply('Enter Image URL (any direct link) or type "skip":');
+        return ctx.wizard.next();
+    },
     async (ctx) => {
-        const type = ctx.message.text.toLowerCase();
+        let imageUrl = ctx.message.text;
+        if (imageUrl.toLowerCase() === 'skip') imageUrl = '';
+
         const data = {
             title: ctx.wizard.state.title,
             content: ctx.wizard.state.content,
-            type: type,
+            type: ctx.wizard.state.type,
             date: new Date().toISOString(),
-            imageUrl: '',
+            imageUrl: imageUrl,
             externalLink: ''
         };
         await db.ref('news_updates').push(data);
