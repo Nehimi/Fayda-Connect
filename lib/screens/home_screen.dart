@@ -218,7 +218,7 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  isPremium ? 'Enjoy all your exclusive benefits.' : 'Get annual expert concierge service.',
+                                  isPremium ? 'Enjoy all your exclusive benefits.' : 'Get year-round priority support.',
                                   style: TextStyle(
                                     color: AppColors.textMain.withValues(alpha: 0.7),
                                     fontSize: 13,

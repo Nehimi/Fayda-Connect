@@ -156,14 +156,14 @@ class ServiceDetailScreen extends ConsumerWidget {
             const Icon(LucideIcons.crown, color: Colors.amber, size: 32),
             const SizedBox(height: 16),
             const Text(
-              'Premium Concierge Active',
+              'Priority Guidance Active',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
             ),
             const SizedBox(height: 8),
             Text(
               lang == AppLanguage.english
-                  ? 'Your service fee is waived. Our experts will handle the process.'
-                  : 'የአገልግሎት ክፍያዎ ቀርቷል። ባለሙያዎቻችን ሂደቱን ያስተናግዳሉ።',
+                  ? 'Professional guidance included. We\'ll help you navigate the process.'
+                  : 'የባለሙያ መመሪያ ተካቷል። ሂደቱን ለመምራት እንረዳዎታለን።',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
             ),
@@ -182,7 +182,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                 }
               },
               child: Text(
-                lang == AppLanguage.english ? 'Contact Expert (Free for Pro)' : 'ባለሙያ ያናግሩ (ለፕሮ ነጻ)',
+                lang == AppLanguage.english ? 'Get Priority Support' : 'የቅድሚያ ድጋፍ ያግኙ',
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
             ),
@@ -203,14 +203,14 @@ class ServiceDetailScreen extends ConsumerWidget {
           const Icon(LucideIcons.sparkles, color: AppColors.accent, size: 32),
           const SizedBox(height: 16),
           Text(
-            lang == AppLanguage.english ? 'Need Expert Help?' : 'የባለሙያ እርዳታ ይፈልጋሉ?',
+            lang == AppLanguage.english ? 'Need Guidance?' : 'መመሪያ ይፈልጋሉ?',
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
           ),
           const SizedBox(height: 8),
           Text(
             lang == AppLanguage.english 
-              ? 'Our certified experts can handle this entire application securely for you.'
-              : 'የእኛ የተረጋገጡ ባለሙያዎች ይህንን አጠቃላይ ማመልከቻ ለእርስዎ ደህንነቱ በተጠበቀ ሁኔታ ማስተናገድ ይችላሉ።',
+              ? 'Get professional assistance to help you navigate your application securely.'
+              : 'ማመልከቻዎን ደህንነቱ በተጠበቀ ሁኔታ ለመሙላት የባለሙያ እርዳታ ያግኙ።',
             textAlign: TextAlign.center,
             style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
           ),
@@ -230,8 +230,8 @@ class ServiceDetailScreen extends ConsumerWidget {
             },
             child: Text(
               lang == AppLanguage.english 
-                ? 'Contact Support for Expert Help' 
-                : 'ለእርዳታ ባለሙያ ያናግሩ', 
+                ? 'Connect with Support for Guidance' 
+                : 'ድጋፍ ለማግኘት ያነጋግሩ', 
               style: const TextStyle(fontWeight: FontWeight.w800)),
           ),
         ],
