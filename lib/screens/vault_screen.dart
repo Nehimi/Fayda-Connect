@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'emergency_screen.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
@@ -134,6 +135,29 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const EmergencyScreen()));
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [Colors.redAccent.shade700, Colors.redAccent]),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [BoxShadow(color: Colors.redAccent.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(LucideIcons.alertCircle, color: Colors.white),
+                    SizedBox(width: 12),
+                    Text('EMERGENCY MEDICAL ID', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15, letterSpacing: 1)),
+                  ],
+                ),
+              ),
             ),
             
             const SizedBox(height: 32),

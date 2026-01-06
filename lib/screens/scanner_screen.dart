@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
@@ -19,41 +20,89 @@ class ScannerScreen extends ConsumerStatefulWidget {
   ConsumerState<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerScreenState extends ConsumerState<ScannerScreen> {
+class _ScannerScreenState extends ConsumerState<ScannerScreen> with WidgetsBindingObserver {
   ScannerMode _mode = ScannerMode.ocr;
   bool _isProcessing = false;
   double _validationProgress = 0.0;
   String _validationStatus = 'Scanning...';
+  
+  MobileScannerController controller = MobileScannerController(
+    detectionSpeed: DetectionSpeed.normal,
+    facing: CameraFacing.back,
+    torchEnabled: false,
+  );
 
-  void _startProcess() {
-    setState(() {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    controller.start();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (controller.value.isInitialized) {
+      if (state == AppLifecycleState.inactive) {
+        controller.stop();
+      } else if (state == AppLifecycleState.resumed) {
+        controller.start();
+      }
+    }
+  }
+
+  void _onDetect(BarcodeCapture capture) {
+    if (_isProcessing || _mode != ScannerMode.ocr) return;
+
+    final List<Barcode> barcodes = capture.barcodes;
+    if (barcodes.isNotEmpty) {
+      final String? code = barcodes.first.rawValue;
+      if (code != null) {
+        setState(() => _isProcessing = true);
+        controller.stop(); // Stop scanning to prevent multiple triggers
+        
+        // Parse data
+        Map<String, String> parsedData = {};
+        
+        if (code.startsWith('EMERGENCY INFO:')) {
+          // Parse our custom format
+          final lines = code.split('\n');
+          for (var line in lines) {
+            final parts = line.split(': ');
+            if (parts.length == 2) {
+              parsedData[parts[0].trim()] = parts[1].trim();
+            }
+          }
+          parsedData.remove('EMERGENCY INFO'); // Remove header if present
+        } else {
+          // Generic content
+          parsedData = {'Scanned Content': code};
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ScannerResultScreen(scannedData: parsedData),
+          ),
+        );
+      }
+    }
+  }
+
+  void _startPhotoValidation() {
+     setState(() {
       _isProcessing = true;
       _validationProgress = 0.0;
     });
 
-    if (_mode == ScannerMode.ocr) {
-      Timer(const Duration(seconds: 3), () {
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ScannerResultScreen(
-                scannedData: {
-                  'Full Name': 'Abenezer Kebede',
-                  'Fayda ID': 'FIN-1234-5678',
-                  'Date of Birth': '12 Oct 1990',
-                  'Nationality': 'Ethiopian',
-                  'Expiry Date': '01 Jan 2030',
-                },
-              ),
-            ),
-          );
-        }
-      });
-    } else {
-      // AI Photo Validation Simulation
-      _simulatePhotoValidation();
-    }
+    // AI Photo Validation Simulation
+    _simulatePhotoValidation();
   }
 
   void _simulatePhotoValidation() async {
@@ -90,35 +139,61 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       appBar: AppBar(
         title: Text(_mode == ScannerMode.ocr ? L10n.get(lang, 'scan_id') : L10n.get(lang, 'photo_validator')),
         backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+            icon: Icon(controller.value.torchState == TorchState.on ? LucideIcons.zap : LucideIcons.zapOff),
+            color: controller.value.torchState == TorchState.on ? Colors.yellow : Colors.grey,
+            onPressed: () async {
+              await controller.toggleTorch();
+              setState(() {});
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
           const SizedBox(height: 24),
           _buildModeSwitcher(lang),
-          const SizedBox(height: 32),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Text(
-              _mode == ScannerMode.ocr ? L10n.get(lang, 'ready_scan') : L10n.get(lang, 'photo_validator'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textMain, fontSize: 24, fontWeight: FontWeight.w900),
+          const SizedBox(height: 20),
+          Expanded(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Camera View or Placeholder
+                _mode == ScannerMode.ocr ? 
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: SizedBox(
+                      height: 400,
+                      child: MobileScanner(
+                        controller: controller,
+                        onDetect: _onDetect,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ) : 
+                Container(
+                   margin: const EdgeInsets.symmetric(horizontal: 24),
+                   height: 400,
+                   decoration: BoxDecoration(
+                     color: Colors.black,
+                     borderRadius: BorderRadius.circular(32),
+                     border: Border.all(color: AppColors.success.withValues(alpha: 0.5), width: 2),
+                   ),
+                   child: const Center(child: Icon(LucideIcons.image, size: 80, color: Colors.white24)),
+                ),
+
+                // Scanner Overlay Interactor
+                _buildScannerFrame(),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Text(
-              _mode == ScannerMode.ocr 
-                ? 'Point your camera at the Fayda QR code or FIN card.' 
-                : L10n.get(lang, 'photo_valid_desc'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textDim, fontSize: 13),
-            ),
-          ),
-          const Spacer(),
-          _buildScannerFrame(),
-          const Spacer(),
-          if (!_isProcessing)
+           const SizedBox(height: 20),
+           
+           if (_mode == ScannerMode.photoValidation && !_isProcessing)
             Padding(
               padding: const EdgeInsets.all(40.0),
               child: ElevatedButton(
@@ -128,13 +203,14 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                   minimumSize: const Size(double.infinity, 64),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
-                onPressed: _startProcess,
-                child: Text('START ${_mode == ScannerMode.ocr ? 'SCAN' : 'VALIDATION'}', style: const TextStyle(fontWeight: FontWeight.w900)),
+                onPressed: _startPhotoValidation,
+                child: const Text('START VALIDATION', style: TextStyle(fontWeight: FontWeight.w900)),
               ),
             ),
-          if (_isProcessing && _mode == ScannerMode.photoValidation)
+           
+           if (_isProcessing && _mode == ScannerMode.photoValidation)
             Padding(
-              padding: const EdgeInsets.all(40.0),
+              padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20),
               child: Column(
                 children: [
                   Text(_validationStatus, style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
@@ -143,7 +219,15 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                 ],
               ),
             ),
-          const SizedBox(height: 20),
+            
+           if (_mode == ScannerMode.ocr)
+            const Padding(
+              padding: EdgeInsets.only(bottom: 40.0),
+              child: Text(
+                'Point camera at QR Code',
+                style: TextStyle(color: AppColors.textDim),
+              ),
+            ),
         ],
       ),
     );
@@ -161,14 +245,20 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
               child: _ModeButton(
                 label: L10n.get(lang, 'scan_id'),
                 isActive: _mode == ScannerMode.ocr,
-                onTap: () => setState(() => _mode = ScannerMode.ocr),
+                onTap: () {
+                   setState(() => _mode = ScannerMode.ocr);
+                   controller.start();
+                },
               ),
             ),
             Expanded(
               child: _ModeButton(
                 label: 'AI PHOTO',
                 isActive: _mode == ScannerMode.photoValidation,
-                onTap: () => setState(() => _mode = ScannerMode.photoValidation),
+                onTap: () {
+                  setState(() => _mode = ScannerMode.photoValidation);
+                  controller.stop();
+                },
               ),
             ),
           ],
@@ -187,18 +277,19 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       ),
       child: Stack(
         children: [
+          if (_mode == ScannerMode.photoValidation)
           Center(
             child: Icon(
-              _mode == ScannerMode.ocr ? LucideIcons.scan : LucideIcons.user,
-              size: 100,
-              color: (_mode == ScannerMode.ocr ? AppColors.primary : AppColors.success).withValues(alpha: 0.2),
+               LucideIcons.user,
+               size: 100,
+               color: AppColors.success.withValues(alpha: 0.2),
             ),
           ),
           _buildCorner(Alignment.topLeft),
           _buildCorner(Alignment.topRight),
           _buildCorner(Alignment.bottomLeft),
           _buildCorner(Alignment.bottomRight),
-          if (_isProcessing) const _ScanningLine(),
+          if (_mode == ScannerMode.ocr) const _ScanningLine(),
         ],
       ),
     );
