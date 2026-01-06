@@ -1,180 +1,130 @@
-# Fayda-Connect (Digital Assistant)
+# Fayda Connect 🇪🇹
+### Your Digital bridge to Ethiopian National ID (Fayda) Services
 
-![Version](https://img.shields.io/badge/Version-1.0-blue) ![Flutter](https://img.shields.io/badge/Built%20with-Flutter-02569B)
-
-**Version:** 1.0 (2026 Strategy)  
-**Developer Role:** Solo Developer (Flutter & Firebase)
-
-Fayda-Connect is a comprehensive digital assistant designed to bridge the gap between the National ID (Fayda) issuance and its practical utility across various Ethiopian sectors. It serves as a unified platform for Banking, Immigration, Business, and Education services, streamlining processes and enhancing user accessibility.
+[![Version](https://img.shields.io/badge/Version-1.2.0-blue.svg?style=for-the-badge)](https://github.com/Nehimi/Fayda-Connect)
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=for-the-badge)](LICENSE)
 
 ---
 
-## 📱 Features
+## 🌟 Overview
 
-### 🔐 Authentication
-*   **Secure Login & Sign Up:** Phone number based authentication with OTP verification.
-*   **Profile Management:** Edit and manage user profiles.
+**Fayda Connect** is a premium, state-of-the-art digital assistant designed to streamline the utility of the Ethiopian National ID (**Fayda**) across multiple sectors. Our mission is to bridge the gap between ID issuance and practical application in Banking, Immigration, Business, and Education.
+
+With a focus on **accessibility, security, and simplicity**, Fayda Connect empowers users—from technology experts to first-time smartphone users—to navigate complex bureaucratic processes with ease.
+
+---
+
+## 🚀 Key Pillars
+
+### 🔐 Security & Identity
+- **Biometric Authentication:** Secure your sensitive documents and data using Fingerprint or Face ID.
+- **Digital Document Vault:** Encrypted storage for your Fayda ID, Passport, and other critical documents.
+- **Secure Auth:** Phone-based OTP verification for a seamless and secure login experience.
 
 ### 🏦 Banking & Finance
-*   **Bank Comparison:** Compare services across different banks (Abyssinia, CBE, Dashen, etc.).
-*   **Service Application:** Apply for accounts, loans, and link Fayda ID directly.
+- **Bank Comparison:** Side-by-side comparison of services, interest rates, and Fayda-linked benefits across major Ethiopian banks (CBE, Dashen, Abyssinia, etc.).
+- **Smart Linking:** Guided processes to link your National ID with your bank accounts for seamless transactions.
 
 ### 🛂 Immigration & Passport
-*   **Passport Services:** Guides for new passports, renewals, and replacements.
-*   **Status Tracking:** Track application status.
-*   **Doc Vault:** Securely store and manage identification documents.
+- **Passport Concierge:** Step-by-step guides for new applications, renewals, and replacements.
+- **Real-time Status Tracking:** Keep tabs on your application progress directly within the app.
 
-### 📚 Academy & Education
-*   **Educational Resources:** "How-To" articles and verified information.
-*   **Exam Registration:** Support for Grade 12 & University admissions.
+### 🎓 Education & Academy
+- **Exam & University Portals:** Integrated support for Grade 12 registrations and university admission processes.
+- **Digital Literacy:** "How-To" guides and resources to help you understand your digital rights and utilities.
 
-### 🛠️ Utilities
-*   **QR Scanner:** Built-in scanner for Fayda ID verification.
-*   **Premium Services:** Subscription-based assistance and priority support.
-*   **Reminders:** Custom reminders for renewals and deadlines.
-*   **Help & Support:** Direct access to support channels.
+### 🛠️ Smart Utilities
+- **OCR Scanner (Offline):** Instantly capture ID details using advanced AI-powered text recognition—works 100% offline.
+- **Emergency QR:** Access critical medical or contact information via a secure QR code on your lock screen.
+- **Reminders & Alerts:** Personalized notifications for document renewals and service deadlines.
+
+---
+
+## 💎 Premium Experience (Pro)
+
+Upgrade to **Fayda Connect Pro** for the ultimate digital assistance:
+- **Expert Concierge:** Priority support and personalized assistance.
+- **Advanced AI Tools:** AI photo validation for passport/ID standards.
+- **Ad-Free Interface:** A clean, focused experience.
+- **Multi-Family Profiles:** Manage IDs and services for your entire household in one place.
 
 ---
 
 ## 🛠 Tech Stack
 
-*   **Frontend:** Flutter (Dart) - Cross-platform (Android/iOS)
-*   **Backend:** Firebase Firestore (NoSQL), Cloud Functions
-*   **Design:** Custom Dark Theme, Glassmorphism elements
-*   **Integrations:** Chapa / Telebirr (Payments), Telegram (Admin Bot)
+- **Frontend:** [Flutter](https://flutter.dev) (Dart) - Premium UI with Glassmorphism and Responsive Design.
+- **Backend:** [Firebase](https://firebase.google.com) (Firestore, Cloud Functions, Auth).
+- **State Management:** Riverpod.
+- **AI/ML:** Google ML Kit for OCR and Face Detection.
+- **Database:** Hive & SQLite for secure offline storage.
+- **Localization:** Support for **Amharic (አማርኛ), Afan Oromo, Tigrinya (ትግርኛ), and English.**
 
 ---
 
 ## 📂 Project Structure
 
-```
+```text
 lib/
-├── models/         # Data models (Order, User, Bank, Service)
-├── providers/      # State management providers
-├── screens/        # UI Screens
-│   ├── auth/       # Authentication (Login, Signup, OTP)
-│   ├── academy_screen.dart
-│   ├── admin_dashboard_screen.dart
-│   ├── home_screen.dart
-│   ├── payment_screen.dart
-│   ├── scanner_screen.dart
-│   └── ...
-├── theme/          # App theme, colors, and localization
-├── widgets/        # Reusable custom widgets (Snackbar, Cards, etc.)
+├── models/         # Domain models (User, Service, Order, Bank)
+├── providers/      # Riverpod state management & business logic
+├── screens/        # Feature-rich UI Modules (Auth, Home, Vault, Scanner)
+├── services/       # Core infrastructure (Firebase, API, Biometrics)
+├── theme/          # Design system, colors, and global localization
+├── utils/          # Responsive utilities and helper functions
+├── widgets/        # Premium custom UI components (GlassCards, Spinners)
 └── main.dart       # Application entry point
 ```
 
 ---
 
-## 🚀 Installation & Setup
+## 🔧 Installation & Setup
 
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/Nehimi/Fayda-Connect.git
-    ```
+Ensure you have the [Flutter SDK](https://docs.flutter.dev/get-started/install) installed on your machine.
 
-2.  **Install dependencies**
-    ```bash
-    flutter pub get
-    ```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Nehimi/Fayda-Connect.git
+   ```
 
-3.  **Run the application**
-    ```bash
-    flutter run
-    ```
+2. **Navigate to the project directory:**
+   ```bash
+   cd Fayda-Connect
+   ```
 
----
+3. **Install dependencies:**
+   ```bash
+   flutter pub get
+   ```
 
-## 🏗️ Project Vision & Roadmap
+4. **Setup Firebase:**
+   - Create a project on [Firebase Console](https://console.firebase.google.com/).
+   - Add Android/iOS apps and download `google-services.json` and `GoogleService-Info.plist`.
+   - Place them in the respective platform directories.
 
-### Core Objective
-To bridge the gap between National ID (Fayda) issuance and practical utility across all Ethiopian sectors.
-
-### Application Architecture
-*   **Modular Design:** Sector-specific modules for easy updates.
-*   **Language Support:** Amharic, Afan Oromo, English, Tigrinya.
-
-### Sector-Specific Goals
-*   **Banking (Revenue Core):** Account opening, Loan checks.
-*   **Immigration (Traffic Driver):** Passport application simplification.
-*   **Business (B2B Gateway):** TIN registration, License renewal.
-*   **Education:** Student verification & Transcript security.
-
-### Development Phases
-*   **Phase 1 (Information Layer):** UI/UX Dashboard, Content Injection, Local Search.
-*   **Phase 2 (Interaction Layer):** Authentication, Dynamic Forms, Payment Integration.
-*   **Phase 3 (Business Layer):** Partner Dashboard, B2B Middleware for ID verification.
-
-### Content Strategy
-*   **Simplified:** Jargon-free "Grandmother-level" language.
-*   **Visual:** Screen-record videos for guides.
-*   **Offline-First:** Downloadable guides for offline access.
-
-### Security & Compliance
-*   **Encryption:** AES-256 for local data.
-*   **Privacy:** Clear distinction as an Independent Assistant (not government official).
+5. **Run the app:**
+   ```bash
+   flutter run
+   ```
 
 ---
 
-## 📄 License
-This project is proprietary.
+## ⚖️ Compliance & Disclaimer
 
-📄 Fayda-Connect: Revised Project Documentation (2026 Strategy)
-1. Project Overview
-Fayda-Connect iyetebale yemitekawekew yih app, be Ethiopia yefayda (National ID) agelglot ena be bankoch, be immigration ena be education mehal yalewun kefitet lemedfegn yetezegaje digital assistant new::
+**Fayda Connect** is an **Independent Service Provider**. 
+- We are **NOT** affiliated with the National ID Program (NID) of Ethiopia or any government entity.
+- Our platform provides assistance, guides, and tools to help users utilize their IDs more effectively.
+- All official processing is conducted through authorized government and bank channels.
 
-2. Core Vision & Objectives
-Simplicity: "Grandmother-level" liron yemichil kelal aserrar::
+---
 
-Security: Be biometric (ashara) yetetebeke yegel dehennet::
+## 🤝 Support
 
-Efficiency: Be camera (OCR) berekettalu mereja memulat::
+For support, please contact us via:
+- **Telegram:** [@Nehimi_Tech](https://t.me/Nehimi_Tech)
+- **Email:** support@faydaconnect.com
 
-Accessibility: Offline misrat ena be hager wist kuankuwoch tederash mehon::
+---
 
-3. Key Features (Yetekatitu Hasaboch)
-A. Smart Interaction & AI
-OCR-Quick Fill (Offline): Be camera yefayda kutrnin ena yebank accountn scan adrgo rasu yemimula (100% free & offline)::
-
-AI Photo Validator: Le passport ena le fayda yemihonun photo tirat be AI check yemiyadrg::
-
-Voice Instructions: Be Amharigna ena be Oromigna demts yemitasagezu memeriyawoch::
-
-B. Security & Privacy
-Biometric Lock: Appu siyekeft be ashara weyim be fit mewecha yemikutleper (Offline)::
-
-Digital Document Vault: ID, Passport ena luloch senedochin be encrypted melk appu wist mekazen::
-
-Emergency QR-Code: Slik sayekeft le accident gize yemihon yemeleyiya QR code::
-
-C. Services & Utilities
-Bank & Immigration Connect: Fayda IDn ke bank account gar mayayez (Be 50 birr agelglot):: Deadline: March 2026::
-
-Status Tracker: Yepassport ena yefayda id dersetual weyim aldershum yemilutin meketatila::
-
-Family Profile Management: Be and app wist yebeteseebn mereja mekazen::
-
-D. Business & Growth
-Agent Mode: Wotatoch lelochin bememezgep commission yemiyagenyubet aserrar (Multi-level growth)::
-
-Referral System: Sewu liyagabizu ye mobile card shilmat yemiyagenyubet::
-
-Telegram Bot Integration: Appun lemayichilu sewu be bot tomisay agelglot meshet::
-
-4. Tech Stack (Technical Side)
-Frontend: Flutter (Dart) - Cross-platform::
-
-Backend: Firebase (Firestore, Cloud Functions, Auth)::
-
-AI Engine: Google ML Kit (Text Recognition & Face Detection)::
-
-Storage: Hive weyim SQLite (Offline secure storage)::
-
-Payment: Chapa / Telebirr Integration::
-
-5. Revenue Model (Gebi Megniya)
-Service Fee: Le and mizuun weyim mayayez 50 birr mekpeel::
-
-Commission: Ke Agent-based regestration yemigeny terf::
-
-Ads: Google AdMob (Tebekamiw siyibez)::
+Managed with ❤️ by **Nehimi Tech** | *Simplifying the Digital Future of Ethiopia.*
