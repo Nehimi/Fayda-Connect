@@ -12,10 +12,12 @@ import '../widgets/category_card.dart';
 import '../widgets/glass_card.dart';
 import 'bank_list_screen.dart';
 import 'service_list_screen.dart';
+import '../models/service_model.dart';
 import 'reminders_list_screen.dart';
 import '../providers/service_provider.dart';
 import '../providers/order_provider.dart';
 import '../models/order_model.dart';
+import '../theme/l10n.dart';
 import '../providers/language_provider.dart';
 import '../providers/reminder_provider.dart';
 import 'bank_comparison_screen.dart';
@@ -26,6 +28,10 @@ import 'auth/login_screen.dart';
 import '../providers/auth_ui_provider.dart';
 import '../utils/responsive.dart';
 import '../providers/user_provider.dart';
+import '../providers/cms_provider.dart';
+import '../models/service_model.dart';
+import 'news_list_screen.dart';
+import 'partner_offer_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -38,6 +44,8 @@ class HomeScreen extends ConsumerWidget {
     final userAsync = ref.watch(authStateProvider);
     final appUser = ref.watch(userProvider);
     final isPremium = appUser.isPremium;
+    final dynamicBenefits = ref.watch(benefitsProvider);
+    final dynamicNews = ref.watch(newsProvider);
     
     final categories = [
       ServiceCategory(
@@ -97,69 +105,48 @@ class HomeScreen extends ConsumerWidget {
               20
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    _MenuButton(),
-                    SizedBox(width: context.responsive.getSpacing(16)),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                          userAsync.when(
-                            data: (user) => Text(
-                              user != null 
-                                ? '${_getGreetingPrefix(currentLang)}, ${user.displayName ?? 'User'}'
-                                : _getGreetingPrefix(currentLang),
-                              style: TextStyle(
-                                color: AppColors.textDim,
-                                fontSize: context.responsive.getFontSize(14),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            loading: () => Text(
-                              'Loading...', 
-                              style: TextStyle(
-                                color: AppColors.textDim, 
-                                fontSize: context.responsive.getFontSize(14)
-                              )
-                            ),
-                            error: (_, __) => Text(
-                              _getGreetingPrefix(currentLang), 
-                              style: TextStyle(
-                                color: AppColors.textDim, 
-                                fontSize: context.responsive.getFontSize(14)
-                              )
-                            ),
-                          ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _getAppName(currentLang),
+                _MenuButton(),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      userAsync.when(
+                        data: (user) => Text(
+                          user != null 
+                            ? '${_getGreetingPrefix(currentLang)}, ${user.displayName ?? 'User'}'
+                            : _getGreetingPrefix(currentLang),
                           style: TextStyle(
-                            color: AppColors.textMain,
-                            fontSize: context.responsive.getFontSize(28),
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -1,
+                            color: AppColors.textDim,
+                            fontSize: context.responsive.getFontSize(13),
+                            fontWeight: FontWeight.w500,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        LucideIcons.scanLine, 
-                        color: AppColors.primary, 
-                        size: context.responsive.getIconSize(28)
+                        loading: () => Text('...', style: TextStyle(color: AppColors.textDim, fontSize: 13)),
+                        error: (_, __) => Text(_getGreetingPrefix(currentLang), style: TextStyle(color: AppColors.textDim, fontSize: 13)),
                       ),
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ScannerScreen())),
-                    ),
-                    const SizedBox(width: 8),
-                    _LanguageToggle(),
-                  ],
+                      Text(
+                        _getAppName(currentLang),
+                        style: TextStyle(
+                          color: AppColors.textMain,
+                          fontSize: context.responsive.getFontSize(24),
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
+                _NotificationBell(ref: ref),
+                const SizedBox(width: 4),
+                _LanguageToggle(),
               ],
             ),
           ),
@@ -169,68 +156,25 @@ class HomeScreen extends ConsumerWidget {
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-              
-
+                
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.responsive.horizontalPadding, 
                     vertical: 8
                   ),
-                  child: InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen())),
-                    child: GlassCard(
-                      padding: const EdgeInsets.all(24),
-                      gradientColors: [
-                        AppColors.accent.withValues(alpha: 0.2),
-                        AppColors.accent.withValues(alpha: 0.05),
-                      ],
-                      borderColor: AppColors.accent.withValues(alpha: 0.3),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(LucideIcons.crown, color: AppColors.accent, size: 20),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Fayda Connect Pro',
-                                      style: TextStyle(
-                                        color: AppColors.accent.withValues(alpha: 0.9),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  isPremium ? 'You are a Pro Member' : 'Unlimited Free Processing',
-                                  style: const TextStyle(
-                                    color: AppColors.textMain,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  isPremium ? 'Enjoy all your exclusive benefits.' : 'Get year-round priority support.',
-                                  style: TextStyle(
-                                    color: AppColors.textMain.withValues(alpha: 0.7),
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Icon(LucideIcons.chevronRight, color: AppColors.accent, size: 24),
-                        ],
-                      ),
-                    ),
+                  child: dynamicNews.when(
+                    data: (news) {
+                      // Only show PREMIUM posts in this banner
+                      final latestPremium = news.where((n) => n.type == NewsType.premium).firstOrNull;
+                      
+                      if (latestPremium == null) {
+                        return _buildPremiumPromo(context, isPremium);
+                      }
+                      return _buildFeaturedNews(context, latestPremium);
+                    },
+                    loading: () => _buildPremiumPromo(context, isPremium),
+                    error: (_, __) => _buildPremiumPromo(context, isPremium),
                   ),
                 ),
               ),
@@ -247,7 +191,7 @@ class HomeScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Partner Benefits',
+                        L10n.get(currentLang, 'partner_benefits'),
                         style: TextStyle(
                           color: AppColors.textMain,
                           fontSize: context.responsive.getFontSize(18),
@@ -257,7 +201,10 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       TextButton(
                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
-                        child: const Text('View All', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          L10n.get(currentLang, 'view_all'), 
+                          style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)
+                        ),
                       ),
                     ],
                   ),
@@ -265,107 +212,44 @@ class HomeScreen extends ConsumerWidget {
               ),
 
               SliverToBoxAdapter(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.responsive.horizontalPadding, 
-                    vertical: 16
-                  ),
-                  child: Row(
-                    children: [
-                      _PartnerCard(
-                        title: 'Amole Special Offer',
-                        desc: 'Get exclusive rewards on linking.',
-                        color: const Color(0xFFF59E0B),
-                        icon: LucideIcons.percent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
+                child: dynamicBenefits.when(
+                  data: (benefits) {
+                    if (benefits.isEmpty) {
+                      return const SizedBox.shrink(); // Fallback if no dynamic content
+                    }
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.responsive.horizontalPadding, 
+                        vertical: 16
                       ),
-                      const SizedBox(width: 16),
-                      _PartnerCard(
-                        title: 'CBE Low Interest',
-                        desc: 'Apply with Fayda ID today.',
-                        color: const Color(0xFF6366F1),
-                        icon: LucideIcons.trendingDown,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
+                      child: Row(
+                        children: benefits.map((benefit) => Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: _PartnerCard(
+                            title: benefit.title,
+                            desc: benefit.description,
+                            color: Color(benefit.colorHex),
+                            icon: _getIconFromName(benefit.iconName),
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => PartnerOfferScreen(benefit: benefit)));
+                            },
+                          ),
+                        )).toList(),
                       ),
-                    ],
+                    );
+                  },
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: Center(child: CircularProgressIndicator()),
                   ),
+                  error: (e, _) => const SizedBox.shrink(),
                 ),
               ),
 
-              if (reminders.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    context.responsive.horizontalPadding, 
-                    context.responsive.getSpacing(40), 
-                    context.responsive.horizontalPadding, 
-                    0
-                  ),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              L10n.get(currentLang, 'alerts'),
-                              style: const TextStyle(color: AppColors.textMain, fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RemindersListScreen())),
-                              child: Text(currentLang == AppLanguage.english ? 'View All' : 'ሁሉንም አስስ', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-                            ),
-                          ],
-                        ),
-                        
-                        const SizedBox(height: 16),
-                        ...reminders.reversed.take(2).map((reminder) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: GlassCard(
-                            padding: const EdgeInsets.all(20),
-                            gradientColors: [
-                              reminder.color.withValues(alpha: 0.1),
-                              reminder.color.withValues(alpha: 0.05),
-                            ],
-                            borderColor: reminder.color.withValues(alpha: 0.3),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: reminder.color.withValues(alpha: 0.15),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(reminder.icon, color: reminder.color, size: 24),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        L10n.getLocalized(currentLang, reminder.title),
-                                        style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.w900, fontSize: 16),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        L10n.getLocalized(currentLang, reminder.description),
-                                        style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13, height: 1.4),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )).toList(),
-                      ],
-                    ),
-                  ),
-                ),
+
+
 
               SliverToBoxAdapter(
                 child: Padding(
@@ -443,6 +327,154 @@ class HomeScreen extends ConsumerWidget {
     drawer: const AppDrawer(),
   );
 }
+
+IconData _getIconFromName(String name) {
+  switch (name) {
+    case 'percent': return LucideIcons.percent;
+    case 'trendingDown': return LucideIcons.trendingDown;
+    case 'gift': return LucideIcons.gift;
+    case 'info': return LucideIcons.info;
+    case 'award': return LucideIcons.award;
+    case 'megaphone': return LucideIcons.megaphone;
+    case 'shield': return LucideIcons.shield;
+    default: return LucideIcons.star;
+  }
+}
+
+  Widget _buildPremiumPromo(BuildContext context, bool isPremium) {
+    return InkWell(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen())),
+      child: GlassCard(
+        padding: const EdgeInsets.all(24),
+        gradientColors: [
+          AppColors.accent.withValues(alpha: 0.2),
+          AppColors.accent.withValues(alpha: 0.05),
+        ],
+        borderColor: AppColors.accent.withValues(alpha: 0.3),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(LucideIcons.crown, color: AppColors.accent, size: 20),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Fayda Connect Pro',
+                        style: TextStyle(
+                          color: AppColors.accent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    isPremium ? 'You are a Pro Member' : 'Unlimited Free Processing',
+                    style: const TextStyle(
+                      color: AppColors.textMain,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isPremium ? 'Enjoy all your exclusive benefits.' : 'Get year-round priority support.',
+                    style: TextStyle(
+                      color: AppColors.textMain.withValues(alpha: 0.7),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(LucideIcons.chevronRight, color: AppColors.accent, size: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeaturedNews(BuildContext context, NewsUpdate latest) {
+    // Premium posts ALWAYS use the original accent/red theme
+    const Color themeColor = AppColors.accent;
+    const IconData themeIcon = LucideIcons.crown;
+    const String label = 'PRO BROADCAST';
+
+    return InkWell(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen())),
+      child: GlassCard(
+        padding: const EdgeInsets.all(24),
+        borderColor: themeColor.withValues(alpha: 0.3),
+        gradientColors: [
+          themeColor.withValues(alpha: 0.15),
+          themeColor.withValues(alpha: 0.05),
+        ],
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: themeColor.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(themeIcon, color: themeColor, size: 14),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          color: themeColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
+                   ),
+                  const SizedBox(height: 12),
+                  Text(
+                    latest.title,
+                    style: const TextStyle(
+                      color: AppColors.textMain,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    latest.content,
+                    style: TextStyle(
+                      color: AppColors.textMain.withValues(alpha: 0.7),
+                      fontSize: 13,
+                      height: 1.4,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Icon(LucideIcons.chevronRight, color: themeColor, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _handleNavigation(BuildContext context, ServiceCategory category) {
     if (category.id == 'banking') {
@@ -565,43 +597,114 @@ class _PartnerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double cardHeight = context.responsive.isSmallPhone ? 280 : 300;
+    
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(context.responsive.getBorderRadius(24)),
+      borderRadius: BorderRadius.circular(28),
       child: GlassCard(
-        width: context.responsive.cardWidth,
-        padding: EdgeInsets.all(context.responsive.getSpacing(20)),
+        width: context.responsive.cardWidth * 1.05,
+        height: cardHeight,
+        padding: EdgeInsets.zero,
+        borderRadius: 28,
         borderColor: color.withValues(alpha: 0.3),
-        gradientColors: [
-          color.withValues(alpha: 0.1),
-          color.withValues(alpha: 0.02),
-        ],
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.2), shape: BoxShape.circle),
-              child: Icon(icon, color: color, size: context.responsive.getIconSize(18)),
-            ),
-            SizedBox(height: context.responsive.getSpacing(16)),
-            Text(
-              title, 
-              style: TextStyle(
-                color: AppColors.textMain, 
-                fontWeight: FontWeight.bold, 
-                fontSize: context.responsive.getFontSize(16)
-              )
-            ),
-            const SizedBox(height: 4),
-            Text(
-              desc, 
-              style: TextStyle(
-                color: AppColors.textMain.withValues(alpha: 0.7), 
-                fontSize: context.responsive.getFontSize(13)
-              )
-            ),
-          ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Stack(
+            children: [
+              // Faded Background Icon for "Pro" feel
+              Positioned(
+                right: -25,
+                bottom: -25,
+                child: Icon(
+                  icon,
+                  size: 160,
+                  color: color.withValues(alpha: 0.05),
+                ),
+              ),
+              
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: color.withValues(alpha: 0.2), width: 1.5),
+                          ),
+                          child: Icon(icon, color: color, size: 22),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'PARTNER',
+                            style: TextStyle(
+                              color: color.withValues(alpha: 0.8),
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: AppColors.textMain,
+                        fontWeight: FontWeight.w900,
+                        fontSize: context.responsive.getFontSize(18),
+                        letterSpacing: -0.5,
+                        height: 1.1,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: Text(
+                        desc,
+                        style: TextStyle(
+                          color: AppColors.textMain.withValues(alpha: 0.6),
+                          fontSize: context.responsive.getFontSize(13),
+                          fontWeight: FontWeight.w500,
+                          height: 1.5,
+                        ),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Text(
+                          'Claim Offer',
+                          style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(LucideIcons.arrowRight, size: 14, color: color),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -697,5 +800,66 @@ class _IdentityPlaceholder extends ConsumerWidget {
         ],
       ),
     ));
+  }
+}
+
+class _NotificationBell extends StatelessWidget {
+  final WidgetRef ref;
+  const _NotificationBell({required this.ref});
+
+  @override
+  Widget build(BuildContext context) {
+    final newsCount = ref.watch(unreadNewsCountProvider);
+
+    return InkWell(
+      onTap: () {
+        // Mark as seen immediately when clicking the bell
+        final news = ref.read(newsProvider).value;
+        if (news != null && news.isNotEmpty) {
+          ref.read(newsSeenProvider.notifier).markAsSeen(news.first.id);
+        }
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsListScreen()));
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          GlassCard(
+            padding: const EdgeInsets.all(10),
+            borderRadius: 12,
+            child: Icon(
+              LucideIcons.bell, 
+              color: AppColors.textMain, 
+              size: context.responsive.getIconSize(22)
+            ),
+          ),
+          if (newsCount > 0)
+            Positioned(
+              top: -6,
+              left: -6,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
+                  ],
+                ),
+                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                child: Text(
+                  newsCount > 9 ? '9+' : newsCount.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

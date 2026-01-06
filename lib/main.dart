@@ -6,6 +6,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'theme/app_theme.dart';
 import 'services/auth_service.dart';
+import 'services/notification_service.dart';
 import 'providers/auth_ui_provider.dart';
 import 'screens/auth/otp_verification_screen.dart';
 
@@ -14,6 +15,7 @@ void main() async {
   
   try {
     await Firebase.initializeApp();
+    await NotificationService.initialize();
   } catch (e) {
     debugPrint("Firebase not configured yet: $e");
   }

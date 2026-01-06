@@ -9,6 +9,7 @@ class GlassCard extends StatelessWidget {
   final Color? borderColor;
   final List<Color>? gradientColors;
   final double? width;
+  final double? height;
 
   const GlassCard({
     super.key,
@@ -18,6 +19,7 @@ class GlassCard extends StatelessWidget {
     this.borderColor,
     this.gradientColors,
     this.width,
+    this.height,
   });
 
   @override
@@ -28,6 +30,7 @@ class GlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           width: width,
+          height: height,
           padding: padding,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(borderRadius),

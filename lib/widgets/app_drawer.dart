@@ -21,6 +21,7 @@ import '../screens/profile_edit_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/emergency_screen.dart';
 import '../providers/user_provider.dart';
+import '../screens/news_list_screen.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -108,9 +109,9 @@ class AppDrawer extends ConsumerWidget {
                 ],
               ),
             ),
-            _DrawerItem(context, ref, LucideIcons.logOut, L10n.get(ref.watch(languageProvider), 'sign_out'), color: Colors.redAccent, route: 'logout'),
-            const SizedBox(height: 40),
-          ],
+             _DrawerItem(context, ref, LucideIcons.logOut, L10n.get(ref.watch(languageProvider), 'sign_out'), color: Colors.redAccent, route: 'logout'),
+             const SizedBox(height: 40),
+           ],
         ),
       ),
     );
@@ -146,6 +147,8 @@ class AppDrawer extends ConsumerWidget {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const AcademyScreen(), settings: const RouteSettings(name: 'academy')));
           } else if (route == 'comparison') {
              Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen(), settings: const RouteSettings(name: 'comparison')));
+          } else if (route == 'news') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsListScreen(), settings: const RouteSettings(name: 'news')));
           } else if (route == 'admin') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen(), settings: const RouteSettings(name: 'admin')));
           } else if (route == 'logout') {
@@ -170,3 +173,4 @@ class AppDrawer extends ConsumerWidget {
     );
   }
 }
+
