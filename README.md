@@ -45,7 +45,7 @@ With a focus on **accessibility, security, and simplicity**, Fayda Connect empow
 ## 💎 Premium Experience (Pro)
 
 Upgrade to **Fayda Connect Pro** for the ultimate digital assistance:
-- **Expert Concierge:** Priority support and personalized assistance.
+- **Priority Assistance:** Priority support and personalized guidance.
 - **Advanced AI Tools:** AI photo validation for passport/ID standards.
 - **Ad-Free Interface:** A clean, focused experience.
 - **Multi-Family Profiles:** Manage IDs and services for your entire household in one place.

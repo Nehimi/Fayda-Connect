@@ -6,7 +6,6 @@ import '../widgets/app_drawer.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'referral_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -38,9 +37,7 @@ class SettingsScreen extends ConsumerWidget {
           _buildSettingItem(context, ref, LucideIcons.info, L10n.get(lang, 'about_app'), L10n.get(lang, 'ver_sub')),
           _buildSettingItem(context, ref, LucideIcons.shield, L10n.get(lang, 'privacy'), L10n.get(lang, 'priv_sub')),
 
-          const SizedBox(height: 32),
-          _buildSection(lang == AppLanguage.english ? 'Growth & Rewards' : 'እድገት እና ሽልማቶች'),
-          _buildSettingItem(context, ref, LucideIcons.gift, L10n.get(lang, 'referral_program'), L10n.get(lang, 'referral_desc')),
+          _buildSection(lang == AppLanguage.english ? 'Safety & Support' : 'ደህንነት እና ድጋፍ'),
           _buildSettingItem(context, ref, LucideIcons.alertCircle, L10n.get(lang, 'emergency_qr'), L10n.get(lang, 'emergency_desc'), color: Colors.redAccent),
           _buildSettingItem(context, ref, LucideIcons.send, L10n.get(lang, 'tg_bot'), 'Ask questions or get help via Telegram.'),
         ],
@@ -67,8 +64,6 @@ class SettingsScreen extends ConsumerWidget {
           onTap: () {
             if (title == L10n.get(ref.read(languageProvider), 'emergency_qr')) {
               _showEmergencyQR(context);
-            } else if (title == L10n.get(ref.read(languageProvider), 'referral_program')) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const ReferralScreen()));
             }
           },
           child: Row(
