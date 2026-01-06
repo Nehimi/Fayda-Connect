@@ -152,6 +152,8 @@ class L10n {
     'photo_validator': 'AI Photo Validator',
     'photo_valid_desc': 'Check if your photo meets official requirements.',
     'tg_bot': 'Telegram Bot Support',
+    'view_all': 'View All',
+    'partner_benefits': 'Partner Benefits',
   };
 
   static const Map<String, String> _am = {
@@ -264,6 +266,8 @@ class L10n {
     'photo_validator': 'የ AI ፎቶ ማረጋገጫ',
     'photo_valid_desc': 'ፎቶዎ ኦፊሴላዊ መስፈርቶችን የሚያሟላ መሆኑን ያረጋግጡ።',
     'tg_bot': 'የቴሌግራም ቦት ድጋፍ',
+    'view_all': 'ሁሉንም ያስሱ',
+    'partner_benefits': 'የአጋር ጥቅማጥቅሞች',
   };
 
   static const Map<String, String> _or = {
@@ -376,6 +380,8 @@ class L10n {
     'photo_validator': 'Validator Suuraa AI',
     'photo_valid_desc': 'Suurri keessan ulaagaa mootummaa guutuu isaa mirkaneessaa.',
     'tg_bot': 'Deggersa Telegram Bot',
+    'view_all': 'Hunda Ilaali',
+    'partner_benefits': 'Bu’aawwan Michuu',
   };
 
   static const Map<String, String> _ti = {
@@ -488,5 +494,7 @@ class L10n {
     'photo_validator': 'ናይ AI ፎቶ መረጋገፂ',
     'photo_valid_desc': 'ፎቶኹም ወግዓዊ ረቛሒታት ዘማልእ ምዃኑ ኣረጋግፁ።',
     'tg_bot': 'ናይ ቴሌግራም ቦት ደገፍ',
+    'view_all': 'ኩሉ ርአ',
+    'partner_benefits': 'ናይ አጋር ጥቕማጥቕምታት',
   };
 }

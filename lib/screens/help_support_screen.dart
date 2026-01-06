@@ -6,6 +6,7 @@ import '../widgets/app_drawer.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HelpSupportScreen extends ConsumerWidget {
   const HelpSupportScreen({super.key});
@@ -56,9 +57,9 @@ class HelpSupportScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              _buildContactButton(LucideIcons.send, 'Telegram', const Color(0xFF0088cc)),
+              _buildContactButton(LucideIcons.send, 'Telegram', const Color(0xFF0088cc), 'https://t.me/NehimiG2'),
               const SizedBox(width: 16),
-              _buildContactButton(LucideIcons.mail, 'Email', AppColors.primary),
+              _buildContactButton(LucideIcons.mail, 'Email', AppColors.primary, 'mailto:support@faydaconnect.com'),
             ],
           ),
         ],
@@ -66,10 +67,15 @@ class HelpSupportScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContactButton(IconData icon, String label, Color color) {
+  Widget _buildContactButton(IconData icon, String label, Color color, String url) {
     return Expanded(
       child: ElevatedButton.icon(
-        onPressed: () {},
+        onPressed: () async {
+          final uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
         icon: Icon(icon, size: 18),
         label: Text(label),
         style: ElevatedButton.styleFrom(

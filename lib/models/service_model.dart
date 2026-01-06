@@ -1,7 +1,16 @@
+import 'package:flutter/foundation.dart';
+
 enum ServiceType {
   online,
   appBased,
   inPerson,
+}
+
+enum NewsType {
+  standard,
+  premium,
+  partner,
+  promotion,
 }
 
 class GeneralService {
@@ -38,5 +47,91 @@ class GeneralService {
       case ServiceType.inPerson:
         return 'Visit Office';
     }
+  }
+}
+
+class PartnerBenefit {
+  final String id;
+  final String title;
+  final String description;
+  final String iconName; // e.g., 'percent', 'trendingDown'
+  final int colorHex;
+  final String? deepLink; // Route to navigate to
+  final List<String> features; // New dynamic field
+
+  PartnerBenefit({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.iconName,
+    required this.colorHex,
+    this.deepLink,
+    this.features = const [],
+  });
+
+  factory PartnerBenefit.fromFirestore(Map<String, dynamic> data, String id) {
+    // Ultra-safe feature parsing
+    List<String> parsedFeatures = [];
+    try {
+      final Object? rawFeatures = data['features'];
+      if (rawFeatures != null) {
+        if (rawFeatures is String && rawFeatures.isNotEmpty) {
+          parsedFeatures = rawFeatures.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+        } else if (rawFeatures is List) {
+          parsedFeatures = rawFeatures.map((e) => e?.toString() ?? "").where((e) => e.isNotEmpty).toList();
+        }
+      }
+    } catch (e) {
+      debugPrint("PartnerBenefit: Error parsing features: $e");
+    }
+
+    return PartnerBenefit(
+      id: id,
+      title: data['title'] ?? '',
+      description: data['description'] ?? '',
+      iconName: data['iconName'] ?? 'star',
+      colorHex: data['colorHex'] ?? 0xFF000000,
+      deepLink: data['deepLink'],
+      features: parsedFeatures,
+    );
+  }
+}
+
+class NewsUpdate {
+  final String id;
+  final String title;
+  final String content;
+  final DateTime date;
+  final String? imageUrl;
+  final String? externalLink;
+  final NewsType type;
+
+  NewsUpdate({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.date,
+    this.imageUrl,
+    this.externalLink,
+    this.type = NewsType.standard,
+  });
+
+  factory NewsUpdate.fromFirestore(Map<String, dynamic> data, String id) {
+    NewsType parseType(String? typeStr) {
+      if (typeStr == 'premium') return NewsType.premium;
+      if (typeStr == 'partner') return NewsType.partner;
+      if (typeStr == 'promotion') return NewsType.promotion;
+      return NewsType.standard;
+    }
+
+    return NewsUpdate(
+      id: id,
+      title: data['title'] ?? '',
+      content: data['content'] ?? '',
+      date: (data['date'] as Object?) != null ? DateTime.parse(data['date']) : DateTime.now(),
+      imageUrl: data['imageUrl'],
+      externalLink: data['externalLink'],
+      type: parseType(data['type']),
+    );
   }
 }
