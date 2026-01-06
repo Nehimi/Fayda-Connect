@@ -14,8 +14,8 @@ class GeneralService {
   final String? officialLink;
   final List<String> instructionSteps;
   final List<String> requirements;
-  final double assistanceFee;
-
+  final double priorityPoints;
+  
   GeneralService({
     required this.id,
     required this.category,
@@ -26,7 +26,7 @@ class GeneralService {
     this.officialLink,
     required this.instructionSteps,
     required this.requirements,
-    this.assistanceFee = 50.0,
+    this.priorityPoints = 50.0,
   });
 
   String get typeLabel {

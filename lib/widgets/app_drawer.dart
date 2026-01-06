@@ -6,7 +6,6 @@ import '../widgets/glass_card.dart';
 import '../screens/home_screen.dart';
 import '../screens/premium_screen.dart';
 import '../screens/bank_list_screen.dart';
-import '../screens/vault_screen.dart';
 import '../screens/order_history_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/help_support_screen.dart';
@@ -20,10 +19,10 @@ import '../widgets/custom_snackbar.dart';
 import '../services/auth_service.dart';
 import '../screens/profile_edit_screen.dart';
 import '../screens/auth/login_screen.dart';
-import '../screens/family_profiles_screen.dart';
-import '../screens/status_tracker_screen.dart';
 import '../screens/agent_mode_screen.dart';
 import '../screens/referral_screen.dart';
+import '../screens/emergency_screen.dart';
+import '../providers/user_provider.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -32,7 +31,9 @@ class AppDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(authStateProvider);
     final user = userAsync.value;
-    final displayName = user?.displayName ?? 'Fayda User';
+    final appUser = ref.watch(userProvider);
+    final displayName = user?.displayName ?? appUser.name;
+    final isPremium = appUser.isPremium;
     return Drawer(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -78,9 +79,17 @@ class AppDrawer extends ConsumerWidget {
                             displayName,
                             style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
                           ),
-                          Text(
-                            'Standard Member',
-                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
+                          Row(
+                            children: [
+                              Text(
+                                isPremium ? 'Premium Member' : 'Standard Member',
+                                style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
+                              ),
+                              if (isPremium) ...[
+                                const SizedBox(width: 8),
+                                const Icon(LucideIcons.crown, color: Colors.amber, size: 16),
+                              ],
+                            ],
                           ),
                         ],
                       ),
@@ -88,10 +97,8 @@ class AppDrawer extends ConsumerWidget {
                   ),
                   const SizedBox(height: 20),
                   _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
-                   _DrawerItem(context, ref, LucideIcons.wallet, L10n.get(ref.watch(languageProvider), 'vault'), route: 'vault'),
+                   _DrawerItem(context, ref, LucideIcons.alertCircle, 'Emergency ID', route: 'emergency', color: Colors.redAccent),
                    _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
-                   _DrawerItem(context, ref, LucideIcons.activity, L10n.get(ref.watch(languageProvider), 'status_tracker'), route: 'status'),
-                   _DrawerItem(context, ref, LucideIcons.users, L10n.get(ref.watch(languageProvider), 'family_profiles'), route: 'family'),
                    _DrawerItem(context, ref, LucideIcons.userCheck, L10n.get(ref.watch(languageProvider), 'agent_mode'), route: 'agent'),
                    _DrawerItem(context, ref, LucideIcons.gift, L10n.get(ref.watch(languageProvider), 'referral_program'), route: 'referral'),
                    _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
@@ -129,8 +136,8 @@ class AppDrawer extends ConsumerWidget {
              Navigator.popUntil(context, (route) => route.isFirst);
           } else if (route == 'pro') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen(), settings: const RouteSettings(name: 'pro')));
-          } else if (route == 'vault') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const VaultScreen(), settings: const RouteSettings(name: 'vault')));
+          } else if (route == 'emergency') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const EmergencyScreen(), settings: const RouteSettings(name: 'emergency')));
           } else if (route == 'history') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderHistoryScreen(), settings: const RouteSettings(name: 'history')));
           } else if (route == 'settings') {
@@ -145,10 +152,6 @@ class AppDrawer extends ConsumerWidget {
              Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen(), settings: const RouteSettings(name: 'comparison')));
           } else if (route == 'admin') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen(), settings: const RouteSettings(name: 'admin')));
-          } else if (route == 'family') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const FamilyProfilesScreen(), settings: const RouteSettings(name: 'family')));
-          } else if (route == 'status') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const StatusTrackerScreen(), settings: const RouteSettings(name: 'status')));
           } else if (route == 'agent') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const AgentModeScreen(), settings: const RouteSettings(name: 'agent')));
           } else if (route == 'referral') {

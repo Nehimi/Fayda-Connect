@@ -41,13 +41,13 @@ class BankComparisonScreen extends ConsumerWidget {
             
             if (bank.id == 'cbe') {
               rate = '7.5%';
-              benefit = '0 ETB Fee for linking';
+              benefit = 'No additional fees for linking';
             } else if (bank.id == 'boa') {
               rate = '7.2%';
               benefit = 'Free Visa Card on linking';
             } else if (bank.id == 'dashen') {
               rate = '7.0%';
-              benefit = '50 ETB Amole Bonus';
+              benefit = 'Exclusive Amole Bonus';
             }
 
             return _buildBankBenefitCard(context, bank, rate, benefit);

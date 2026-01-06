@@ -93,7 +93,7 @@ class ReferralScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             _buildStepItem(LucideIcons.share2, 'Share your code', 'Invite friends to download Fayda-Connect.'),
             _buildStepItem(LucideIcons.userPlus, 'Friend Registers', 'They complete their first Fayda sync.'),
-            _buildStepItem(LucideIcons.smartphone, 'Earn Rewards', 'Get 10 ETB Mobile Card per referral!'),
+            _buildStepItem(LucideIcons.smartphone, 'Earn Rewards', 'Get Priority Credits per referral!'),
             
             const SizedBox(height: 40),
             

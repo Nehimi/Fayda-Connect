@@ -3,7 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../models/service_model.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
-import 'payment_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
@@ -125,43 +124,28 @@ class _ServiceFormScreenState extends ConsumerState<ServiceFormScreen> {
                   if (_formKey.currentState!.validate()) {
                     final formData = _controllers.map((key, controller) => MapEntry(key, controller.text));
                     
-                    if (user.isPremium) {
-                      // Premium Logic: Skip Payment
-                      final newOrder = ServiceOrder(
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        serviceName: widget.serviceName,
-                        serviceCategory: widget.category,
-                        customerPhone: _controllers['phone']!.text,
-                        orderDate: DateTime.now(),
-                        amountPaid: 0.0,
-                        formData: formData,
-                        status: OrderStatus.processing, // Or pending
-                      );
-                      
-                      ref.read(ordersProvider.notifier).addOrder(newOrder);
+                    // Create a review request/order for all users
+                    final newOrder = ServiceOrder(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      serviceName: widget.serviceName,
+                      serviceCategory: widget.category,
+                      customerPhone: _controllers['phone']!.text,
+                      orderDate: DateTime.now(),
+                      amountPaid: 0.0,
+                      formData: formData,
+                      status: OrderStatus.processing,
+                    );
+                    
+                    ref.read(ordersProvider.notifier).addOrder(newOrder);
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => SuccessScreen(bankName: widget.serviceName)),
-                      );
-                    } else {
-                      // Standard Logic: Go to Payment
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PaymentScreen(
-                            bankName: widget.serviceName,
-                            formData: formData,
-                          ),
-                        ),
-                      );
-                    }
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => SuccessScreen(bankName: widget.serviceName)),
+                    );
                   }
                 },
                 child: Text(
-                  user.isPremium 
-                    ? (lang == AppLanguage.english ? 'Submit Application' : 'ማመልከቻውን አስገባ') 
-                    : (lang == AppLanguage.english ? 'Continue to Payment' : 'ወደ ክፍያ ይቀጥሉ'),
+                  lang == AppLanguage.english ? 'Request Professional Review' : 'የባለሙያ ክትትል ይጠይቁ',
                   style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)
                 ),
               ),

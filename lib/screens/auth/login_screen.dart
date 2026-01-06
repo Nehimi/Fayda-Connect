@@ -6,9 +6,9 @@ import '../../widgets/glass_card.dart';
 import 'signup_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/auth_service.dart';
-import '../../services/sync_service.dart';
 import '../../widgets/custom_snackbar.dart';
 import '../../providers/auth_ui_provider.dart';
+import '../../utils/responsive.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -86,13 +86,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsive.horizontalPadding
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                         const SizedBox(height: 20),
+                         SizedBox(height: context.responsive.getSpacing(20)),
                          _LogoHeader(),
-                         const SizedBox(height: 48),
+                         SizedBox(height: context.responsive.getSpacing(48)),
                          
                          // --- EMAIL FIELD ---
                          GlassCard(
@@ -159,7 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                          const SizedBox(height: 40),
                          
                          // Sign Up Link
-                         Row(
+                          Row(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
                              const Text("New user? ", style: TextStyle(color: AppColors.textDim)),
@@ -169,6 +171,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                              ),
                            ],
                          ),
+                         const SizedBox(height: 32),
+                          
+                          // Government Disclaimer
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.orange.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                            ),
+                            child: const Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(LucideIcons.alertTriangle, size: 16, color: Colors.orange),
+                                    SizedBox(width: 8),
+                                    Text('NOT A GOVERNMENT APP', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12)),
+                                  ],
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Fayda-Connect is an independent utility tool. We are NOT affiliated with the Ethiopian Government or NIDP. Your data is stored locally.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: AppColors.textDim, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ),
                          const SizedBox(height: 40),
                       ],
                     ),

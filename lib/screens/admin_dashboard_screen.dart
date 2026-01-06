@@ -90,7 +90,7 @@ class _AdminOrderCard extends ConsumerWidget {
             const SizedBox(height: 16),
             
             _buildInfoRow(LucideIcons.phone, 'Customer', order.customerPhone),
-            _buildInfoRow(LucideIcons.banknote, 'Amount', '${order.amountPaid} ETB'),
+            _buildInfoRow(LucideIcons.star, 'Credits', '${order.amountPaid} pts'),
             
             if (order.formData != null && order.formData!.isNotEmpty) ...[
               const SizedBox(height: 12),

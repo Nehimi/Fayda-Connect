@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
+import '../utils/responsive.dart';
 
 class EmergencyScreen extends ConsumerStatefulWidget {
   const EmergencyScreen({super.key});
@@ -125,24 +126,32 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(context.responsive.horizontalPadding),
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            _buildQRSection(),
-            const SizedBox(height: 40),
+            SizedBox(height: context.responsive.getSpacing(20)),
+            _buildQRSection(context),
+            SizedBox(height: context.responsive.getSpacing(40)),
             _buildInfoSection(),
-            const SizedBox(height: 30),
+            SizedBox(height: context.responsive.getSpacing(30)),
             if (!_isEditing)
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFD32F2F), // Medical Red
                   foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  minimumSize: Size(double.infinity, context.responsive.buttonHeight),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(context.responsive.getBorderRadius(16))
+                  ),
                 ),
                 icon: const Icon(LucideIcons.phoneCall),
-                label: const Text('CALL EMERGENCY CONTACT', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                label: Text(
+                  'CALL EMERGENCY CONTACT', 
+                  style: TextStyle(
+                    fontSize: context.responsive.getFontSize(16), 
+                    fontWeight: FontWeight.bold
+                  )
+                ),
                 onPressed: _makeEmergencyCall,
               ),
           ],
@@ -151,7 +160,7 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
     );
   }
 
-  Widget _buildQRSection() {
+  Widget _buildQRSection(BuildContext context) {
     // Helper to format data string for QR
     String qrData = "EMERGENCY INFO:\n"
         "Name: ${_emergencyData['Name']}\n"
@@ -159,15 +168,17 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
         "Allergies: ${_emergencyData['Allergies']}\n"
         "Contact: ${_emergencyData['Emergency Contact']}";
 
+    final qrSize = context.responsive.qrCodeSize;
+
     return Column(
       children: [
         Container(
-          width: 260,
-          height: 260,
-          padding: const EdgeInsets.all(12),
+          width: qrSize,
+          height: qrSize,
+          padding: EdgeInsets.all(context.responsive.getSpacing(12)),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(context.responsive.getBorderRadius(24)),
             boxShadow: [
               BoxShadow(color: Colors.redAccent.withValues(alpha: 0.4), blurRadius: 30, spreadRadius: 5),
             ],
@@ -176,15 +187,19 @@ class _EmergencyScreenState extends ConsumerState<EmergencyScreen> {
             child: QrImageView(
               data: qrData,
               version: QrVersions.auto,
-              size: 220,
+              size: qrSize - (context.responsive.getSpacing(12) * 2) - 20,
               backgroundColor: Colors.white,
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        const Text(
+        SizedBox(height: context.responsive.getSpacing(16)),
+        Text(
           'Scan for Medical Info',
-          style: TextStyle(color: Colors.white70, fontSize: 13, letterSpacing: 1),
+          style: TextStyle(
+            color: Colors.white70, 
+            fontSize: context.responsive.getFontSize(13), 
+            letterSpacing: 1
+          ),
         ),
       ],
     );

@@ -4,7 +4,6 @@ import '../../theme/colors.dart';
 import '../../widgets/glass_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/auth_service.dart';
-import '../../services/sync_service.dart';
 import '../../widgets/custom_snackbar.dart';
 
 import 'otp_verification_screen.dart';
@@ -31,22 +30,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 1. Create the account (AuthService will auto-send the verification link)
-      final credential = await ref.read(authServiceProvider).signUpWithEmailAndPassword(
+      // Create the account (AuthService will auto-send the verification link)
+      await ref.read(authServiceProvider).signUpWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
         name: _nameController.text,
       );
-      
-      final user = credential.user;
-      if (user != null) {
-        // 2. Create Firestore profile IMMEDIATELY (pending verification)
-        await ref.read(syncServiceProvider).createUserProfile(
-          user.uid, 
-          _nameController.text, 
-          _emailController.text
-        );
-      }
       
       if (mounted) {
         setState(() => _isLoading = false);
