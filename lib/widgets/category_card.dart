@@ -6,6 +6,7 @@ import '../widgets/glass_card.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../utils/responsive.dart';
 
 class CategoryCard extends ConsumerWidget {
   final ServiceCategory category;
@@ -55,28 +56,30 @@ class CategoryCard extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(context.responsive.getSpacing(20)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(context.responsive.getSpacing(12)),
                     decoration: BoxDecoration(
                       color: category.color.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(
+                        context.responsive.getBorderRadius(16)
+                      ),
                     ),
                     child: Icon(
                       category.icon,
                       color: category.color,
-                      size: 28,
+                      size: context.responsive.getIconSize(28),
                     ),
                   ),
                   const Spacer(),
                   Text(
                     localizedTitle,
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: context.responsive.getFontSize(18),
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
                       color: AppColors.textMain,
@@ -85,8 +88,8 @@ class CategoryCard extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     category.description,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: context.responsive.getFontSize(12),
                       color: AppColors.textDim,
                       height: 1.2,
                     ),

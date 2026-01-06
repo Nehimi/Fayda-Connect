@@ -8,7 +8,6 @@ import '../home_screen.dart';
 import '../../widgets/custom_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/auth_service.dart';
-import '../../services/sync_service.dart';
 
 class OtpVerificationScreen extends ConsumerStatefulWidget {
   final String phoneNumber;
@@ -67,15 +66,6 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
       if (user != null && user.emailVerified) {
         _timer?.cancel();
-      
-      if (widget.isSignUp && widget.name != null) {
-        // Sync to Firestore once verified
-        await ref.read(syncServiceProvider).createUserProfile(
-          user.uid, 
-          widget.name!, 
-          widget.email!
-        );
-      }
 
         if (mounted) {
           CustomSnackBar.show(context, message: 'Email Verified Successfully!');

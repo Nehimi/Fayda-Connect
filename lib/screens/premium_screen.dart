@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
-import '../widgets/app_drawer.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'payment_screen.dart';
 
 class PremiumScreen extends ConsumerStatefulWidget {
   const PremiumScreen({super.key});
@@ -16,8 +15,6 @@ class PremiumScreen extends ConsumerStatefulWidget {
 }
 
 class _PremiumScreenState extends ConsumerState<PremiumScreen> {
-  bool isAnnual = true;
-
   @override
   Widget build(BuildContext context) {
     final lang = ref.watch(languageProvider);
@@ -55,7 +52,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
             ),
             const SizedBox(height: 32),
             const Text(
-              'Go Premium',
+              'Premium Pass',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
@@ -65,59 +62,46 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
             ),
             const SizedBox(height: 12),
             const Text(
-              'One subscription for all your digital identity needs in Ethiopia.',
+              'Get direct access to expert assistance and advanced identity management tools.',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.textDim, fontSize: 16),
             ),
             const SizedBox(height: 40),
 
-            // Plan Toggle
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: AppColors.glassSurface,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _PlanTab('Monthly', !isAnnual, () => setState(() => isAnnual = false)),
-                  _PlanTab('Yearly (Save 17%)', isAnnual, () => setState(() => isAnnual = true)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+
 
             // Feature List
-            _buildFeature(LucideIcons.zap, 'Zero Processing Fees', 'Skip the 50 ETB fee for individual bank linkings.'),
+            _buildFeature(LucideIcons.zap, 'Zero Processing Fees', 'Skip separate processing requests for individual bank linkings.'),
             _buildFeature(LucideIcons.headphones, 'Priority Concierge', 'Direct access to an agent via Telegram for complex issues.'),
             _buildFeature(LucideIcons.shieldCheck, 'Verified ID Vault', 'Advanced encryption for storing multiple family IDs.'),
             _buildFeature(LucideIcons.bellRing, 'Renewal Alerts', 'Get SMS alerts before your Passport or SIM expires.'),
 
             const SizedBox(height: 48),
 
-            // Pricing Card
             GlassCard(
               padding: const EdgeInsets.all(32),
               borderColor: AppColors.primary.withValues(alpha: 0.5),
               child: Column(
                 children: [
-                   Text(
-                    isAnnual ? 'ANNUAL PLAN' : 'MONTHLY PLAN',
-                    style: const TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 12),
+                   const Text(
+                    'SERVICE ACCESS',
+                    style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 12),
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('ETB ', style: TextStyle(fontSize: 18, color: AppColors.textMain, fontWeight: FontWeight.bold, height: 2)),
-                      Text(isAnnual ? '499' : '50', style: const TextStyle(fontSize: 48, color: AppColors.textMain, fontWeight: FontWeight.w900, letterSpacing: -2)),
-                      Text(isAnnual ? '/yr' : '/mo', style: const TextStyle(fontSize: 16, color: AppColors.textDim, height: 3)),
-                    ],
+                  const Text(
+                    'Full Support & Features',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 24, color: AppColors.textMain, fontWeight: FontWeight.w900),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Contact our support team to activate premium features and priority services.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.textDim, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -126,17 +110,14 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
                       shadowColor: AppColors.primary.withOpacity(0.4),
                       elevation: 10,
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PaymentScreen(
-                            bankName: isAnnual ? 'Premium (Yearly)' : 'Premium (Monthly)',
-                          ),
-                        ),
-                      );
+                    onPressed: () async {
+                      final url = Uri.parse('https://t.me/NehimiG2');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      }
                     },
-                    child: Text(isAnnual ? 'Save & Subscribe' : 'Subscribe Now', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+                    icon: const Icon(LucideIcons.send),
+                    label: const Text('Contact Support (@NehimiG2)', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
                   ),
                 ],
               ),
@@ -148,33 +129,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
     );
   }
 
-  Widget _PlanTab(String title, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: isSelected ? [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ] : null,
-        ),
-        child: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textDim,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
-        ),
-      ),
-    );
-  }
+
 
   Widget _buildFeature(IconData icon, String title, String subtitle) {
     return Padding(

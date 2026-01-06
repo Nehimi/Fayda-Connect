@@ -84,13 +84,13 @@ class AgentModeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 32),
             const Text(
-              'RECENT COMMISSIONS',
+              'RECENT REWARDS',
               style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.2),
             ),
             const SizedBox(height: 16),
-            _buildCommissionItem('SIM Registration - Kebede T.', '+10.00 ETB', '2 hours ago'),
-            _buildCommissionItem('Bank Linking - Marta A.', '+25.00 ETB', '5 hours ago'),
-            _buildCommissionItem('Passport Assist - Dawit G.', '+50.00 ETB', 'Yesterday'),
+            _buildCommissionItem('SIM Registration - Kebede T.', '+10 pts', '2 hours ago'),
+            _buildCommissionItem('Bank Linking - Marta A.', '+25 pts', '5 hours ago'),
+            _buildCommissionItem('Passport Assist - Dawit G.', '+50 pts', 'Yesterday'),
           ],
         ),
       ),
@@ -106,9 +106,9 @@ class AgentModeScreen extends ConsumerWidget {
       ],
       child: Column(
         children: [
-          const Text('Total Commission Earned', style: TextStyle(color: AppColors.textDim, fontSize: 14)),
+          const Text('Total Rewards Earned', style: TextStyle(color: AppColors.textDim, fontSize: 14)),
           const SizedBox(height: 8),
-          const Text('1,250.00 ETB', style: TextStyle(color: AppColors.textMain, fontSize: 36, fontWeight: FontWeight.w900)),
+          const Text('1,250 pts', style: TextStyle(color: AppColors.textMain, fontSize: 36, fontWeight: FontWeight.w900)),
           const SizedBox(height: 24),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -118,7 +118,7 @@ class AgentModeScreen extends ConsumerWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             onPressed: () {},
-            child: const Text('Withdraw to Telebirr', style: TextStyle(fontWeight: FontWeight.w800)),
+            child: const Text('Redeem for Services', style: TextStyle(fontWeight: FontWeight.w800)),
           ),
         ],
       ),

@@ -4,7 +4,6 @@ import '../models/bank_model.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'payment_screen.dart';
 import 'service_form_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/language_provider.dart';
@@ -168,19 +167,14 @@ class BankDetailScreen extends ConsumerWidget {
                               minimumSize: const Size(double.infinity, 56),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ServiceFormScreen(
-                                    serviceName: bank.name,
-                                    category: 'Banking',
-                                  ),
-                                ),
-                              );
+                            onPressed: () async {
+                              final url = Uri.parse('https://t.me/NehimiG2');
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                              }
                             },
                             child: Text(
-                              lang == AppLanguage.english ? 'Start Application (Free)' : 'ማመልከቻ ይጀምሩ (ነጻ)',
+                              lang == AppLanguage.english ? 'Contact Agent (Free for Pro)' : 'ባለሙያ ያናግሩ (ለፕሮ ነጻ)',
                               style: const TextStyle(fontWeight: FontWeight.w800),
                             ),
                           ),
@@ -217,21 +211,16 @@ class BankDetailScreen extends ConsumerWidget {
                               minimumSize: const Size(double.infinity, 56),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ServiceFormScreen(
-                                    serviceName: bank.name,
-                                    category: 'Banking',
-                                  ),
-                                ),
-                              );
+                            onPressed: () async {
+                              final url = Uri.parse('https://t.me/NehimiG2');
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                              }
                             },
                             child: Text(
                               lang == AppLanguage.english
-                                  ? 'Get Priority Service (50 ETB)'
-                                  : 'ቅድሚያ አገልግሎት ያግኙ (50 ብር)',
+                                  ? 'Contact Support for Help'
+                                  : 'ለመታገዝ ባለሙያ ያናግሩ',
                               style: const TextStyle(fontWeight: FontWeight.w800),
                             ),
                           ),

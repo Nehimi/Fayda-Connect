@@ -24,6 +24,8 @@ import '../widgets/custom_snackbar.dart';
 import '../services/auth_service.dart';
 import 'auth/login_screen.dart';
 import '../providers/auth_ui_provider.dart';
+import '../utils/responsive.dart';
+import '../providers/user_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -34,6 +36,8 @@ class HomeScreen extends ConsumerWidget {
     final currentLang = ref.watch(languageProvider);
     final reminders = ref.watch(remindersProvider);
     final userAsync = ref.watch(authStateProvider);
+    final appUser = ref.watch(userProvider);
+    final isPremium = appUser.isPremium;
     
     final categories = [
       ServiceCategory(
@@ -86,14 +90,19 @@ class HomeScreen extends ConsumerWidget {
         children: [
           // Fixed Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 60, 24, 20),
+            padding: EdgeInsets.fromLTRB(
+              context.responsive.horizontalPadding, 
+              60, 
+              context.responsive.horizontalPadding, 
+              20
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
                     _MenuButton(),
-                    const SizedBox(width: 16),
+                    SizedBox(width: context.responsive.getSpacing(16)),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -102,21 +111,33 @@ class HomeScreen extends ConsumerWidget {
                               user != null 
                                 ? '${_getGreetingPrefix(currentLang)}, ${user.displayName ?? 'User'}'
                                 : _getGreetingPrefix(currentLang),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: AppColors.textDim,
-                                fontSize: 14,
+                                fontSize: context.responsive.getFontSize(14),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            loading: () => const Text('Loading...', style: TextStyle(color: AppColors.textDim, fontSize: 14)),
-                            error: (_, __) => Text(_getGreetingPrefix(currentLang), style: const TextStyle(color: AppColors.textDim, fontSize: 14)),
+                            loading: () => Text(
+                              'Loading...', 
+                              style: TextStyle(
+                                color: AppColors.textDim, 
+                                fontSize: context.responsive.getFontSize(14)
+                              )
+                            ),
+                            error: (_, __) => Text(
+                              _getGreetingPrefix(currentLang), 
+                              style: TextStyle(
+                                color: AppColors.textDim, 
+                                fontSize: context.responsive.getFontSize(14)
+                              )
+                            ),
                           ),
                         const SizedBox(height: 4),
                         Text(
                           _getAppName(currentLang),
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textMain,
-                            fontSize: 28,
+                            fontSize: context.responsive.getFontSize(28),
                             fontWeight: FontWeight.w900,
                             letterSpacing: -1,
                           ),
@@ -128,7 +149,11 @@ class HomeScreen extends ConsumerWidget {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(LucideIcons.scanLine, color: AppColors.primary, size: 28),
+                      icon: Icon(
+                        LucideIcons.scanLine, 
+                        color: AppColors.primary, 
+                        size: context.responsive.getIconSize(28)
+                      ),
                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ScannerScreen())),
                     ),
                     const SizedBox(width: 8),
@@ -148,7 +173,10 @@ class HomeScreen extends ConsumerWidget {
 
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.responsive.horizontalPadding, 
+                    vertical: 8
+                  ),
                   child: InkWell(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen())),
                     child: GlassCard(
@@ -180,9 +208,9 @@ class HomeScreen extends ConsumerWidget {
                                   ],
                                 ),
                                 const SizedBox(height: 12),
-                                const Text(
-                                  'Unlimited Free Processing',
-                                  style: TextStyle(
+                                Text(
+                                  isPremium ? 'You are a Pro Member' : 'Unlimited Free Processing',
+                                  style: const TextStyle(
                                     color: AppColors.textMain,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -190,7 +218,7 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Get annual concierge service for 499 ETB.',
+                                  isPremium ? 'Enjoy all your exclusive benefits.' : 'Get annual expert concierge service.',
                                   style: TextStyle(
                                     color: AppColors.textMain.withValues(alpha: 0.7),
                                     fontSize: 13,
@@ -209,15 +237,20 @@ class HomeScreen extends ConsumerWidget {
 
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
+                  padding: EdgeInsets.fromLTRB(
+                    context.responsive.horizontalPadding, 
+                    context.responsive.getSpacing(40), 
+                    context.responsive.horizontalPadding, 
+                    0
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Partner Benefits',
                         style: TextStyle(
                           color: AppColors.textMain,
-                          fontSize: 18,
+                          fontSize: context.responsive.getFontSize(18),
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.5,
                         ),
@@ -235,12 +268,15 @@ class HomeScreen extends ConsumerWidget {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.responsive.horizontalPadding, 
+                    vertical: 16
+                  ),
                   child: Row(
                     children: [
                       _PartnerCard(
                         title: 'Amole Special Offer',
-                        desc: 'Get 5% Cashback on linking.',
+                        desc: 'Get exclusive rewards on linking.',
                         color: const Color(0xFFF59E0B),
                         icon: LucideIcons.percent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
@@ -261,8 +297,13 @@ class HomeScreen extends ConsumerWidget {
               if (reminders.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
-                    child: Column(
+                  padding: EdgeInsets.fromLTRB(
+                    context.responsive.horizontalPadding, 
+                    context.responsive.getSpacing(40), 
+                    context.responsive.horizontalPadding, 
+                    0
+                  ),
+                  child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
@@ -328,12 +369,17 @@ class HomeScreen extends ConsumerWidget {
 
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(24, 40, 24, 16),
+                  padding: EdgeInsets.fromLTRB(
+                    context.responsive.horizontalPadding, 
+                    context.responsive.getSpacing(40), 
+                    context.responsive.horizontalPadding, 
+                    16
+                  ),
                   child: Text(
                     L10n.get(currentLang, 'explore'),
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textMain,
-                      fontSize: 20,
+                      fontSize: context.responsive.getFontSize(20),
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
                     ),
@@ -342,13 +388,15 @@ class HomeScreen extends ConsumerWidget {
               ),
 
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.responsive.horizontalPadding
+                ),
                 sliver: SliverGrid(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.85,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: context.responsive.gridCrossAxisCount,
+                    crossAxisSpacing: context.responsive.getSpacing(16),
+                    mainAxisSpacing: context.responsive.getSpacing(16),
+                    childAspectRatio: context.responsive.isTablet ? 1.0 : 0.85,
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
@@ -519,10 +567,10 @@ class _PartnerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(context.responsive.getBorderRadius(24)),
       child: GlassCard(
-        width: 260,
-        padding: const EdgeInsets.all(20),
+        width: context.responsive.cardWidth,
+        padding: EdgeInsets.all(context.responsive.getSpacing(20)),
         borderColor: color.withValues(alpha: 0.3),
         gradientColors: [
           color.withValues(alpha: 0.1),
@@ -534,12 +582,25 @@ class _PartnerCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(color: color.withValues(alpha: 0.2), shape: BoxShape.circle),
-              child: Icon(icon, color: color, size: 18),
+              child: Icon(icon, color: color, size: context.responsive.getIconSize(18)),
             ),
-            const SizedBox(height: 16),
-            Text(title, style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold, fontSize: 16)),
+            SizedBox(height: context.responsive.getSpacing(16)),
+            Text(
+              title, 
+              style: TextStyle(
+                color: AppColors.textMain, 
+                fontWeight: FontWeight.bold, 
+                fontSize: context.responsive.getFontSize(16)
+              )
+            ),
             const SizedBox(height: 4),
-            Text(desc, style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13)),
+            Text(
+              desc, 
+              style: TextStyle(
+                color: AppColors.textMain.withValues(alpha: 0.7), 
+                fontSize: context.responsive.getFontSize(13)
+              )
+            ),
           ],
         ),
       ),

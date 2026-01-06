@@ -16,11 +16,11 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit the official INAS portal.',
         'Select "New Passport" and enter your FIN.',
         'Choose your appointment date and office location.',
-        'Pay the fee via Telebirr or CBE Birr.',
+        'Complete official fee requirements via Telebirr or CBE Birr.',
         'Print your appointment slip.'
       ],
       requirements: ['Fayda FIN', 'Birth Certificate', 'Telebirr/CBE Birr', 'Appointment Slip'],
-      assistanceFee: 100.0,
+      priorityPoints: 100.0,
     ),
     GeneralService(
       id: 'pass_renew',
@@ -34,11 +34,11 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Login to the INAS portal.',
         'Enter your old passport number and Fayda FIN.',
         'Upload a digital photo if required.',
-        'Pay the renewal fee.',
+        'Complete renewal requirements.',
         'Schedule your biometric data collection.'
       ],
       requirements: ['Old Passport', 'Fayda ID', 'Digital Photo'],
-      assistanceFee: 100.0,
+      priorityPoints: 100.0,
     ),
     GeneralService(
       id: 'pass_lost',
@@ -53,11 +53,11 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Obtain a police report document.',
         'Visit INAS portal and select "Lost Passport".',
         'Upload the police report and Fayda ID.',
-        'Pay the replacement fee.',
+        'Complete replacement requirements.',
         'Schedule biometric appointment.'
       ],
-      requirements: ['Police Report', 'Fayda ID', 'Birth Certificate', 'Payment Receipt'],
-      assistanceFee: 150.0,
+      requirements: ['Police Report', 'Fayda ID', 'Birth Certificate', 'Official Receipt'],
+      priorityPoints: 150.0,
     ),
     GeneralService(
       id: 'pass_damaged',
@@ -73,10 +73,10 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Upload photos of the damaged passport.',
         'Enter your Fayda FIN for verification.',
         'Submit the old damaged passport at appointment.',
-        'Pay the replacement fee.'
+        'Complete replacement requirements.'
       ],
       requirements: ['Damaged Passport', 'Fayda ID', 'Digital Photos'],
-      assistanceFee: 120.0,
+      priorityPoints: 120.0,
     ),
     GeneralService(
       id: 'pass_stolen',
@@ -91,11 +91,11 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Get a copy of the theft report.',
         'Visit INAS portal and report the theft.',
         'Upload police report and Fayda ID.',
-        'Pay the replacement and processing fee.',
+        'Complete replacement and processing requirements.',
         'Attend biometric appointment.'
       ],
-      requirements: ['Police Theft Report', 'Fayda ID', 'Affidavit', 'Payment Receipt'],
-      assistanceFee: 150.0,
+      requirements: ['Police Theft Report', 'Fayda ID', 'Affidavit', 'Official Receipt'],
+      priorityPoints: 150.0,
     ),
     GeneralService(
       id: 'pass_emergency',
@@ -109,11 +109,11 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit the INAS office in person with proof of emergency.',
         'Bring your Fayda ID and travel documents.',
         'Explain your emergency situation.',
-        'Pay the expedited processing fee.',
+        'Complete expedited requirements.',
         'Receive emergency travel document within 24-48 hours.'
       ],
       requirements: ['Fayda ID', 'Proof of Emergency', 'Flight Ticket', 'Expedited Fee'],
-      assistanceFee: 200.0,
+      priorityPoints: 200.0,
     ),
     GeneralService(
       id: 'pass_name_correction',
@@ -128,11 +128,11 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Select "Name Correction/Update".',
         'Upload supporting documents (court order, marriage certificate).',
         'Enter your Fayda FIN.',
-        'Pay the correction fee.',
+        'Complete correction requirements.',
         'Submit old passport at appointment.'
       ],
       requirements: ['Current Passport', 'Legal Document', 'Fayda ID', 'Court Order/Marriage Certificate'],
-      assistanceFee: 130.0,
+      priorityPoints: 130.0,
     ),
     GeneralService(
       id: 'pass_extension',
@@ -146,11 +146,11 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Contact the nearest Ethiopian embassy.',
         'Provide your current passport and Fayda ID.',
         'Fill out the extension application form.',
-        'Pay the extension fee.',
+        'Complete extension requirements.',
         'Receive extended passport within 5-7 business days.'
       ],
       requirements: ['Current Passport', 'Fayda ID', 'Proof of Residence Abroad'],
-      assistanceFee: 100.0,
+      priorityPoints: 100.0,
     ),
     GeneralService(
       id: 'pass_child',
@@ -165,11 +165,11 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Provide child\'s birth certificate and Fayda ID.',
         'Submit both parents\' consent forms.',
         'Upload child\'s photo.',
-        'Pay the child passport fee.',
+        'Complete child passport requirements.',
         'Attend appointment with the child.'
       ],
       requirements: ['Child Birth Certificate', 'Child Fayda ID', 'Parents Consent', 'Guardian ID'],
-      assistanceFee: 120.0,
+      priorityPoints: 120.0,
     ),
     GeneralService(
       id: 'pass_status_check',
@@ -187,7 +187,7 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Download receipt if ready for collection.'
       ],
       requirements: ['Application Reference Number', 'Fayda FIN'],
-      assistanceFee: 0.0,
+      priorityPoints: 0.0,
     ),
   ];
 });
@@ -210,7 +210,7 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Confirm and submit.'
       ],
       requirements: ['School Code', 'Fayda ID', 'Grade 11 Results'],
-      assistanceFee: 50.0,
+      priorityPoints: 50.0,
     ),
     GeneralService(
       id: 'edu_uni_admission',
@@ -226,7 +226,7 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Wait for placement notification based on your verified data.'
       ],
       requirements: ['Grade 12 Result', 'Fayda ID'],
-      assistanceFee: 80.0,
+      priorityPoints: 80.0,
     ),
     GeneralService(
       id: 'edu_scholarship',
@@ -245,7 +245,7 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Wait for evaluation results.'
       ],
       requirements: ['Fayda ID', 'Academic Records', 'Financial Documents', 'Recommendation Letters'],
-      assistanceFee: 100.0,
+      priorityPoints: 100.0,
     ),
     GeneralService(
       id: 'edu_student_id',
@@ -264,7 +264,7 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Receive digital student ID.'
       ],
       requirements: ['Fayda ID', 'University Admission Letter', 'Student Number'],
-      assistanceFee: 60.0,
+      priorityPoints: 60.0,
     ),
     GeneralService(
       id: 'edu_transcript',
@@ -278,12 +278,12 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Login to MoE student portal.',
         'Verify identity with Fayda ID.',
         'Select transcript type (official/unofficial).',
-        'Pay processing fee.',
+        'Complete processing requirements.',
         'Choose delivery method (digital/physical).',
         'Receive transcript within 5-7 days.'
       ],
-      requirements: ['Fayda ID', 'Student ID', 'Payment Receipt'],
-      assistanceFee: 70.0,
+      requirements: ['Fayda ID', 'Student ID', 'Official Receipt'],
+      priorityPoints: 70.0,
     ),
     GeneralService(
       id: 'edu_tvet',
@@ -299,10 +299,10 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Verify identity with Fayda ID.',
         'Upload Grade 10 certificate.',
         'Complete enrollment form.',
-        'Pay registration fee.'
+        'Complete registration requirements.'
       ],
       requirements: ['Fayda ID', 'Grade 10 Certificate', 'Birth Certificate'],
-      assistanceFee: 90.0,
+      priorityPoints: 90.0,
     ),
     GeneralService(
       id: 'edu_graduate_verify',
@@ -317,11 +317,11 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Enter your Fayda FIN.',
         'Upload degree certificate.',
         'Submit verification request.',
-        'Pay verification fee.',
+        'Complete verification requirements.',
         'Receive digital verification certificate.'
       ],
       requirements: ['Fayda ID', 'Degree Certificate', 'University Transcript'],
-      assistanceFee: 120.0,
+      priorityPoints: 120.0,
     ),
     GeneralService(
       id: 'edu_student_loan',
@@ -341,7 +341,7 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Wait for approval.'
       ],
       requirements: ['Fayda ID', 'University Admission', 'Guarantor Details', 'Financial Statements'],
-      assistanceFee: 150.0,
+      priorityPoints: 150.0,
     ),
     GeneralService(
       id: 'edu_record_correction',
@@ -361,7 +361,7 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Receive corrected records.'
       ],
       requirements: ['Fayda ID', 'Original Documents', 'Supporting Evidence', 'Affidavit if needed'],
-      assistanceFee: 100.0,
+      priorityPoints: 100.0,
     ),
     GeneralService(
       id: 'edu_grade10_cert',
@@ -375,12 +375,12 @@ final educationServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit MoE certificate portal.',
         'Verify with Fayda ID.',
         'Enter school details.',
-        'Pay certificate fee.',
+        'Complete certificate requirements.',
         'Choose delivery method.',
         'Receive certificate within 10 days.'
       ],
       requirements: ['Fayda ID', 'School Name', 'Year of Completion'],
-      assistanceFee: 50.0,
+      priorityPoints: 50.0,
     ),
   ];
 });
@@ -403,7 +403,7 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Submit for digital certificate issuance.'
       ],
       requirements: ['Fayda ID', 'Business Address', 'Phone Number'],
-      assistanceFee: 150.0,
+      priorityPoints: 150.0,
     ),
     GeneralService(
       id: 'biz_license_new',
@@ -418,11 +418,11 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Select "New Business License".',
         'Verify identity with Fayda ID.',
         'Upload business plan and documents.',
-        'Pay license fee via Telebirr.',
+        'Complete license requirements via Telebirr.',
         'Receive digital license certificate.'
       ],
-      requirements: ['Fayda ID', 'TIN', 'Business Plan', 'Rental Agreement', 'Payment Receipt'],
-      assistanceFee: 250.0,
+      requirements: ['Fayda ID', 'TIN', 'Business Plan', 'Rental Agreement', 'Official Receipt'],
+      priorityPoints: 250.0,
     ),
     GeneralService(
       id: 'biz_license_renew',
@@ -435,11 +435,11 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
       instructionSteps: [
         'Login to Ministry of Trade portal.',
         'Link your Fayda ID to your existing profile.',
-        'Pay renewal fees via Telebirr.',
+        'Complete renewal requirements via Telebirr.',
         'Download your renewed digital license.'
       ],
       requirements: ['Existing License', 'Fayda ID', 'Tax Clearance'],
-      assistanceFee: 200.0,
+      priorityPoints: 200.0,
     ),
     GeneralService(
       id: 'biz_trade_name',
@@ -454,11 +454,11 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Search for name availability.',
         'Submit 3 preferred names.',
         'Verify with Fayda ID.',
-        'Pay reservation fee.',
+        'Complete reservation requirements.',
         'Receive approval within 3 business days.'
       ],
       requirements: ['Fayda ID', 'Proposed Business Names', 'Payment'],
-      assistanceFee: 100.0,
+      priorityPoints: 100.0,
     ),
     GeneralService(
       id: 'biz_vat',
@@ -477,7 +477,7 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Receive VAT certificate digitally.'
       ],
       requirements: ['TIN', 'Business License', 'Fayda ID', 'Financial Statements'],
-      assistanceFee: 180.0,
+      priorityPoints: 180.0,
     ),
     GeneralService(
       id: 'biz_import_export',
@@ -492,11 +492,11 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Select "Import/Export License".',
         'Verify identity with Fayda ID.',
         'Upload company documents.',
-        'Pay license fee.',
+        'Complete license requirements.',
         'Attend inspection if required.'
       ],
       requirements: ['Business License', 'TIN', 'Fayda ID', 'Bank Statement', 'Warehouse Proof'],
-      assistanceFee: 300.0,
+      priorityPoints: 300.0,
     ),
     GeneralService(
       id: 'biz_company_reg',
@@ -511,11 +511,11 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit e-Trade portal.',
         'Submit shareholder details with Fayda IDs.',
         'Upload all required documents.',
-        'Pay registration fee.',
+        'Complete registration requirements.',
         'Receive company certificate.'
       ],
       requirements: ['Shareholders Fayda IDs', 'Memorandum', 'Articles of Association', 'Capital Proof'],
-      assistanceFee: 500.0,
+      priorityPoints: 500.0,
     ),
     GeneralService(
       id: 'biz_tax_clearance',
@@ -532,8 +532,8 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Request clearance certificate.',
         'Download digital certificate.'
       ],
-      requirements: ['TIN', 'Fayda ID', 'Tax Payment Receipts', 'Business License'],
-      assistanceFee: 120.0,
+      requirements: ['TIN', 'Fayda ID', 'Tax Official Receipts', 'Business License'],
+      priorityPoints: 120.0,
     ),
     GeneralService(
       id: 'biz_closure',
@@ -552,7 +552,7 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Receive closure certificate.'
       ],
       requirements: ['Business License', 'Tax Clearance', 'Fayda ID', 'Final Financial Statement'],
-      assistanceFee: 150.0,
+      priorityPoints: 150.0,
     ),
     GeneralService(
       id: 'biz_name_change',
@@ -568,11 +568,11 @@ final businessServiceProvider = Provider<List<GeneralService>>((ref) {
         'Submit name change request.',
         'Upload supporting documents.',
         'Verify with Fayda ID.',
-        'Pay amendment fee.',
+        'Complete amendment requirements.',
         'Receive updated license.'
       ],
       requirements: ['Current License', 'Fayda ID', 'Board Resolution', 'New Name Reservation'],
-      assistanceFee: 180.0,
+      priorityPoints: 180.0,
     ),
   ];
 });
@@ -591,11 +591,11 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
         'Go to the Transport Authority digital portal.',
         'Validate your identity with Fayda ID.',
         'Submit medical certificate digital copy.',
-        'Pay the renewal fee.',
+        'Complete renewal requirements.',
         'Pick up your license or request delivery.'
       ],
       requirements: ['Expired License', 'Medical Certificate', 'Fayda ID'],
-      assistanceFee: 50.0,
+      priorityPoints: 50.0,
     ),
     GeneralService(
       id: 'pub_driver_new',
@@ -611,11 +611,11 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit Transport Authority office.',
         'Verify identity with Fayda ID.',
         'Submit medical certificate.',
-        'Pay license fee.',
+        'Complete license requirements.',
         'Receive license within 7 days.'
       ],
       requirements: ['Fayda ID', 'Driving School Certificate', 'Medical Certificate', 'Exam Results'],
-      assistanceFee: 100.0,
+      priorityPoints: 100.0,
     ),
     GeneralService(
       id: 'pub_birth_cert',
@@ -633,7 +633,7 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
         'Receive digital certificate link.'
       ],
       requirements: ['Physical ID', 'Birth Certificate', 'Woreda Appointment'],
-      assistanceFee: 150.0,
+      priorityPoints: 150.0,
     ),
     GeneralService(
       id: 'pub_marriage_cert',
@@ -648,11 +648,11 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
         'Present both Fayda IDs.',
         'Provide witness information.',
         'Sign marriage register.',
-        'Pay registration fee.',
+        'Complete registration requirements.',
         'Receive marriage certificate.'
       ],
       requirements: ['Both Fayda IDs', 'Witnesses', 'Birth Certificates'],
-      assistanceFee: 80.0,
+      priorityPoints: 80.0,
     ),
     GeneralService(
       id: 'pub_death_cert',
@@ -671,7 +671,7 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
         'Receive death certificate.'
       ],
       requirements: ['Deceased Fayda ID', 'Medical Report', 'Family Member ID'],
-      assistanceFee: 60.0,
+      priorityPoints: 60.0,
     ),
     GeneralService(
       id: 'pub_pension',
@@ -688,7 +688,7 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
         'Update your contact information in the system.'
       ],
       requirements: ['Pensioner Book', 'Fayda ID', 'Fingerprint Scan'],
-      assistanceFee: 30.0,
+      priorityPoints: 30.0,
     ),
     GeneralService(
       id: 'pub_police_clearance',
@@ -702,11 +702,11 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit police clearance portal.',
         'Verify identity with Fayda ID.',
         'Submit fingerprints at police station.',
-        'Pay clearance fee.',
+        'Complete clearance requirements.',
         'Receive certificate within 5-10 days.'
       ],
-      requirements: ['Fayda ID', 'Fingerprints', 'Payment Receipt'],
-      assistanceFee: 100.0,
+      requirements: ['Fayda ID', 'Fingerprints', 'Official Receipt'],
+      priorityPoints: 100.0,
     ),
     GeneralService(
       id: 'pub_health_insurance',
@@ -721,11 +721,11 @@ final publicServiceServiceProvider = Provider<List<GeneralService>>((ref) {
         'Verify with Fayda ID.',
         'Select insurance plan.',
         'Add family members.',
-        'Pay premium.',
+        'Complete premium requirements.',
         'Receive insurance card.'
       ],
       requirements: ['Fayda ID', 'Family Members IDs', 'Payment'],
-      assistanceFee: 70.0,
+      priorityPoints: 70.0,
     ),
   ];
 });
@@ -747,7 +747,7 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
         'Receive confirmation SMS.'
       ],
       requirements: ['Active SIM', 'Fayda ID', '12-digit FIN'],
-      assistanceFee: 20.0,
+      priorityPoints: 20.0,
     ),
     GeneralService(
       id: 'tel_new_sim',
@@ -761,11 +761,11 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit Ethio Telecom or Safaricom shop.',
         'Present your Fayda ID.',
         'Choose phone number.',
-        'Pay SIM card fee.',
+        'Complete SIM requirements.',
         'Activate SIM immediately.'
       ],
       requirements: ['Fayda ID', 'Payment'],
-      assistanceFee: 30.0,
+      priorityPoints: 30.0,
     ),
     GeneralService(
       id: 'tel_number_portability',
@@ -779,11 +779,11 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit new operator shop.',
         'Request number portability.',
         'Verify with Fayda ID.',
-        'Pay portability fee.',
+        'Complete portability requirements.',
         'Wait 24-48 hours for activation.'
       ],
       requirements: ['Fayda ID', 'Current SIM', 'Payment'],
-      assistanceFee: 50.0,
+      priorityPoints: 50.0,
     ),
     GeneralService(
       id: 'tel_lost_sim',
@@ -797,11 +797,11 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit operator shop immediately.',
         'Report SIM loss.',
         'Verify identity with Fayda ID.',
-        'Pay replacement fee.',
+        'Complete replacement requirements.',
         'Receive new SIM with same number.'
       ],
       requirements: ['Fayda ID', 'Phone Number', 'Payment'],
-      assistanceFee: 40.0,
+      priorityPoints: 40.0,
     ),
     GeneralService(
       id: 'tel_data_plan',
@@ -818,7 +818,7 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
         'Receive activation SMS.'
       ],
       requirements: ['Active SIM', 'Sufficient Balance'],
-      assistanceFee: 0.0,
+      priorityPoints: 0.0,
     ),
     GeneralService(
       id: 'tel_mobile_money',
@@ -836,7 +836,7 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
         'Complete registration.'
       ],
       requirements: ['Fayda ID', 'Active SIM', 'Smartphone'],
-      assistanceFee: 25.0,
+      priorityPoints: 25.0,
     ),
     GeneralService(
       id: 'tel_postpaid',
@@ -855,7 +855,7 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
         'Activate postpaid service.'
       ],
       requirements: ['Fayda ID', 'Proof of Address', 'Employment Letter'],
-      assistanceFee: 80.0,
+      priorityPoints: 80.0,
     ),
   ];
 });
