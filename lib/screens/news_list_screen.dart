@@ -70,7 +70,8 @@ class NewsListScreen extends ConsumerWidget {
             itemCount: filteredNews.length,
             itemBuilder: (context, index) {
               final item = filteredNews[index];
-              return _NewsUpdateCard(item: item);
+              final isPremium = ref.watch(userProvider).isPremium;
+              return _NewsUpdateCard(item: item, isUserPremium: isPremium);
             },
           );
         },
@@ -112,7 +113,8 @@ class NewsListScreen extends ConsumerWidget {
 
 class _NewsUpdateCard extends StatefulWidget {
   final NewsItem item;
-  const _NewsUpdateCard({required this.item});
+  final bool isUserPremium;
+  const _NewsUpdateCard({required this.item, required this.isUserPremium});
 
   @override
   State<_NewsUpdateCard> createState() => _NewsUpdateCardState();
@@ -163,7 +165,13 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
           child: const Icon(LucideIcons.trash2, color: AppColors.error, size: 28),
         ),
         child: InkWell(
-          onTap: () => setState(() => _isExpanded = !_isExpanded),
+          onTap: () {
+            if (item.type == NewsType.premium) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen()));
+            } else {
+              setState(() => _isExpanded = !_isExpanded);
+            }
+          },
           borderRadius: BorderRadius.circular(24),
           child: GlassCard(
             padding: const EdgeInsets.all(20),
@@ -309,6 +317,10 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
                         elevation: 0,
                       ),
                       onPressed: () async {
+                        if (item.type == NewsType.premium && !widget.isUserPremium) {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen()));
+                          return;
+                        }
                         String urlStr = item.externalLink!.trim();
                         if (!urlStr.startsWith('http')) {
                           urlStr = 'https://$urlStr';

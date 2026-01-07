@@ -16,7 +16,7 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit the official INAS portal.',
         'Select "New Passport" and enter your FIN.',
         'Choose your appointment date and office location.',
-        'Complete official fee requirements via Telebirr or CBE Birr.',
+        'Complete Official Requirements via Telebirr or CBE Birr.',
         'Print your appointment slip.'
       ],
       requirements: ['Fayda FIN', 'Birth Certificate', 'Telebirr/CBE Birr', 'Appointment Slip'],
@@ -109,10 +109,10 @@ final passportServiceProvider = Provider<List<GeneralService>>((ref) {
         'Visit the INAS office in person with proof of emergency.',
         'Bring your Fayda ID and travel documents.',
         'Explain your emergency situation.',
-        'Complete expedited requirements.',
+        'Complete Requirements.',
         'Receive emergency travel document within 24-48 hours.'
       ],
-      requirements: ['Fayda ID', 'Proof of Emergency', 'Flight Ticket', 'Expedited Fee'],
+      requirements: ['Fayda ID', 'Proof of Emergency', 'Flight Ticket', 'Requirements'],
       priorityPoints: 200.0,
     ),
     GeneralService(
@@ -752,8 +752,8 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
     GeneralService(
       id: 'tel_new_sim',
       category: 'Telecom',
-      name: 'New SIM Card Purchase',
-      description: 'Buy a new SIM card with Fayda ID verification.',
+      name: 'New SIM Card Registration',
+      description: 'Request a new SIM card with Fayda ID verification.',
       logo: 'https://cdn-icons-png.flaticon.com/512/3415/3415077.png',
       type: ServiceType.inPerson,
       officialLink: 'https://www.ethiotelecom.et',
@@ -842,7 +842,7 @@ final telecomServiceProvider = Provider<List<GeneralService>>((ref) {
       id: 'tel_postpaid',
       category: 'Telecom',
       name: 'Postpaid Plan Registration',
-      description: 'Switch to postpaid billing plan.',
+      description: 'Switch to postpaid Activation Steps.',
       logo: 'https://cdn-icons-png.flaticon.com/512/3415/3415077.png',
       type: ServiceType.inPerson,
       officialLink: 'https://www.ethiotelecom.et',

@@ -19,6 +19,33 @@ const db = admin.database();
 // --- BOT INIT ---
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+// --- FCM HELPER ---
+const sendNotification = async (title, body, type, imageUrl = '') => {
+    const message = {
+        notification: {
+            title: title,
+            body: body,
+        },
+        android: {
+            notification: {
+                imageUrl: imageUrl || undefined
+            }
+        },
+        data: {
+            type: type, // Helps app handle click logic
+            click_action: 'FLUTTER_NOTIFICATION_CLICK',
+        },
+        topic: 'all_users',
+    };
+
+    try {
+        await admin.messaging().send(message);
+        console.log('Successfully sent FCM notification');
+    } catch (error) {
+        console.error('Error sending FCM:', error);
+    }
+};
+
 // --- MIDDLEWARE ---
 bot.use(session());
 
@@ -52,17 +79,78 @@ bot.use(async (ctx, next) => {
 
 // --- KEYBOARDS ---
 const mainMenu = Markup.keyboard([
-    ['� News / Official Alert', '🤝 New Partner'],
-    ['�️ Post Promotion', '� Academy / Tutorial'],
-    ['� Manage & Delete', '👀 View Status'], // New Manage Button
-    ['🎨 Toggle Pro Banner', '🤝 Toggle Partners'],
-    ['✨ Clear Chat', '🔥 Wipe DB']
+    ['📰 News / Official Alert', '🤝 New Partner'],
+    ['📢 Post Promotion', '🎓 Academy / Tutorial'],
+    ['📝 Manage & Delete', '👤 Manage Users'],
+    ['📊 App Stats', '🔔 Pending Requests'],
+    ['💎 Broadcast ↔ Promo', '🎨 Toggle Pro Card'],
+    ['🤝 Toggle Partners', '✨ Clear Chat'],
+    ['🔥 Wipe DB']
 ]).resize();
 
 const cancelMenu = Markup.keyboard([['❌ Cancel']]).resize();
+const typeMenu = Markup.keyboard([['Standard', 'Premium', 'Alert'], ['❌ Cancel']]).resize();
+const confirmMenu = Markup.keyboard([['✅ Confirm', '❌ Cancel']]).resize();
+const userActionMenu = Markup.keyboard([['⭐ Set Premium', '🚫 Revoke Premium'], ['❌ Cancel']]).resize();
 
 // --- HELPERS ---
 const showMenu = (ctx) => ctx.reply('🤖 Fayda Connect CMS\nSelect an action:', mainMenu);
+
+// --- SEARCH HELPER ---
+async function findUsers(query) {
+    const results = [];
+    const searchLow = query.toLowerCase();
+
+    // 1. Search Auth Users
+    const listResult = await admin.auth().listUsers();
+    listResult.users.forEach(u => {
+        const nameMatch = (u.displayName && u.displayName.toLowerCase().includes(searchLow));
+        const emailMatch = (u.email && u.email.toLowerCase().includes(searchLow));
+        const uidMatch = u.uid === query;
+        if (nameMatch || emailMatch || uidMatch) {
+            results.push({ uid: u.uid, name: u.displayName || 'No Name', email: u.email || 'No Email' });
+        }
+    });
+
+    // 2. Search DB (for users not in Auth or with different DB names)
+    const dbSnap = await db.ref('users').once('value');
+    if (dbSnap.exists()) {
+        const dbUsers = dbSnap.val();
+        Object.entries(dbUsers).forEach(([uid, data]) => {
+            if (results.find(r => r.uid === uid)) return;
+            const nameMatch = (data.name && data.name.toLowerCase().includes(searchLow));
+            if (nameMatch) {
+                results.push({ uid: uid, name: data.name, email: 'DB Entry' });
+            }
+        });
+    }
+
+    return results.slice(0, 10); // Limit to 10 for UI clarity
+}
+
+async function processUserSelection(ctx, uid) {
+    try {
+        const snapshot = await db.ref(`users/${uid}`).once('value');
+        const userData = snapshot.val();
+        let authUser = null;
+        try { authUser = await admin.auth().getUser(uid); } catch (e) { }
+
+        const message = `👤 **Member Profile**\n\n` +
+            `🆔 **UID:** \`${uid}\`\n` +
+            `👤 **Name:** ${authUser ? authUser.displayName : (userData ? userData.name : 'N/A')}\n` +
+            `📧 **Email:** ${authUser ? authUser.email : 'N/A'}\n` +
+            `💎 **Status:** ${userData && userData.isPremium ? '✅ PREMIUM MEMBER' : '❌ STANDARD MEMBER'}\n\n` +
+            `Activate or revoke professional access:`;
+
+        await ctx.replyWithMarkdown(message, userActionMenu);
+
+        // We set the UID in session because wizards are tricky with external calls
+        ctx.session.selectedUserUid = uid;
+    } catch (e) {
+        console.error(e);
+        ctx.reply('Error loading user details.');
+    }
+}
 
 // --- SCENES ---
 
@@ -81,28 +169,53 @@ const newsWizard = new Scenes.WizardScene(
     },
     (ctx) => {
         ctx.wizard.state.content = ctx.message.text;
-        ctx.reply('Enter Type (standard, premium, alert):');
+        ctx.reply('Select Type:', typeMenu);
         return ctx.wizard.next();
     },
     (ctx) => {
+        if (ctx.message.text === '❌ Cancel') return ctx.scene.leave();
         ctx.wizard.state.type = ctx.message.text.toLowerCase();
-        ctx.reply('Enter Image or Video URL (YouTube/Direct Link) or type "skip":');
+        ctx.reply('Enter Image URL (or type "skip"):', cancelMenu);
+        return ctx.wizard.next();
+    },
+    (ctx) => {
+        if (ctx.message.text === '❌ Cancel') return ctx.scene.leave();
+        ctx.wizard.state.imageUrl = ctx.message.text.toLowerCase() === 'skip' ? '' : ctx.message.text;
+
+        const preview = `📝 **NEWS PREVIEW**\n\n` +
+            `📌 **Title:** ${ctx.wizard.state.title}\n` +
+            `📄 **Type:** ${ctx.wizard.state.type}\n` +
+            `🖼️ **Image:** ${ctx.wizard.state.imageUrl || 'None'}\n\n` +
+            `**Content:**\n${ctx.wizard.state.content}\n\n` +
+            `🚀 Post and notify all users?`;
+
+        ctx.replyWithMarkdown(preview, confirmMenu);
         return ctx.wizard.next();
     },
     async (ctx) => {
-        let imageUrl = ctx.message.text;
-        if (imageUrl.toLowerCase() === 'skip') imageUrl = '';
+        if (ctx.message.text === '✅ Confirm') {
+            const data = {
+                title: ctx.wizard.state.title,
+                content: ctx.wizard.state.content,
+                type: ctx.wizard.state.type,
+                date: new Date().toISOString(),
+                imageUrl: ctx.wizard.state.imageUrl,
+                externalLink: ''
+            };
+            await db.ref('news_updates').push(data);
 
-        const data = {
-            title: ctx.wizard.state.title,
-            content: ctx.wizard.state.content,
-            type: ctx.wizard.state.type,
-            date: new Date().toISOString(),
-            imageUrl: imageUrl,
-            externalLink: ''
-        };
-        await db.ref('news_updates').push(data);
-        await ctx.reply('✅ News Posted!');
+            // Send Push Notification
+            await sendNotification(
+                `📢 ${ctx.wizard.state.title}`,
+                ctx.wizard.state.content.substring(0, 100) + '...',
+                ctx.wizard.state.type,
+                ctx.wizard.state.imageUrl
+            );
+
+            await ctx.reply('✅ News Posted & Notification Sent!');
+        } else {
+            await ctx.reply('❌ Post Cancelled.');
+        }
         return ctx.scene.leave();
     }
 );
@@ -168,17 +281,41 @@ const promotionWizard = new Scenes.WizardScene(
         ctx.reply('Enter Action Link (URL):');
         return ctx.wizard.next();
     },
+    (ctx) => {
+        ctx.wizard.state.link = ctx.message.text;
+        const preview = `📢 **PROMOTION PREVIEW**\n\n` +
+            `📌 **Title:** ${ctx.wizard.state.title}\n` +
+            `🔗 **Link:** ${ctx.wizard.state.link}\n\n` +
+            `**Content:**\n${ctx.wizard.state.content}\n\n` +
+            `🚀 Blast this promotion to all users?`;
+
+        ctx.replyWithMarkdown(preview, confirmMenu);
+        return ctx.wizard.next();
+    },
     async (ctx) => {
-        const data = {
-            title: ctx.wizard.state.title,
-            content: ctx.wizard.state.content,
-            type: 'promotion',
-            date: new Date().toISOString(),
-            imageUrl: ctx.wizard.state.image,
-            externalLink: ctx.message.text
-        };
-        await db.ref('news_updates').push(data);
-        await ctx.reply('🚀 Promotion Live!');
+        if (ctx.message.text === '✅ Confirm') {
+            const data = {
+                title: ctx.wizard.state.title,
+                content: ctx.wizard.state.content,
+                type: 'promotion',
+                date: new Date().toISOString(),
+                imageUrl: ctx.wizard.state.image,
+                externalLink: ctx.wizard.state.link
+            };
+            await db.ref('news_updates').push(data);
+
+            // Send Push Notification
+            await sendNotification(
+                `✨ ${ctx.wizard.state.title}`,
+                ctx.wizard.state.content.substring(0, 100) + '...',
+                'promotion',
+                ctx.wizard.state.image
+            );
+
+            await ctx.reply('🚀 Promotion Live & Notified!');
+        } else {
+            await ctx.reply('❌ Promotion Cancelled.');
+        }
         return ctx.scene.leave();
     }
 );
@@ -222,7 +359,6 @@ const academyWizard = new Scenes.WizardScene(
 const editPostWizard = new Scenes.WizardScene(
     'EDIT_POST_WIZARD',
     async (ctx) => {
-        // Initialize state from passed scene starter state if needed
         if (!ctx.wizard.state.postId) {
             ctx.wizard.state.postId = ctx.scene.state.postId;
         }
@@ -250,7 +386,55 @@ const editPostWizard = new Scenes.WizardScene(
     }
 );
 
-const stage = new Scenes.Stage([newsWizard, benefitWizard, promotionWizard, academyWizard, editPostWizard]);
+// 6. User Management Wizard (ELITE VERSION)
+const userManageWizard = new Scenes.WizardScene(
+    'USER_MANAGE_WIZARD',
+    (ctx) => {
+        ctx.reply('👤 **User Search**\nEnter Name, Email, or UID:', cancelMenu);
+        return ctx.wizard.next();
+    },
+    async (ctx) => {
+        if (ctx.message.text === '❌ Cancel') return ctx.scene.leave();
+        const query = ctx.message.text.trim();
+
+        ctx.reply('🔍 Searching...');
+        const matches = await findUsers(query);
+
+        if (matches.length === 0) {
+            ctx.reply('❌ No users found. Please try another search.');
+            return ctx.scene.leave();
+        }
+
+        if (matches.length === 1) {
+            await processUserSelection(ctx, matches[0].uid);
+            return ctx.wizard.next();
+        }
+
+        // Multiple Matches
+        const buttons = matches.map(m => [Markup.button.callback(`${m.name} (${m.email.substring(0, 5)}...)`, `sel_user_${m.uid}`)]);
+        ctx.reply('👥 Multiple matches found. Select one:', Markup.inlineKeyboard(buttons));
+        return ctx.wizard.next();
+    },
+    async (ctx) => {
+        // Handling input
+        if (ctx.message && ctx.message.text === '❌ Cancel') return ctx.scene.leave();
+
+        // Final Action Step for User Manager
+        const action = ctx.message.text;
+        const uid = ctx.session.selectedUserUid;
+        if (!uid) return ctx.scene.leave();
+
+        if (action === '⭐ Set Premium' || action === '🚫 Revoke Premium') {
+            const isPremium = action === '⭐ Set Premium';
+            await db.ref(`users/${uid}`).update({ isPremium: isPremium });
+            await db.ref(`premium_requests/${uid}`).remove();
+            await ctx.reply(isPremium ? `✅ User ACTIVATED!` : `🚫 Status RESTORED to Standard.`);
+            return ctx.scene.leave();
+        }
+    }
+);
+
+const stage = new Scenes.Stage([newsWizard, benefitWizard, promotionWizard, academyWizard, editPostWizard, userManageWizard]);
 bot.use(stage.middleware());
 
 // --- COMMANDS ---
@@ -262,24 +446,84 @@ bot.start((ctx) => {
     ctx.reply('🔒 Admin System Locked. Enter Password:');
 });
 
-bot.hears('� News / Official Alert', (ctx) => ctx.scene.enter('NEWS_WIZARD'));
+bot.hears('📰 News / Official Alert', (ctx) => ctx.scene.enter('NEWS_WIZARD'));
 bot.hears('🤝 New Partner', (ctx) => ctx.scene.enter('BENEFIT_WIZARD'));
-bot.hears('�️ Post Promotion', (ctx) => ctx.scene.enter('PROMOTION_WIZARD'));
-bot.hears('� Academy / Tutorial', (ctx) => ctx.scene.enter('ACADEMY_WIZARD'));
+bot.hears('📢 Post Promotion', (ctx) => ctx.scene.enter('PROMOTION_WIZARD'));
+bot.hears('🎓 Academy / Tutorial', (ctx) => ctx.scene.enter('ACADEMY_WIZARD'));
+bot.hears('👤 Manage Users', (ctx) => ctx.scene.enter('USER_MANAGE_WIZARD'));
+
+bot.hears('🔔 Pending Requests', async (ctx) => {
+    const snapshot = await db.ref('premium_requests').once('value');
+    if (!snapshot.exists()) return ctx.reply('✅ No pending requests.');
+
+    const requests = snapshot.val();
+    let text = '🔔 **Pending Activation Requests**\n\n';
+    const buttons = [];
+
+    Object.entries(requests).forEach(([uid, data]) => {
+        text += `👤 **${data.name}**\n🆔 \`${uid}\`\n\n`;
+        buttons.push([Markup.button.callback(`✅ Approve ${data.name.split(' ')[0]}`, `approve_req_${uid}`)]);
+    });
+
+    ctx.replyWithMarkdown(text, Markup.inlineKeyboard(buttons));
+});
+
+// --- CALLBACK HANDLERS ---
+bot.action(/^sel_user_(.+)$/, async (ctx) => {
+    const uid = ctx.match[1];
+    await ctx.answerCbQuery();
+    await processUserSelection(ctx, uid);
+});
+
+bot.action(/^approve_req_(.+)$/, async (ctx) => {
+    const uid = ctx.match[1];
+    await db.ref(`users/${uid}`).update({ isPremium: true });
+    await db.ref(`premium_requests/${uid}`).remove();
+    await ctx.editMessageText(`✅ User \`${uid}\` approved manually.`);
+    await ctx.answerCbQuery('User Activated!');
+});
+
+// --- STATS HANDLER ---
+bot.hears('📊 App Stats', async (ctx) => {
+    try {
+        const loadingMsg = await ctx.reply('📊 Calculating stats...');
+        const usersResult = await admin.auth().listUsers();
+        const totalUsersCount = usersResult.users.length;
+
+        const usersSnapshot = await db.ref('users').once('value');
+        let premiumCount = 0;
+        if (usersSnapshot.exists()) {
+            const users = usersSnapshot.val();
+            premiumCount = Object.values(users).filter(u => u.isPremium === true).length;
+        }
+
+        const newsSnapshot = await db.ref('news_updates').once('value');
+        const totalPosts = newsSnapshot.exists() ? Object.keys(newsSnapshot.val()).length : 0;
+
+        const statsText = `📊 **Fayda Connect Insights**\n\n` +
+            `👥 **Total Users:** ${totalUsersCount}\n` +
+            `⭐ **Premium Members:** ${premiumCount}\n` +
+            `📰 **Live Posts:** ${totalPosts}\n\n` +
+            `Built with ❤️ by Fayda Team`;
+
+        await ctx.telegram.editMessageText(ctx.chat.id, loadingMsg.message_id, null, statsText, { parse_mode: 'Markdown' });
+    } catch (e) {
+        console.error(e);
+        ctx.reply('❌ Error fetching stats.');
+    }
+});
 
 // --- MANAGE POSTS HANDLERS ---
-bot.hears('� Manage & Delete', async (ctx) => {
+bot.hears('📝 Manage & Delete', async (ctx) => {
     try {
         const snapshot = await db.ref('news_updates').limitToLast(10).once('value');
         const data = snapshot.val();
         if (!data) return ctx.reply('📭 No posts found.');
 
         const buttons = [];
-        // Loop reversed to show newest first
         const entries = Object.entries(data).reverse();
 
         entries.forEach(([key, value]) => {
-            // Truncate title
             const label = value.title.length > 20 ? value.title.substring(0, 20) + '...' : value.title;
             const typeEmoji = value.type === 'academy' ? '🎓' : (value.type === 'promotion' ? '📢' : '📰');
             buttons.push([Markup.button.callback(`${typeEmoji} ${label}`, `manage_post_${key}`)]);
@@ -298,7 +542,7 @@ bot.action(/^manage_post_(.+)$/, async (ctx) => {
         const post = snapshot.val();
 
         if (!post) {
-            return ctx.reply('❌ Post not found (it might have been deleted).');
+            return ctx.reply('❌ Post not found.');
         }
 
         const message = `📌 **${post.title}**\n\n${post.content}\n\nType: ${post.type}\nDate: ${new Date(post.date).toLocaleDateString()}`;
@@ -322,31 +566,35 @@ bot.action(/^delete_post_(.+)$/, async (ctx) => {
 bot.action(/^edit_post_(.+)$/, async (ctx) => {
     const postId = ctx.match[1];
     await ctx.answerCbQuery();
-    // Enter the wizard, passing the postId in the initial state
     await ctx.scene.enter('EDIT_POST_WIZARD', { postId: postId });
 });
 
-bot.hears('🎨 Toggle Pro Banner', async (ctx) => {
+bot.hears('💎 Broadcast ↔ Promo', async (ctx) => {
+    const ref = db.ref('settings/hide_premium_news');
+    const snapshot = await ref.once('value');
+    const current = snapshot.val() === true;
+    await ref.set(!current);
+    ctx.reply(!current ? '💎 Switched to: PROMO MODE\n(Broadcasts are hidden, default Pro message is shown.)' : '💎 Switched to: BROADCAST MODE\n(Latest Premium News will be shown in the header.)');
+});
+
+bot.hears('🎨 Toggle Pro Card', async (ctx) => {
     const ref = db.ref('settings/show_premium_promo');
     const snapshot = await ref.once('value');
-    const current = snapshot.val() !== false; // Default true
-
+    const current = snapshot.val() !== false;
     await ref.set(!current);
-    ctx.reply(!current ? '✅ Pro Promo is now VISIBLE.' : '🚫 Pro Promo is now HIDDEN.');
+    ctx.reply(!current ? '✅ Pro Card is now VISIBLE.' : '🚫 Pro Card is now HIDDEN.');
 });
 
 bot.hears('🤝 Toggle Partners', async (ctx) => {
     const ref = db.ref('settings/show_partners');
     const snapshot = await ref.once('value');
-    const current = snapshot.val() !== false; // Default true
-
+    const current = snapshot.val() !== false;
     await ref.set(!current);
     ctx.reply(!current ? '✅ Partners Section is now VISIBLE.' : '🚫 Partners Section is now HIDDEN.');
 });
 
 bot.hears('✨ Clear Chat', async (ctx) => {
     try {
-        // Loop to delete last 100 messages (approx)
         for (let i = 0; i < 100; i++) {
             await ctx.deleteMessage(ctx.message.message_id - i).catch(() => { });
         }
@@ -366,9 +614,29 @@ bot.command('confirm_wipe', async (ctx) => {
 
 bot.action('cancel', (ctx) => ctx.scene.leave());
 
-// Start Bot
-bot.launch().then(() => console.log('🤖 Admin Bot Started'));
+// --- LIVE REQUEST LISTENER ---
+db.ref('premium_requests').on('child_added', (snapshot) => {
+    const uid = snapshot.key;
+    const data = snapshot.val();
 
-// Enable graceful stop
+    ADMIN_IDS.forEach(async (id) => {
+        try {
+            const msg = `🚨 **NEW ACTIVATION REQUEST** 🚨\n\n` +
+                `👤 **Name:** ${data.name}\n` +
+                `📧 **Email:** ${data.email}\n` +
+                `🆔 **UID:** \`${uid}\`\n\n` +
+                `Directly approve this user?`;
+
+            await bot.telegram.sendMessage(id, msg, {
+                parse_mode: 'Markdown',
+                ...Markup.inlineKeyboard([
+                    [Markup.button.callback('✅ APPROVE NOW', `approve_req_${uid}`)]
+                ])
+            });
+        } catch (e) { }
+    });
+});
+
+bot.launch().then(() => console.log('🤖 Admin Bot Started'));
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
