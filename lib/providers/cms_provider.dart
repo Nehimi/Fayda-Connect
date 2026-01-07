@@ -79,6 +79,16 @@ final promoVisibilityProvider = StreamProvider<bool>((ref) {
   });
 });
 
+final hidePremiumNewsProvider = StreamProvider<bool>((ref) {
+  final database = FirebaseDatabase.instanceFor(
+    app: Firebase.app(),
+    databaseURL: 'https://fayda-connect-default-rtdb.firebaseio.com',
+  );
+  return database.ref('settings/hide_premium_news').onValue.map((event) {
+    return (event.snapshot.value as bool?) ?? false;
+  });
+});
+
 final partnerVisibilityProvider = StreamProvider<bool>((ref) {
   final database = FirebaseDatabase.instanceFor(
     app: Firebase.app(),

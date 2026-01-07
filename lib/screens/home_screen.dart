@@ -51,6 +51,7 @@ class HomeScreen extends ConsumerWidget {
     final dynamicBenefits = ref.watch(benefitsProvider);
     final dynamicNews = ref.watch(newsProvider);
     final showPartners = ref.watch(partnerVisibilityProvider).value ?? true;
+    final hidePremiumNews = ref.watch(hidePremiumNewsProvider).value ?? false;
     
     final categories = [
       ServiceCategory(
@@ -176,14 +177,14 @@ class HomeScreen extends ConsumerWidget {
                     data: (news) {
                       // 1. Check for active PREMIUM News (Priority)
                       final latestPremium = news.where((n) => n.type == NewsType.premium).firstOrNull;
-                      if (latestPremium != null) {
-                        return _buildFeaturedNews(context, latestPremium);
+                      if (latestPremium != null && !hidePremiumNews) {
+                        return _buildFeaturedNews(context, latestPremium, isPremium);
                       }
 
                       // 2. Check for latest non-promotion News (Alert, Standard, Partner)
                       final latestOther = news.where((n) => n.type != NewsType.promotion && n.type != NewsType.academy).firstOrNull;
                       if (latestOther != null) {
-                         return _buildFeaturedNews(context, latestOther);
+                         return _buildFeaturedNews(context, latestOther, isPremium);
                       }
 
                       // 2. Fallback to Static PRO Promo (Controlled by Admin Bot)
@@ -405,14 +406,20 @@ IconData _getIconFromName(String name) {
     );
   }
 
-  Widget _buildFeaturedNews(BuildContext context, NewsItem latest) {
+  Widget _buildFeaturedNews(BuildContext context, NewsItem latest, bool isPremium) {
     // Premium posts ALWAYS use the original accent/red theme
     final Color themeColor = latest.type == NewsType.premium ? AppColors.accent : (latest.type == NewsType.alert ? AppColors.error : AppColors.primary);
     final IconData themeIcon = latest.type == NewsType.premium ? LucideIcons.crown : (latest.type == NewsType.alert ? LucideIcons.alertCircle : LucideIcons.megaphone);
     final String label = latest.type == NewsType.premium ? 'PRO BROADCAST' : (latest.type == NewsType.alert ? 'SECURITY ALERT' : 'OFFICIAL FEED');
 
     return InkWell(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsListScreen())),
+      onTap: () {
+        if (latest.type == NewsType.premium) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen()));
+        } else {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsListScreen()));
+        }
+      },
       child: GlassCard(
         padding: const EdgeInsets.all(24),
         borderColor: themeColor.withValues(alpha: 0.3),

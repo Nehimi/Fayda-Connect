@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter/services.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
 import '../screens/home_screen.dart';
@@ -78,17 +79,41 @@ class AppDrawer extends ConsumerWidget {
                             displayName,
                             style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
                           ),
-                          Row(
-                            children: [
-                              Text(
+                               Text(
                                 isPremium ? 'Premium Member' : 'Standard Member',
-                                style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14, fontWeight: FontWeight.w600),
                               ),
                               if (isPremium) ...[
                                 const SizedBox(width: 8),
                                 const Icon(LucideIcons.crown, color: Colors.amber, size: 16),
                               ],
                             ],
+                          ),
+                          const SizedBox(height: 12),
+                          InkWell(
+                            onTap: () {
+                              Clipboard.setData(ClipboardData(text: user?.uid ?? ''));
+                              CustomSnackBar.show(context, message: 'User ID copied to clipboard');
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'ID: ${user?.uid.substring(0, 8) ?? 'N/A'}...',
+                                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(LucideIcons.copy, color: Colors.white.withValues(alpha: 0.5), size: 12),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
