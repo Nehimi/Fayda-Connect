@@ -52,10 +52,10 @@ bot.use(async (ctx, next) => {
 
 // --- KEYBOARDS ---
 const mainMenu = Markup.keyboard([
-    ['🚀 New Update', '🤝 New Partner'],
-    ['📢 Post Promotion', '🎓 Post Academy Video'],
-    ['📝 Manage Posts', '👀 View Status'], // New Manage Button
-    ['👁️ Toggle Pro Promo', '🤝 Toggle Partners'],
+    ['� News / Official Alert', '🤝 New Partner'],
+    ['�️ Post Promotion', '� Academy / Tutorial'],
+    ['� Manage & Delete', '👀 View Status'], // New Manage Button
+    ['🎨 Toggle Pro Banner', '🤝 Toggle Partners'],
     ['✨ Clear Chat', '🔥 Wipe DB']
 ]).resize();
 
@@ -262,13 +262,13 @@ bot.start((ctx) => {
     ctx.reply('🔒 Admin System Locked. Enter Password:');
 });
 
-bot.hears('🚀 New Update', (ctx) => ctx.scene.enter('NEWS_WIZARD'));
+bot.hears('� News / Official Alert', (ctx) => ctx.scene.enter('NEWS_WIZARD'));
 bot.hears('🤝 New Partner', (ctx) => ctx.scene.enter('BENEFIT_WIZARD'));
-bot.hears('📢 Post Promotion', (ctx) => ctx.scene.enter('PROMOTION_WIZARD'));
-bot.hears('🎓 Post Academy Video', (ctx) => ctx.scene.enter('ACADEMY_WIZARD'));
+bot.hears('�️ Post Promotion', (ctx) => ctx.scene.enter('PROMOTION_WIZARD'));
+bot.hears('� Academy / Tutorial', (ctx) => ctx.scene.enter('ACADEMY_WIZARD'));
 
 // --- MANAGE POSTS HANDLERS ---
-bot.hears('📝 Manage Posts', async (ctx) => {
+bot.hears('� Manage & Delete', async (ctx) => {
     try {
         const snapshot = await db.ref('news_updates').limitToLast(10).once('value');
         const data = snapshot.val();
@@ -326,7 +326,7 @@ bot.action(/^edit_post_(.+)$/, async (ctx) => {
     await ctx.scene.enter('EDIT_POST_WIZARD', { postId: postId });
 });
 
-bot.hears('👁️ Toggle Pro Promo', async (ctx) => {
+bot.hears('🎨 Toggle Pro Banner', async (ctx) => {
     const ref = db.ref('settings/show_premium_promo');
     const snapshot = await ref.once('value');
     const current = snapshot.val() !== false; // Default true
