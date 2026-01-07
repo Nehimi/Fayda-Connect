@@ -145,8 +145,8 @@ class L10n {
     'add_member': 'Add Family Member',
     'status_tracker': 'Status Tracker',
     'track_desc': 'Track your passport and Fayda status.',
-    'enable_biometrics': 'Enable Biometric Lock',
-    'bio_desc': 'Keep your data safe with fingerprint.',
+    'emergency_qr': 'Emergency QR Code',
+    'emergency_desc': 'Emergency identity for quick scanning.',
     'track_id': 'Enter Application ID or FIN',
     'check_status': 'Check Status',
     'photo_validator': 'AI Photo Validator',
@@ -154,6 +154,10 @@ class L10n {
     'tg_bot': 'Telegram Bot Support',
     'view_all': 'View All',
     'partner_benefits': 'Partner Benefits',
+    'news_feed': 'Official Feed',
+    'no_updates': 'No updates available',
+    'indep_provider': 'Independent Service Provider',
+    'not_affiliated': 'Not affiliated with NID Ethiopia',
   };
 
   static const Map<String, String> _am = {
@@ -257,8 +261,7 @@ class L10n {
     'add_member': 'የቤተሰብ አባል ያክሉ',
     'status_tracker': 'የሁኔታ መከታተያ',
     'track_desc': 'የፓስፖርት እና የፋይዳ ሁኔታዎን ይከታተሉ።',
-    'enable_biometrics': 'ባዮሜትሪክ መቆለፊያ ያግብሩ',
-    'bio_desc': 'መረጃዎን በጣት አሻራ ደህንነቱ የተጠበቀ ያድርጉት።',
+
     'emergency_qr': 'የአደጋ ጊዜ QR ኮድ',
     'emergency_desc': 'ለአደጋ ጊዜ መለያ መታወቂያ።',
     'track_id': 'የማመልከቻ መታወቂያ ወይም FIN ያስገቡ',
@@ -268,6 +271,10 @@ class L10n {
     'tg_bot': 'የቴሌግራም ቦት ድጋፍ',
     'view_all': 'ሁሉንም ያስሱ',
     'partner_benefits': 'የአጋር ጥቅማጥቅሞች',
+    'news_feed': 'ማሳወቂያዎች',
+    'no_updates': 'ምንም ማስታወቂያ የለም',
+    'indep_provider': 'ይህ የግል አገልግሎት ሰጪ ነው',
+    'not_affiliated': 'ከኢትዮጵያ ብሄራዊ መታወቂያ ጋር ግንኙነት የለውም',
   };
 
   static const Map<String, String> _or = {
@@ -371,8 +378,7 @@ class L10n {
     'add_member': 'Malaammaltummaa Maatii Dabali',
     'status_tracker': 'Hordoffii Haala',
     'track_desc': 'Haala paaspoortii fi Fayidaa keessanii hordofaa.',
-    'enable_biometrics': 'Lokii Baayoomeetiriksii dandeessisi',
-    'bio_desc': 'Ragaa keessan mallattoo qubaatiin eegaa.',
+
     'emergency_qr': 'Koodii QR Muddamaa',
     'emergency_desc': 'Eenyummaa haala muddamaatiif.',
     'track_id': 'ID Iyyataa ykn FIN galchi',
@@ -382,6 +388,10 @@ class L10n {
     'tg_bot': 'Deggersa Telegram Bot',
     'view_all': 'Hunda Ilaali',
     'partner_benefits': 'Bu’aawwan Michuu',
+    'news_feed': 'Oduu Haaraa',
+    'no_updates': 'Oduun haaraan hin jiru',
+    'indep_provider': 'Dhiyeessaa Tajaajila Dhuunfaa',
+    'not_affiliated': 'NID Itoophiyaa waliin walitti dhufeenya hin qabu',
   };
 
   static const Map<String, String> _ti = {
@@ -485,8 +495,7 @@ class L10n {
     'add_member': 'ናይ ስድራቤት ኣባል ወስኽ',
     'status_tracker': 'ከተታተል ሁኔታ',
     'track_desc': 'ናይ ፓስፖርትን ፋይዳን ኩነታት ተኸታተሉ።',
-    'enable_biometrics': 'ባዮሜትሪክ መቆለፊያ ኣግብሩ',
-    'bio_desc': 'ሓበሬታኹም ብዓሻራ ደሕንነቱ ዝተሓለወ ግበሩ።',
+
     'emergency_qr': 'ናይ ህጹጽ እዋን QR ኮድ',
     'emergency_desc': 'ንህጹጽ እዋን መለለዪ መንነት።',
     'track_id': 'መታወቂያ ማመልከቻ ወይ FIN የእትዉ',
@@ -496,5 +505,9 @@ class L10n {
     'tg_bot': 'ናይ ቴሌግራም ቦት ደገፍ',
     'view_all': 'ኩሉ ርአ',
     'partner_benefits': 'ናይ አጋር ጥቕማጥቕምታት',
+    'news_feed': 'ናይ ዜና ምግቢ',
+    'no_updates': 'ዝኾነ ሓበሬታ የለን',
+    'indep_provider': 'ናይ ብሕቲ ኣገልግሎት ወሃቢ',
+    'not_affiliated': 'ምስ ብሄራዊ መታወቂያ ኢትዮጵያ ዝኾነ ርክብ የብሉን',
   };
 }

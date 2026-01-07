@@ -10,12 +10,26 @@ import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import 'bank_detail_screen.dart';
 
-class BankListScreen extends ConsumerWidget {
+class BankListScreen extends ConsumerStatefulWidget {
   const BankListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final banks = ref.watch(bankListProvider);
+  ConsumerState<BankListScreen> createState() => _BankListScreenState();
+}
+
+class _BankListScreenState extends ConsumerState<BankListScreen> {
+  String _searchQuery = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final allBanks = ref.watch(bankListProvider);
+    final currentLang = ref.watch(languageProvider);
+
+    // Filter Logic
+    final filteredBanks = allBanks.where((bank) {
+      final query = _searchQuery.toLowerCase();
+      return bank.name.toLowerCase().contains(query);
+    }).toList();
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
@@ -45,8 +59,14 @@ class BankListScreen extends ConsumerWidget {
                   padding: EdgeInsets.zero,
                   borderRadius: 20,
                   child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    style: const TextStyle(color: AppColors.textMain),
                     decoration: InputDecoration(
-                      hintText: 'Search for a bank...',
+                      hintText: currentLang == AppLanguage.english ? 'Search for a bank...' : 'ባንክ ይፈልጉ...',
                       hintStyle: const TextStyle(color: AppColors.textDim),
                       prefixIcon: const Icon(LucideIcons.search, color: AppColors.textDim, size: 20),
                       border: InputBorder.none,
@@ -56,12 +76,26 @@ class BankListScreen extends ConsumerWidget {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
+                child: filteredBanks.isEmpty 
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(LucideIcons.landmark, size: 48, color: AppColors.textDim.withValues(alpha: 0.3)),
+                          const SizedBox(height: 16),
+                          Text(
+                            currentLang == AppLanguage.english ? 'No banks found' : 'ምንም ባንክ አልተገኘም',
+                            style: const TextStyle(color: AppColors.textDim, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   physics: const BouncingScrollPhysics(),
-                  itemCount: banks.length,
+                  itemCount: filteredBanks.length,
                   itemBuilder: (context, index) {
-                    final bank = banks[index];
+                    final bank = filteredBanks[index];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: GlassCard(

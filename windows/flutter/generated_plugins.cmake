@@ -8,7 +8,9 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   flutter_inappwebview_windows
   flutter_secure_storage_windows
+  flutter_tts
   local_auth_windows
+  share_plus
   url_launcher_windows
 )
 
