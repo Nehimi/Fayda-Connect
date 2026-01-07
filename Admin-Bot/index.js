@@ -53,7 +53,8 @@ bot.use(async (ctx, next) => {
 // --- KEYBOARDS ---
 const mainMenu = Markup.keyboard([
     ['🚀 New Update', '🤝 New Partner'],
-    ['📢 Post Promotion', '👀 View Status'],
+    ['📢 Post Promotion', '🎓 Post Academy Video'],
+    ['📝 Manage Posts', '👀 View Status'], // New Manage Button
     ['👁️ Toggle Pro Promo', '🤝 Toggle Partners'],
     ['✨ Clear Chat', '🔥 Wipe DB']
 ]).resize();
@@ -85,7 +86,7 @@ const newsWizard = new Scenes.WizardScene(
     },
     (ctx) => {
         ctx.wizard.state.type = ctx.message.text.toLowerCase();
-        ctx.reply('Enter Image URL (any direct link) or type "skip":');
+        ctx.reply('Enter Image or Video URL (YouTube/Direct Link) or type "skip":');
         return ctx.wizard.next();
     },
     async (ctx) => {
@@ -182,7 +183,74 @@ const promotionWizard = new Scenes.WizardScene(
     }
 );
 
-const stage = new Scenes.Stage([newsWizard, benefitWizard, promotionWizard]);
+
+// 4. Academy Wizard
+const academyWizard = new Scenes.WizardScene(
+    'ACADEMY_WIZARD',
+    (ctx) => {
+        ctx.reply('🎓 Enter Video Title:', cancelMenu);
+        return ctx.wizard.next();
+    },
+    (ctx) => {
+        if (ctx.message.text === '❌ Cancel') return ctx.scene.leave();
+        ctx.wizard.state.title = ctx.message.text;
+        ctx.reply('Enter Description:');
+        return ctx.wizard.next();
+    },
+    (ctx) => {
+        ctx.wizard.state.content = ctx.message.text;
+        ctx.reply('Enter YouTube Video Link:');
+        return ctx.wizard.next();
+    },
+    async (ctx) => {
+        const videoLink = ctx.message.text;
+        const data = {
+            title: ctx.wizard.state.title,
+            content: ctx.wizard.state.content,
+            type: 'academy', // Specific type for Academy
+            date: new Date().toISOString(),
+            imageUrl: videoLink, // We store video link in imageUrl field as per app logic
+            externalLink: videoLink
+        };
+        await db.ref('news_updates').push(data);
+        await ctx.reply('🎓 Academy Video Posted!');
+        return ctx.scene.leave();
+    }
+);
+
+// 5. Edit Post Wizard (Non-linear entry)
+const editPostWizard = new Scenes.WizardScene(
+    'EDIT_POST_WIZARD',
+    async (ctx) => {
+        // Initialize state from passed scene starter state if needed
+        if (!ctx.wizard.state.postId) {
+            ctx.wizard.state.postId = ctx.scene.state.postId;
+        }
+        ctx.reply('✏️ **EDIT MODE**\n\nEnter new **Title** (or type "skip" to keep current):', cancelMenu);
+        return ctx.wizard.next();
+    },
+    (ctx) => {
+        if (ctx.message.text === '❌ Cancel') return ctx.scene.leave();
+        ctx.wizard.state.newTitle = ctx.message.text;
+        ctx.reply('Enter new **Content** (or type "skip" to keep current):');
+        return ctx.wizard.next();
+    },
+    async (ctx) => {
+        const updates = {};
+        if (ctx.wizard.state.newTitle.toLowerCase() !== 'skip') updates.title = ctx.wizard.state.newTitle;
+        if (ctx.message.text.toLowerCase() !== 'skip') updates.content = ctx.message.text;
+
+        if (Object.keys(updates).length > 0) {
+            await db.ref('news_updates/' + ctx.wizard.state.postId).update(updates);
+            await ctx.reply('✅ Post Updated Successfully!');
+        } else {
+            await ctx.reply('No changes made.');
+        }
+        return ctx.scene.leave();
+    }
+);
+
+const stage = new Scenes.Stage([newsWizard, benefitWizard, promotionWizard, academyWizard, editPostWizard]);
 bot.use(stage.middleware());
 
 // --- COMMANDS ---
@@ -197,6 +265,66 @@ bot.start((ctx) => {
 bot.hears('🚀 New Update', (ctx) => ctx.scene.enter('NEWS_WIZARD'));
 bot.hears('🤝 New Partner', (ctx) => ctx.scene.enter('BENEFIT_WIZARD'));
 bot.hears('📢 Post Promotion', (ctx) => ctx.scene.enter('PROMOTION_WIZARD'));
+bot.hears('🎓 Post Academy Video', (ctx) => ctx.scene.enter('ACADEMY_WIZARD'));
+
+// --- MANAGE POSTS HANDLERS ---
+bot.hears('📝 Manage Posts', async (ctx) => {
+    try {
+        const snapshot = await db.ref('news_updates').limitToLast(10).once('value');
+        const data = snapshot.val();
+        if (!data) return ctx.reply('📭 No posts found.');
+
+        const buttons = [];
+        // Loop reversed to show newest first
+        const entries = Object.entries(data).reverse();
+
+        entries.forEach(([key, value]) => {
+            // Truncate title
+            const label = value.title.length > 20 ? value.title.substring(0, 20) + '...' : value.title;
+            const typeEmoji = value.type === 'academy' ? '🎓' : (value.type === 'promotion' ? '📢' : '📰');
+            buttons.push([Markup.button.callback(`${typeEmoji} ${label}`, `manage_post_${key}`)]);
+        });
+
+        ctx.reply('📝 **Select a post to manage:**', Markup.inlineKeyboard(buttons));
+    } catch (e) {
+        ctx.reply('Error fetching posts.');
+    }
+});
+
+bot.action(/^manage_post_(.+)$/, async (ctx) => {
+    try {
+        const postId = ctx.match[1];
+        const snapshot = await db.ref(`news_updates/${postId}`).once('value');
+        const post = snapshot.val();
+
+        if (!post) {
+            return ctx.reply('❌ Post not found (it might have been deleted).');
+        }
+
+        const message = `📌 **${post.title}**\n\n${post.content}\n\nType: ${post.type}\nDate: ${new Date(post.date).toLocaleDateString()}`;
+
+        await ctx.reply(message, Markup.inlineKeyboard([
+            [Markup.button.callback('✏️ Edit', `edit_post_${postId}`), Markup.button.callback('🗑️ Delete', `delete_post_${postId}`)]
+        ]));
+    } catch (e) {
+        console.error(e);
+    }
+    await ctx.answerCbQuery();
+});
+
+bot.action(/^delete_post_(.+)$/, async (ctx) => {
+    const postId = ctx.match[1];
+    await db.ref(`news_updates/${postId}`).remove();
+    await ctx.reply('🗑️ Post Deleted.');
+    await ctx.answerCbQuery();
+});
+
+bot.action(/^edit_post_(.+)$/, async (ctx) => {
+    const postId = ctx.match[1];
+    await ctx.answerCbQuery();
+    // Enter the wizard, passing the postId in the initial state
+    await ctx.scene.enter('EDIT_POST_WIZARD', { postId: postId });
+});
 
 bot.hears('👁️ Toggle Pro Promo', async (ctx) => {
     const ref = db.ref('settings/show_premium_promo');
