@@ -148,14 +148,14 @@ class BankDetailScreen extends ConsumerWidget {
                           const Icon(LucideIcons.crown, color: Colors.amber, size: 32),
                           const SizedBox(height: 16),
                           const Text(
-                            'Premium Concierge Active',
+                            'Priority Guidance Active',
                             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.textMain),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             lang == AppLanguage.english
-                                ? 'Your service fee is waived. Our experts will handle the process.'
-                                : 'የአገልግሎት ክፍያዎ ቀርቷል። ባለሙያዎቻችን ሂደቱን ያስተናግዳሉ።',
+                                ? 'Personal guidance included. Our experts will handle the process.'
+                                : 'የባለሙያ መመሪያ ተካቷል። ባለሙያዎቻችን ሂደቱን ያስተናግዳሉ።',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
                           ),
@@ -168,13 +168,13 @@ class BankDetailScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
                             onPressed: () async {
-                              final url = Uri.parse('https://t.me/NehimiG2');
+                              final url = Uri.parse('https://t.me/faydaconnectbot');
                               if (await canLaunchUrl(url)) {
                                 await launchUrl(url, mode: LaunchMode.externalApplication);
                               }
                             },
                             child: Text(
-                              lang == AppLanguage.english ? 'Contact Agent (Free for Pro)' : 'ባለሙያ ያናግሩ (ለፕሮ ነጻ)',
+                              lang == AppLanguage.english ? 'Contact Agent (Support Included)' : 'ባለሙያ ያናግሩ (ድጋፍ ተካቷል)',
                               style: const TextStyle(fontWeight: FontWeight.w800),
                             ),
                           ),
@@ -212,7 +212,7 @@ class BankDetailScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
                             onPressed: () async {
-                              final url = Uri.parse('https://t.me/NehimiG2');
+                              final url = Uri.parse('https://t.me/faydaconnectbot');
                               if (await canLaunchUrl(url)) {
                                 await launchUrl(url, mode: LaunchMode.externalApplication);
                               }

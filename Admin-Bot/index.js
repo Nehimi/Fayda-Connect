@@ -5,7 +5,7 @@ require('dotenv').config();
 
 // --- CONFIG ---
 const ADMIN_PASSWORD = 'Sumaso4060';
-const ADMIN_IDS = [5686616010, 891630138]; // Add your Telegram ID here
+const ADMIN_IDS = [5686616010, 891630138, 7008748559]; // Add your Telegram ID here
 
 // --- FIREBASE INIT ---
 if (!admin.apps.length) {
@@ -27,12 +27,22 @@ const sendNotification = async (title, body, type, imageUrl = '') => {
             body: body,
         },
         android: {
+            priority: 'high',
             notification: {
-                imageUrl: imageUrl || undefined
+                imageUrl: imageUrl || undefined,
+                sound: 'default',
+                channelId: 'fayda_alerts', // Target a high-importance channel
             }
         },
+        apns: {
+            payload: {
+                aps: {
+                    sound: 'default',
+                },
+            },
+        },
         data: {
-            type: type, // Helps app handle click logic
+            type: type,
             click_action: 'FLUTTER_NOTIFICATION_CLICK',
         },
         topic: 'all_users',
@@ -57,24 +67,39 @@ const isAdmin = (ctx) => {
 bot.use(async (ctx, next) => {
     if (!ctx.session) ctx.session = {};
 
-    // Skip auth for start command to allow password entry
-    if (ctx.message && ctx.message.text === '/start') return next();
-
-    // Check Auth
-    if (isAdmin(ctx)) {
-        return next();
+    // --- LOGGING (For Setup) ---
+    if (ctx.from) {
+        console.log(`[LOG] Msg from ${ctx.from.id} (@${ctx.from.username || 'no_user'}): ${ctx.message ? ctx.message.text : 'CallbackQuery'}`);
     }
 
-    // Password Check
+    // 1. Always allow Callback Queries (Inline Buttons) for everyone
+    if (ctx.callbackQuery) return next();
+
+    // 2. Clear pass for /start
+    if (ctx.message && ctx.message.text === '/start') return next();
+
+    // 3. Admin check
+    if (isAdmin(ctx)) return next();
+
+    // 4. Password Check
     if (ctx.message && ctx.message.text === ADMIN_PASSWORD) {
         ctx.session.isAuthenticated = true;
         await ctx.reply('✅ Access Granted. Welcome, Admin.');
         return showMenu(ctx);
     }
 
-    if (ctx.message && ctx.message.text) {
-        await ctx.reply('🔒 Restricted Access. Enter Admin Password:');
+    // 5. If it's a message from a non-admin, and we're not in a scene, don't let it pass to hears
+    // This prevents noise, but we allow them to talk to scenes if they were in one (though they shouldn't be)
+    if (ctx.message && !ctx.session.isAuthenticated) {
+        // Do nothing, or maybe a tiny hint
+        if (ctx.session.waitingForPassword) {
+            await ctx.reply('❌ Incorrect Password. Please try again or contact support.');
+            ctx.session.waitingForPassword = false;
+        }
+        return; // Swallow message
     }
+
+    return next();
 });
 
 // --- KEYBOARDS ---
@@ -439,11 +464,45 @@ bot.use(stage.middleware());
 
 // --- COMMANDS ---
 
-bot.start((ctx) => {
+bot.start(async (ctx) => {
     if (isAdmin(ctx)) {
         return showMenu(ctx);
     }
-    ctx.reply('🔒 Admin System Locked. Enter Password:');
+
+    const supportMsg = `👋 **Welcome to Fayda Connect Support**\n\n` +
+        `This is the official identity verification bot. How can we help you today?\n\n` +
+        `🇪🇹 **የፋይዳ ኮኔክት ድጋፍ ሰጪ ቦት**\n` +
+        `እንኳን ወደ ፋይዳ ኮኔክት የድጋፍ መስጫ ቦት በደህና መጡ። እንዴት ልንረዳዎ እንችላለን?`;
+
+    const userKeyboard = Markup.inlineKeyboard([
+        [Markup.button.callback('🛡️ How to Activate', 'user_how_to')],
+        [Markup.button.callback('📞 Contact Agent', 'user_contact')],
+        [Markup.button.callback('🔒 Admin Login', 'user_admin_login')]
+    ]);
+
+    await ctx.replyWithMarkdown(supportMsg, userKeyboard);
+});
+
+bot.action('user_admin_login', (ctx) => {
+    ctx.session.waitingForPassword = true;
+    ctx.reply('🔑 Please enter the Admin Password to access the management dashboard:');
+    ctx.answerCbQuery();
+});
+
+bot.action('user_how_to', (ctx) => {
+    const text = `ℹ️ **How to Activate Pro Access**\n\n` +
+        `1. Open Fayda Connect App\n` +
+        `2. Go to **"Professional Status"** in the side menu\n` +
+        `3. Copy your **User ID**\n` +
+        `4. Click **"Request Activation"** on that page\n\n` +
+        `Our team will review your ID and activate your status within 24 hours!`;
+    ctx.replyWithMarkdown(text);
+    ctx.answerCbQuery();
+});
+
+bot.action('user_contact', (ctx) => {
+    ctx.reply(`👨‍💻 For direct assistance, please contact our support lead: @NehimiG2`);
+    ctx.answerCbQuery();
 });
 
 bot.hears('📰 News / Official Alert', (ctx) => ctx.scene.enter('NEWS_WIZARD'));
