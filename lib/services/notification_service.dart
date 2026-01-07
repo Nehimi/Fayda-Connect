@@ -13,12 +13,15 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      // Get the token for testing
+      String? token = await _messaging.getToken();
+      
       if (kDebugMode) {
-        print('User granted permission');
+        print('🔔 FCM Token: $token');
+        print('User granted permission for notifications & sound');
       }
 
       // SUBSCRIBE TO ALL USERS TOPIC
-      // This allows the admin bot to send broadcasts
       await _messaging.subscribeToTopic('all_users');
     }
 

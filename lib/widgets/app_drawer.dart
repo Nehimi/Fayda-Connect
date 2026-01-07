@@ -80,7 +80,7 @@ class AppDrawer extends ConsumerWidget {
                             style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
                           ),
                                Text(
-                                isPremium ? 'Premium Member' : 'Standard Member',
+                                isPremium ? 'Verified Professional' : 'Standard Status',
                                 style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14, fontWeight: FontWeight.w600),
                               ),
                               if (isPremium) ...[
@@ -122,6 +122,7 @@ class AppDrawer extends ConsumerWidget {
                   const SizedBox(height: 20),
                   _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
                    _DrawerItem(context, ref, LucideIcons.alertCircle, 'Emergency ID', route: 'emergency', color: Colors.redAccent),
+                   _DrawerItem(context, ref, LucideIcons.shieldCheck, L10n.get(ref.watch(languageProvider), 'pro'), route: 'pro', color: Colors.amber),
                    _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
                    _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
                    _DrawerItem(context, ref, LucideIcons.megaphone, L10n.get(ref.watch(languageProvider), 'news_feed'), route: 'news'),

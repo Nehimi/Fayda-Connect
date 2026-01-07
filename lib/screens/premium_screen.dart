@@ -164,7 +164,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
                       }
 
                       // 2. Launch Telegram for communication
-                      final url = Uri.parse('https://t.me/NehimiG2');
+                      final url = Uri.parse('https://t.me/faydaconnectbot');
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url, mode: LaunchMode.externalApplication);
                       }

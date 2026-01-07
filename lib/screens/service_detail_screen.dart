@@ -177,7 +177,7 @@ class ServiceDetailScreen extends ConsumerWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
               onPressed: () async {
-                final url = Uri.parse('https://t.me/NehimiG2');
+                final url = Uri.parse('https://t.me/faydaconnectbot');
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url, mode: LaunchMode.externalApplication);
                 }
@@ -224,7 +224,7 @@ class ServiceDetailScreen extends ConsumerWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             onPressed: () async {
-              final url = Uri.parse('https://t.me/NehimiG2');
+              final url = Uri.parse('https://t.me/faydaconnectbot');
               if (await canLaunchUrl(url)) {
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               }
