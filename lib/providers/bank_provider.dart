@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/bank_model.dart';
 
-final bankListProvider = Provider<List<BankService>>((ref) {
+final bankListProvider = Provider<List<Bank>>((ref) {
   return [
-    BankService(
+    Bank(
       id: 'cbe',
       name: 'Commercial Bank of Ethiopia (CBE)',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=CBE&backgroundColor=6366f1',
@@ -18,7 +18,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['CBE Account', 'Fayda ID', 'Active Phone Number'],
     ),
-    BankService(
+    Bank(
       id: 'boa',
       name: 'Bank of Abyssinia',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=BOA&backgroundColor=b6e3f4',
@@ -32,7 +32,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['BoA Account', 'Fayda ID', 'Camera for Liveness'],
     ),
-    BankService(
+    Bank(
       id: 'dashen',
       name: 'Dashen Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Dashen&backgroundColor=ffd5dc',
@@ -46,7 +46,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Dashen/Amole Mobile Number', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'awash',
       name: 'Awash Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Awash&backgroundColor=10b981',
@@ -61,7 +61,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Awash Account', 'Fayda ID', 'Phone Number'],
     ),
-    BankService(
+    Bank(
       id: 'wegagen',
       name: 'Wegagen Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Wegagen&backgroundColor=f59e0b',
@@ -76,7 +76,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Wegagen Account', 'Fayda ID', 'Mobile Number'],
     ),
-    BankService(
+    Bank(
       id: 'united',
       name: 'United Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=United&backgroundColor=ec4899',
@@ -90,7 +90,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['United Account', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'nib',
       name: 'Nib International Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=NIB&backgroundColor=8b5cf6',
@@ -104,7 +104,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Nib Account', 'Fayda ID', 'Biometric Data'],
     ),
-    BankService(
+    Bank(
       id: 'coop',
       name: 'Cooperative Bank of Oromia',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=COOP&backgroundColor=06b6d4',
@@ -118,7 +118,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Coop Account', 'Fayda ID', 'Phone Number'],
     ),
-    BankService(
+    Bank(
       id: 'oromia',
       name: 'Oromia Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Oromia&backgroundColor=ef4444',
@@ -133,7 +133,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Oromia Account', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'lion',
       name: 'Lion International Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Lion&backgroundColor=f97316',
@@ -147,7 +147,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Lion Account', 'Fayda ID', 'Phone Number'],
     ),
-    BankService(
+    Bank(
       id: 'zemen',
       name: 'Zemen Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Zemen&backgroundColor=14b8a6',
@@ -162,7 +162,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Zemen Account', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'bunna',
       name: 'Bunna International Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Bunna&backgroundColor=a855f7',
@@ -176,7 +176,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Bunna Account', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'berhan',
       name: 'Berhan Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Berhan&backgroundColor=eab308',
@@ -190,7 +190,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Berhan Account', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'enat',
       name: 'Enat Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Enat&backgroundColor=84cc16',
@@ -204,7 +204,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Enat Account', 'Fayda ID', 'Phone Number'],
     ),
-    BankService(
+    Bank(
       id: 'addis',
       name: 'Addis International Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Addis&backgroundColor=3b82f6',
@@ -219,7 +219,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Addis Account', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'hijra',
       name: 'Hijra Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Hijra&backgroundColor=22c55e',
@@ -233,7 +233,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Hijra Account', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'tsehay',
       name: 'Tsehay Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Tsehay&backgroundColor=f43f5e',
@@ -247,7 +247,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Tsehay Account', 'Fayda ID', 'Phone Number'],
     ),
-    BankService(
+    Bank(
       id: 'shabelle',
       name: 'Shabelle Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Shabelle&backgroundColor=0ea5e9',
@@ -261,7 +261,7 @@ final bankListProvider = Provider<List<BankService>>((ref) {
       ],
       requirements: ['Shabelle Account', 'Fayda ID'],
     ),
-    BankService(
+    Bank(
       id: 'gadaa',
       name: 'Gadaa Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Gadaa&backgroundColor=fb923c',

@@ -10,6 +10,7 @@ class AppColors {
   static const Color scaffold = Color(0xFF0F172A); // Deep Navy
   static const Color surface = Color(0xFF1E293B);  // Lighter Navy
   static const Color card = Color(0xFF334155);     // Slate
+  static const Color cardSurface = card;
   
   // Glassmorphism specific
   static const Color glassBorder = Color(0x33FFFFFF);

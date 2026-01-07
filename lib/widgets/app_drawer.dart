@@ -99,6 +99,7 @@ class AppDrawer extends ConsumerWidget {
                    _DrawerItem(context, ref, LucideIcons.alertCircle, 'Emergency ID', route: 'emergency', color: Colors.redAccent),
                    _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
                    _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
+                   _DrawerItem(context, ref, LucideIcons.megaphone, L10n.get(ref.watch(languageProvider), 'news_feed'), route: 'news'),
                    _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
                    _DrawerItem(context, ref, LucideIcons.history, L10n.get(ref.watch(languageProvider), 'order_history'), route: 'history'),
                    const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
