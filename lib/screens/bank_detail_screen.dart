@@ -11,11 +11,11 @@ import '../theme/l10n.dart';
 import '../providers/user_provider.dart';
 
 class BankDetailScreen extends ConsumerWidget {
-  final BankService bank;
+  final Bank bank;
 
   const BankDetailScreen({super.key, required this.bank});
 
-  Future<void> _launchUrl(BankService bank) async {
+  Future<void> _launchUrl(Bank bank) async {
     if (bank.officialLink == null) return;
     final Uri url = Uri.parse(bank.officialLink!);
     if (!await launchUrl(url)) {

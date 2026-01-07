@@ -30,8 +30,12 @@ import '../utils/responsive.dart';
 import '../providers/user_provider.dart';
 import '../providers/cms_provider.dart';
 import '../models/service_model.dart';
+import '../models/news_item.dart';
 import 'news_list_screen.dart';
 import 'partner_offer_screen.dart';
+import 'notifications_screen.dart';
+import '../providers/notification_provider.dart';
+import 'search_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -46,6 +50,7 @@ class HomeScreen extends ConsumerWidget {
     final isPremium = appUser.isPremium;
     final dynamicBenefits = ref.watch(benefitsProvider);
     final dynamicNews = ref.watch(newsProvider);
+    final showPartners = ref.watch(partnerVisibilityProvider).value ?? true;
     
     final categories = [
       ServiceCategory(
@@ -116,7 +121,7 @@ class HomeScreen extends ConsumerWidget {
                       userAsync.when(
                         data: (user) => Text(
                           user != null 
-                            ? '${_getGreetingPrefix(currentLang)}, ${user.displayName ?? 'User'}'
+                            ? '${_getGreetingPrefix(currentLang)}, ${user.displayName?.split(' ').first ?? 'User'}'
                             : _getGreetingPrefix(currentLang),
                           style: TextStyle(
                             color: AppColors.textDim,
@@ -129,20 +134,24 @@ class HomeScreen extends ConsumerWidget {
                         loading: () => Text('...', style: TextStyle(color: AppColors.textDim, fontSize: 13)),
                         error: (_, __) => Text(_getGreetingPrefix(currentLang), style: TextStyle(color: AppColors.textDim, fontSize: 13)),
                       ),
-                      Text(
-                        _getAppName(currentLang),
-                        style: TextStyle(
-                          color: AppColors.textMain,
-                          fontSize: context.responsive.getFontSize(24),
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.5,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          _getAppName(currentLang),
+                          style: TextStyle(
+                            color: AppColors.textMain,
+                            fontSize: context.responsive.getFontSize(24),
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(width: 8),
+                _SearchButton(),
                 const SizedBox(width: 8),
                 _NotificationBell(ref: ref),
                 const SizedBox(width: 4),
@@ -165,88 +174,83 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   child: dynamicNews.when(
                     data: (news) {
-                      // Only show PREMIUM posts in this banner
+                      // 1. Check for active PREMIUM News (Priority)
                       final latestPremium = news.where((n) => n.type == NewsType.premium).firstOrNull;
-                      
-                      if (latestPremium == null) {
-                        return _buildPremiumPromo(context, isPremium);
+                      if (latestPremium != null) {
+                        return _buildFeaturedNews(context, latestPremium);
                       }
-                      return _buildFeaturedNews(context, latestPremium);
+
+                      // 2. Check for latest non-promotion News (Alert, Standard, Partner)
+                      final latestOther = news.where((n) => n.type != NewsType.promotion && n.type != NewsType.academy).firstOrNull;
+                      if (latestOther != null) {
+                         return _buildFeaturedNews(context, latestOther);
+                      }
+
+                      // 2. Fallback to Static PRO Promo (Controlled by Admin Bot)
+                      // We use async here, so we default to true to avoid flicker if loading
+                      final showPromo = ref.watch(promoVisibilityProvider).value ?? true;
+                      
+                      if (showPromo) {
+                        return _buildPremiumPromo(context, isPremium);
+                      } else {
+                        return const SizedBox.shrink(); // Admin hidden it
+                      }
                     },
-                    loading: () => _buildPremiumPromo(context, isPremium),
-                    error: (_, __) => _buildPremiumPromo(context, isPremium),
+                    loading: () => const SizedBox.shrink(), // Don't show anything while loading to avoid jump
+                    error: (_, __) => const SizedBox.shrink(),
                   ),
                 ),
               ),
 
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    context.responsive.horizontalPadding, 
-                    context.responsive.getSpacing(40), 
-                    context.responsive.horizontalPadding, 
-                    0
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        L10n.get(currentLang, 'partner_benefits'),
-                        style: TextStyle(
-                          color: AppColors.textMain,
-                          fontSize: context.responsive.getFontSize(18),
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
-                        child: Text(
-                          L10n.get(currentLang, 'view_all'), 
-                          style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              SliverToBoxAdapter(
-                child: dynamicBenefits.when(
-                  data: (benefits) {
-                    if (benefits.isEmpty) {
-                      return const SizedBox.shrink(); // Fallback if no dynamic content
-                    }
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: context.responsive.horizontalPadding, 
-                        vertical: 16
-                      ),
-                      child: Row(
-                        children: benefits.map((benefit) => Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: _PartnerCard(
-                            title: benefit.title,
-                            desc: benefit.description,
-                            color: Color(benefit.colorHex),
-                            icon: _getIconFromName(benefit.iconName),
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => PartnerOfferScreen(benefit: benefit)));
-                            },
+              if (showPartners) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      context.responsive.horizontalPadding, 
+                      context.responsive.getSpacing(40), 
+                      context.responsive.horizontalPadding, 
+                      0
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          L10n.get(currentLang, 'partner_benefits'),
+                          style: TextStyle(
+                            color: AppColors.textMain,
+                            fontSize: context.responsive.getFontSize(18),
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
                           ),
-                        )).toList(),
-                      ),
-                    );
-                  },
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(24.0),
-                    child: Center(child: CircularProgressIndicator()),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
+                          child: Text(
+                            L10n.get(currentLang, 'view_all'), 
+                            style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  error: (e, _) => const SizedBox.shrink(),
                 ),
-              ),
+
+                SliverToBoxAdapter(
+                  child: dynamicBenefits.when(
+                    data: (benefits) {
+                      if (benefits.isEmpty) return const SizedBox.shrink();
+                      // Newest First
+                      final sortedBenefits = benefits.reversed.toList();
+                      return _BenefitsCarousel(benefits: sortedBenefits);
+                    },
+                    loading: () => const Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                    error: (e, _) => const SizedBox.shrink(),
+                  ),
+                ),
+              ],
 
 
 
@@ -305,13 +309,15 @@ class HomeScreen extends ConsumerWidget {
                       children: [
                         const SizedBox(height: 40),
                         Text(
-                          'Independent Service Provider',
-                          style: TextStyle(color: AppColors.textDim, fontSize: 11),
+                          L10n.get(currentLang, 'indep_provider'),
+                          style: const TextStyle(color: AppColors.textDim, fontSize: 13, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         Text(
-                          'Not affiliated with NID Ethiopia',
-                          style: TextStyle(color: AppColors.textDim.withValues(alpha: 0.5), fontSize: 10),
+                          L10n.get(currentLang, 'not_affiliated'),
+                          style: TextStyle(color: AppColors.textDim.withValues(alpha: 0.8), fontSize: 11),
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 120),
                       ],
@@ -399,14 +405,14 @@ IconData _getIconFromName(String name) {
     );
   }
 
-  Widget _buildFeaturedNews(BuildContext context, NewsUpdate latest) {
+  Widget _buildFeaturedNews(BuildContext context, NewsItem latest) {
     // Premium posts ALWAYS use the original accent/red theme
-    const Color themeColor = AppColors.accent;
-    const IconData themeIcon = LucideIcons.crown;
-    const String label = 'PRO BROADCAST';
+    final Color themeColor = latest.type == NewsType.premium ? AppColors.accent : (latest.type == NewsType.alert ? AppColors.error : AppColors.primary);
+    final IconData themeIcon = latest.type == NewsType.premium ? LucideIcons.crown : (latest.type == NewsType.alert ? LucideIcons.alertCircle : LucideIcons.megaphone);
+    final String label = latest.type == NewsType.premium ? 'PRO BROADCAST' : (latest.type == NewsType.alert ? 'SECURITY ALERT' : 'OFFICIAL FEED');
 
     return InkWell(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen())),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsListScreen())),
       child: GlassCard(
         padding: const EdgeInsets.all(24),
         borderColor: themeColor.withValues(alpha: 0.3),
@@ -568,17 +574,19 @@ class _LanguageToggle extends ConsumerWidget {
         );
       }).toList(),
       child: GlassCard(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        borderRadius: 12,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        borderRadius: 14,
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.languages, size: 16, color: AppColors.primary),
+            const Icon(LucideIcons.languages, size: 24, color: AppColors.primary),
             const SizedBox(width: 8),
             Text(
               currentLang.code,
-              style: const TextStyle(color: AppColors.textMain, fontSize: 12, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: AppColors.textMain, fontSize: 14, fontWeight: FontWeight.bold),
             ),
-            const Icon(LucideIcons.chevronDown, size: 14, color: AppColors.textDim),
+            const SizedBox(width: 4),
+            const Icon(LucideIcons.chevronDown, size: 16, color: AppColors.textDim),
           ],
         ),
       ),
@@ -592,39 +600,127 @@ class _PartnerCard extends StatelessWidget {
   final Color color;
   final IconData icon;
   final VoidCallback onTap;
+  final bool isHorizontal;
 
-  const _PartnerCard({required this.title, required this.desc, required this.color, required this.icon, required this.onTap});
+  const _PartnerCard({
+    required this.title, 
+    required this.desc, 
+    required this.color, 
+    required this.icon, 
+    required this.onTap,
+    this.isHorizontal = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final double cardHeight = context.responsive.isSmallPhone ? 280 : 300;
+    // If Horizontal (Single Item), act like a Banner
+    if (isHorizontal) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: GlassCard(
+          width: double.infinity, // Full Width
+          padding: const EdgeInsets.all(24),
+          borderRadius: 24,
+          borderColor: color.withValues(alpha: 0.3),
+          gradientColors: [
+             color.withValues(alpha: 0.15),
+             color.withValues(alpha: 0.05),
+          ],
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                         Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(icon, color: color, size: 18),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "PARTNER OFFER",
+                          style: TextStyle(
+                            color: color,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: AppColors.textMain,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      desc,
+                      style: TextStyle(
+                         color: AppColors.textMain.withValues(alpha: 0.7),
+                         fontSize: 13, 
+                         height: 1.4,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Large Icon on the right for style
+              Opacity(
+                opacity: 0.2,
+                child: Icon(icon, size: 60, color: color),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final double cardHeight = context.responsive.isSmallPhone ? 200 : 220;
     
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(28),
+      borderRadius: BorderRadius.circular(24),
       child: GlassCard(
-        width: context.responsive.cardWidth * 1.05,
+        width: context.responsive.cardWidth * 0.85,
         height: cardHeight,
         padding: EdgeInsets.zero,
-        borderRadius: 28,
+        borderRadius: 24,
         borderColor: color.withValues(alpha: 0.3),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(24),
           child: Stack(
             children: [
               // Faded Background Icon for "Pro" feel
               Positioned(
-                right: -25,
-                bottom: -25,
+                right: -20,
+                bottom: -20,
                 child: Icon(
                   icon,
-                  size: 160,
+                  size: 120,
                   color: color.withValues(alpha: 0.05),
                 ),
               ),
               
               Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -632,56 +728,54 @@ class _PartnerCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: color.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: color.withValues(alpha: 0.2), width: 1.5),
                           ),
-                          child: Icon(icon, color: color, size: 22),
+                          child: Icon(icon, color: color, size: 24),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: color.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: color.withValues(alpha: 0.2)),
                           ),
                           child: Text(
-                            'PARTNER',
+                            "PARTNER",
                             style: TextStyle(
-                              color: color.withValues(alpha: 0.8),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
+                              color: color,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
                               letterSpacing: 1,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                     Text(
                       title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.textMain,
-                        fontWeight: FontWeight.w900,
-                        fontSize: context.responsive.getFontSize(18),
-                        letterSpacing: -0.5,
-                        height: 1.1,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     Expanded(
                       child: Text(
                         desc,
                         style: TextStyle(
-                          color: AppColors.textMain.withValues(alpha: 0.6),
-                          fontSize: context.responsive.getFontSize(13),
-                          fontWeight: FontWeight.w500,
-                          height: 1.5,
+                          color: AppColors.textMain.withValues(alpha: 0.7),
+                          fontSize: 13,
+                          height: 1.4,
                         ),
-                        maxLines: 4,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -803,37 +897,35 @@ class _IdentityPlaceholder extends ConsumerWidget {
   }
 }
 
-class _NotificationBell extends StatelessWidget {
+class _NotificationBell extends ConsumerWidget {
   final WidgetRef ref;
   const _NotificationBell({required this.ref});
 
   @override
-  Widget build(BuildContext context) {
-    final newsCount = ref.watch(unreadNewsCountProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch both News and Notifications
+    final notifications = ref.watch(notificationsProvider);
+    final newsUnread = ref.watch(unreadNewsCountProvider);
+    final unreadCount = notifications.where((n) => !n.isRead).length + newsUnread;
 
     return InkWell(
       onTap: () {
-        // Mark as seen immediately when clicking the bell
-        final news = ref.read(newsProvider).value;
-        if (news != null && news.isNotEmpty) {
-          ref.read(newsSeenProvider.notifier).markAsSeen(news.first.id);
-        }
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsListScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsScreen()));
       },
       borderRadius: BorderRadius.circular(12),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           GlassCard(
-            padding: const EdgeInsets.all(10),
-            borderRadius: 12,
-            child: Icon(
+            padding: const EdgeInsets.all(12),
+            borderRadius: 14,
+            child: const Icon(
               LucideIcons.bell, 
               color: AppColors.textMain, 
-              size: context.responsive.getIconSize(22)
+              size: 24,
             ),
           ),
-          if (newsCount > 0)
+          if (unreadCount > 0)
             Positioned(
               top: -6,
               left: -6,
@@ -848,7 +940,7 @@ class _NotificationBell extends StatelessWidget {
                 ),
                 constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
                 child: Text(
-                  newsCount > 9 ? '9+' : newsCount.toString(),
+                  unreadCount > 9 ? '9+' : unreadCount.toString(),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
@@ -859,6 +951,102 @@ class _NotificationBell extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _BenefitsCarousel extends StatefulWidget {
+  final List<PartnerBenefit> benefits;
+  const _BenefitsCarousel({required this.benefits});
+
+  @override
+  State<_BenefitsCarousel> createState() => _BenefitsCarouselState();
+}
+
+class _BenefitsCarouselState extends State<_BenefitsCarousel> {
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 180, // Fixed height for the banner style
+          child: PageView.builder(
+            controller: _pageController,
+            physics: const BouncingScrollPhysics(),
+            itemCount: widget.benefits.length,
+            onPageChanged: (index) {
+              setState(() => _currentIndex = index);
+            },
+            itemBuilder: (context, index) {
+              final benefit = widget.benefits[index];
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: context.responsive.horizontalPadding),
+                child: _PartnerCard(
+                  title: benefit.title,
+                  desc: benefit.description,
+                  color: Color(benefit.colorHex),
+                  icon: _getIconFromName(benefit.iconName),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PartnerOfferScreen(benefit: benefit)));
+                  },
+                  isHorizontal: true, // Always Horizontal Banner
+                ),
+              );
+            },
+          ),
+        ),
+        
+        if (widget.benefits.length > 1) ...[
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(widget.benefits.length, (index) {
+              final isActive = _currentIndex == index;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                height: 4,
+                width: isActive ? 24 : 8, // "..." Effect
+                decoration: BoxDecoration(
+                  color: isActive ? AppColors.primary : AppColors.textDim.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              );
+            }),
+          ),
+        ],
+      ],
+    );
+  }
+  IconData _getIconFromName(String name) {
+    switch (name) {
+      case 'percent': return LucideIcons.percent;
+      case 'trendingDown': return LucideIcons.trendingDown;
+      case 'gift': return LucideIcons.gift;
+      case 'info': return LucideIcons.info;
+      case 'award': return LucideIcons.award;
+      case 'megaphone': return LucideIcons.megaphone;
+      case 'shield': return LucideIcons.shield;
+      default: return LucideIcons.star;
+    }
+  }
+}
+
+class _SearchButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+      },
+      child: GlassCard(
+        padding: const EdgeInsets.all(12),
+        borderRadius: 14,
+        child: const Icon(LucideIcons.search, color: AppColors.primary, size: 24),
       ),
     );
   }

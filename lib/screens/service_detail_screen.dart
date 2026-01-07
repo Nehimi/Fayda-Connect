@@ -4,6 +4,7 @@ import '../models/service_model.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'service_form_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/language_provider.dart';
@@ -340,7 +341,10 @@ class _VoiceGuide extends StatefulWidget {
   final List<String> steps;
   final AppLanguage lang;
 
-  const _VoiceGuide({required this.steps, required this.lang});
+  const _VoiceGuide({
+    required this.steps, 
+    required this.lang,
+  });
 
   @override
   State<_VoiceGuide> createState() => _VoiceGuideState();
@@ -350,6 +354,7 @@ class _VoiceGuideState extends State<_VoiceGuide> with SingleTickerProviderState
   bool _isPlaying = false;
   int _currentStepIndex = -1;
   late AnimationController _controller;
+  late FlutterTts _flutterTts;
 
   @override
   void initState() {
@@ -358,34 +363,67 @@ class _VoiceGuideState extends State<_VoiceGuide> with SingleTickerProviderState
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
+    _flutterTts = FlutterTts();
+    _initTts();
+  }
+
+  Future<void> _initTts() async {
+    await _flutterTts.awaitSpeakCompletion(true);
+    await _flutterTts.setLanguage("en-US"); // Default to English for now
+    await _flutterTts.setPitch(1.0);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _flutterTts.stop();
     super.dispose();
   }
 
   void _togglePlay() async {
-    setState(() {
-      _isPlaying = !_isPlaying;
-      if (_isPlaying) {
+    if (_isPlaying) {
+      // Stop
+      await _flutterTts.stop();
+      if (mounted) {
+        setState(() {
+          _isPlaying = false;
+          _currentStepIndex = -1;
+          _controller.stop();
+        });
+      }
+    } else {
+      // Start
+      setState(() {
+        _isPlaying = true;
         _currentStepIndex = 0;
         _controller.repeat(reverse: true);
-        _playSequence();
-      } else {
-        _currentStepIndex = -1;
-        _controller.stop();
-      }
-    });
+      });
+      _playSequence();
+    }
   }
 
   void _playSequence() async {
+    // 1. Speak Greeting - Generic
+    await _flutterTts.speak("Listen carefully to the following steps.");
+    
+    // 2. Speak Steps
     for (int i = 0; i < widget.steps.length; i++) {
       if (!_isPlaying) break;
+      if (!mounted) break;
+
       setState(() => _currentStepIndex = i);
-      await Future.delayed(const Duration(seconds: 3));
+      
+      // Get text to speak
+      String text = L10n.getLocalized(widget.lang, widget.steps[i]);
+      await _flutterTts.speak(text);
+      
+      // Short pause between steps
+      if (_isPlaying) {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
     }
+
+    // 3. Finish
     if (mounted && _isPlaying) {
       setState(() {
         _isPlaying = false;
@@ -428,7 +466,7 @@ class _VoiceGuideState extends State<_VoiceGuide> with SingleTickerProviderState
                   style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 Text(
-                  _isPlaying 
+                  _isPlaying && _currentStepIndex >= 0 && _currentStepIndex < widget.steps.length
                     ? L10n.getLocalized(widget.lang, widget.steps[_currentStepIndex])
                     : L10n.get(widget.lang, 'listen_instr'),
                   style: TextStyle(

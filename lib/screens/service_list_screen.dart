@@ -9,7 +9,7 @@ import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import 'service_detail_screen.dart';
 
-class ServiceListScreen extends ConsumerWidget {
+class ServiceListScreen extends ConsumerStatefulWidget {
   final String title;
   final ProviderListenable<List<GeneralService>> serviceProvider;
 
@@ -20,14 +20,28 @@ class ServiceListScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final services = ref.watch(serviceProvider);
+  ConsumerState<ServiceListScreen> createState() => _ServiceListScreenState();
+}
+
+class _ServiceListScreenState extends ConsumerState<ServiceListScreen> {
+  String _searchQuery = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final allServices = ref.watch(widget.serviceProvider);
     final currentLang = ref.watch(languageProvider);
+
+    // Filter Logic
+    final filteredServices = allServices.where((service) {
+      final query = _searchQuery.toLowerCase();
+      return service.name.toLowerCase().contains(query) || 
+             service.description.toLowerCase().contains(query);
+    }).toList();
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       appBar: AppBar(
-        title: Text(_getLocalizedTitle(ref.watch(languageProvider), title)),
+        title: Text(_getLocalizedTitle(ref.watch(languageProvider), widget.title)),
         backgroundColor: Colors.transparent,
       ),
       body: Column(
@@ -38,6 +52,12 @@ class ServiceListScreen extends ConsumerWidget {
               padding: EdgeInsets.zero,
               borderRadius: 20,
               child: TextField(
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                style: const TextStyle(color: AppColors.textMain),
                 decoration: InputDecoration(
                   hintText: currentLang == AppLanguage.english ? 'Search for a service...' : 'አገልግሎት ፈልግ...',
                   hintStyle: const TextStyle(color: AppColors.textDim),
@@ -49,12 +69,26 @@ class ServiceListScreen extends ConsumerWidget {
             ),
           ),
           Expanded(
-            child: ListView.builder(
+            child: filteredServices.isEmpty 
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(LucideIcons.searchX, size: 48, color: AppColors.textDim.withValues(alpha: 0.3)),
+                      const SizedBox(height: 16),
+                      Text(
+                        currentLang == AppLanguage.english ? 'No services found' : 'ምንም አገልግሎት አልተገኘም',
+                        style: const TextStyle(color: AppColors.textDim, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               physics: const BouncingScrollPhysics(),
-              itemCount: services.length,
+              itemCount: filteredServices.length,
               itemBuilder: (context, index) {
-                final service = services[index];
+                final service = filteredServices[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: GlassCard(

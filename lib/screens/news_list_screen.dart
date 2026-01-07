@@ -10,7 +10,7 @@ import '../theme/l10n.dart';
 import '../providers/language_provider.dart';
 import '../widgets/custom_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/service_model.dart';
+import '../models/news_item.dart';
 
 class NewsListScreen extends ConsumerWidget {
   const NewsListScreen({super.key});
@@ -20,12 +20,13 @@ class NewsListScreen extends ConsumerWidget {
     final newsAsync = ref.watch(newsProvider);
     final currentLang = ref.watch(languageProvider);
 
-    // Mark latest news as seen when viewing the list
-    newsAsync.whenData((news) {
-      if (news.isNotEmpty) {
-        Future.microtask(() => ref.read(newsSeenProvider.notifier).markAsSeen(news.first.id));
-      }
-    });
+    // 1. Filter out Academy posts from Official Feed to avoid duplication
+    final filteredNews = newsAsync.value?.where((n) => n.type != NewsType.academy).toList() ?? [];
+
+    // 2. Mark latest Official news as seen
+    if (filteredNews.isNotEmpty) {
+      Future.microtask(() => ref.read(newsSeenStatusProvider.notifier).markAsSeen(filteredNews.first.id, isAcademy: false));
+    }
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
@@ -36,9 +37,9 @@ class NewsListScreen extends ConsumerWidget {
           icon: const Icon(LucideIcons.arrowLeft, color: AppColors.textMain),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Official Updates',
-          style: TextStyle(
+        title: Text(
+          L10n.get(currentLang, 'news_feed'),
+          style: const TextStyle(
             color: AppColors.textMain, 
             fontWeight: FontWeight.w900,
             letterSpacing: -1,
@@ -47,8 +48,8 @@ class NewsListScreen extends ConsumerWidget {
         ),
       ),
       body: newsAsync.when(
-        data: (news) {
-          if (news.isEmpty) {
+        data: (_) {
+          if (filteredNews.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -56,8 +57,8 @@ class NewsListScreen extends ConsumerWidget {
                   Icon(LucideIcons.bellOff, size: 64, color: AppColors.textDim.withValues(alpha: 0.3)),
                   const SizedBox(height: 16),
                   Text(
-                    'No updates available',
-                    style: TextStyle(color: AppColors.textDim, fontSize: 16),
+                    L10n.get(currentLang, 'no_updates'),
+                    style: const TextStyle(color: AppColors.textDim, fontSize: 16),
                   ),
                 ],
               ),
@@ -66,9 +67,9 @@ class NewsListScreen extends ConsumerWidget {
 
           return ListView.builder(
             padding: EdgeInsets.symmetric(horizontal: context.responsive.horizontalPadding, vertical: 10),
-            itemCount: news.length,
+            itemCount: filteredNews.length,
             itemBuilder: (context, index) {
-              final item = news[index];
+              final item = filteredNews[index];
               return _NewsUpdateCard(item: item);
             },
           );
@@ -110,7 +111,7 @@ class NewsListScreen extends ConsumerWidget {
 }
 
 class _NewsUpdateCard extends StatefulWidget {
-  final NewsUpdate item;
+  final NewsItem item;
   const _NewsUpdateCard({required this.item});
 
   @override
@@ -185,7 +186,7 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            item.type == NewsType.premium ? LucideIcons.crown : (item.type == NewsType.promotion ? LucideIcons.shoppingBag : LucideIcons.megaphone), 
+                            item.type == NewsType.premium ? LucideIcons.crown : (item.type == NewsType.promotion ? LucideIcons.shoppingBag : (item.type == NewsType.academy ? LucideIcons.graduationCap : LucideIcons.megaphone)), 
                             color: item.type == NewsType.premium ? AppColors.accent : AppColors.primary, 
                             size: 14
                           ),
@@ -198,7 +199,7 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            item.type == NewsType.premium ? 'PREMIUM' : (item.type == NewsType.promotion ? 'PROMOTION' : 'OFFICIAL'),
+                            item.type == NewsType.premium ? 'PREMIUM' : (item.type == NewsType.promotion ? 'PROMOTION' : (item.type == NewsType.academy ? 'ACADEMY' : 'OFFICIAL')),
                             style: TextStyle(
                               color: item.type == NewsType.premium ? AppColors.accent : (item.type == NewsType.promotion ? Colors.orange : AppColors.primary),
                               fontSize: 10,
@@ -230,7 +231,9 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
                         width: double.infinity,
                         height: _isExpanded ? null : 220,
                         child: Image.network(
-                          sanitizedUrl,
+                          _isVideo(sanitizedUrl) 
+                            ? 'https://img.youtube.com/vi/${_getYoutubeId(sanitizedUrl)}/hqdefault.jpg'
+                            : sanitizedUrl,
                           fit: _isExpanded ? BoxFit.fitWidth : BoxFit.cover,
                           alignment: Alignment.topCenter,
                           loadingBuilder: (context, child, loadingProgress) {
@@ -259,7 +262,7 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
                               children: [
                                 Icon(LucideIcons.imageOff, color: AppColors.error.withValues(alpha: 0.3), size: 32),
                                 const SizedBox(height: 8),
-                                Text('Image Preview Unavailable', style: TextStyle(color: AppColors.textDim, fontSize: 12)),
+                                Text('Preview Unavailable', style: TextStyle(color: AppColors.textDim, fontSize: 12)),
                               ],
                             ),
                           ),
@@ -336,5 +339,27 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
         ),
       ),
     );
+  }
+
+  bool _isVideo(String url) {
+    return url.contains('youtube.com') || url.contains('youtu.be');
+  }
+
+  String _getYoutubeId(String url) {
+    try {
+      final RegExp regExp = RegExp(
+        r'^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*',
+        caseSensitive: false,
+        multiLine: false,
+      );
+      final Match? match = regExp.firstMatch(url);
+      if (match != null && match.groupCount >= 7) {
+        String? id = match.group(7);
+        return id ?? '';
+      }
+    } catch (e) {
+      return '';
+    }
+    return '';
   }
 }

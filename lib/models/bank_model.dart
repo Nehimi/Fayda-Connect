@@ -4,7 +4,7 @@ enum BankType {
   inPerson,
 }
 
-class BankService {
+class Bank {
   final String id;
   final String name;
   final String logo;
@@ -13,7 +13,7 @@ class BankService {
   final List<String> instructionSteps;
   final List<String> requirements;
 
-  BankService({
+  Bank({
     required this.id,
     required this.name,
     required this.logo,

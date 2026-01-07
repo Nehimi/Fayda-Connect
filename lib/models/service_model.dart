@@ -6,12 +6,7 @@ enum ServiceType {
   inPerson,
 }
 
-enum NewsType {
-  standard,
-  premium,
-  partner,
-  promotion,
-}
+
 
 class GeneralService {
   final String id;
@@ -97,41 +92,4 @@ class PartnerBenefit {
   }
 }
 
-class NewsUpdate {
-  final String id;
-  final String title;
-  final String content;
-  final DateTime date;
-  final String? imageUrl;
-  final String? externalLink;
-  final NewsType type;
 
-  NewsUpdate({
-    required this.id,
-    required this.title,
-    required this.content,
-    required this.date,
-    this.imageUrl,
-    this.externalLink,
-    this.type = NewsType.standard,
-  });
-
-  factory NewsUpdate.fromFirestore(Map<String, dynamic> data, String id) {
-    NewsType parseType(String? typeStr) {
-      if (typeStr == 'premium') return NewsType.premium;
-      if (typeStr == 'partner') return NewsType.partner;
-      if (typeStr == 'promotion') return NewsType.promotion;
-      return NewsType.standard;
-    }
-
-    return NewsUpdate(
-      id: id,
-      title: data['title'] ?? '',
-      content: data['content'] ?? '',
-      date: (data['date'] as Object?) != null ? DateTime.parse(data['date']) : DateTime.now(),
-      imageUrl: data['imageUrl'],
-      externalLink: data['externalLink'],
-      type: parseType(data['type']),
-    );
-  }
-}

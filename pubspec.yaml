@@ -54,8 +54,11 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   firebase_database: ^12.1.1
   firebase_messaging: ^16.1.0
+  flutter_tts: ^4.2.5
+  share_plus: ^12.0.1
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
@@ -107,3 +110,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
+
