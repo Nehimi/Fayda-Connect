@@ -117,7 +117,11 @@ class NewsSeenNotifier extends StateNotifier<Map<String, String>> {
     
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('last_seen_$key', newsId);
-    state = {...state, key: newsId};
+    
+    // Update state with the correct key variable value
+    final newState = Map<String, String>.from(state);
+    newState[key] = newsId;
+    state = newState;
   }
 
   bool isNew(NewsItem item) {

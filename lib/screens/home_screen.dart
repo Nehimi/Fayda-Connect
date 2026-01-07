@@ -380,7 +380,7 @@ IconData _getIconFromName(String name) {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    isPremium ? 'You are a Pro Member' : 'Unlimited Free Processing',
+                    isPremium ? 'Verified Professional Access' : 'Professional Identity Support',
                     style: const TextStyle(
                       color: AppColors.textMain,
                       fontSize: 18,
@@ -389,7 +389,7 @@ IconData _getIconFromName(String name) {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isPremium ? 'Enjoy all your exclusive benefits.' : 'Get year-round priority support.',
+                    isPremium ? 'Exclusive member tools active.' : 'Get official identity guidance.',
                     style: TextStyle(
                       color: AppColors.textMain.withValues(alpha: 0.7),
                       fontSize: 13,
@@ -928,7 +928,7 @@ class _NotificationBell extends ConsumerWidget {
           if (unreadCount > 0)
             Positioned(
               top: -6,
-              left: -6,
+              right: -6,
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: const BoxDecoration(

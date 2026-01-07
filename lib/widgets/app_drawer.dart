@@ -14,7 +14,6 @@ import '../theme/l10n.dart';
 import '../screens/academy_screen.dart';
 import '../screens/bank_comparison_screen.dart';
 import '../screens/scanner_screen.dart';
-import '../screens/admin_dashboard_screen.dart';
 import '../widgets/custom_snackbar.dart';
 import '../services/auth_service.dart';
 import '../screens/profile_edit_screen.dart';
@@ -80,9 +79,9 @@ class AppDrawer extends ConsumerWidget {
                           ),
                           Row(
                             children: [
-                              Text(
-                                isPremium ? 'Premium Member' : 'Standard Member',
-                                style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w600),
+                               Text(
+                                isPremium ? 'Verified Professional' : 'Standard Status',
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14, fontWeight: FontWeight.w600),
                               ),
                               if (isPremium) ...[
                                 const SizedBox(width: 8),
@@ -97,13 +96,13 @@ class AppDrawer extends ConsumerWidget {
                   const SizedBox(height: 20),
                   _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
                    _DrawerItem(context, ref, LucideIcons.alertCircle, 'Emergency ID', route: 'emergency', color: Colors.redAccent),
+                   _DrawerItem(context, ref, LucideIcons.shieldCheck, L10n.get(ref.watch(languageProvider), 'pro'), route: 'pro', color: Colors.amber),
                    _DrawerItem(context, ref, LucideIcons.scan, L10n.get(ref.watch(languageProvider), 'scan_id'), route: 'scanner'),
                    _DrawerItem(context, ref, LucideIcons.graduationCap, L10n.get(ref.watch(languageProvider), 'academy'), route: 'academy'),
                    _DrawerItem(context, ref, LucideIcons.megaphone, L10n.get(ref.watch(languageProvider), 'news_feed'), route: 'news'),
                    _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
                    _DrawerItem(context, ref, LucideIcons.history, L10n.get(ref.watch(languageProvider), 'order_history'), route: 'history'),
                    const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
-                   _DrawerItem(context, ref, LucideIcons.layoutDashboard, L10n.get(ref.watch(languageProvider), 'admin_panel'), route: 'admin', color: AppColors.accent),
                    _DrawerItem(context, ref, LucideIcons.settings, L10n.get(ref.watch(languageProvider), 'settings'), route: 'settings'),
                   _DrawerItem(context, ref, LucideIcons.helpCircle, L10n.get(ref.watch(languageProvider), 'help'), route: 'help'),
                   const SizedBox(height: 20),
@@ -150,8 +149,6 @@ class AppDrawer extends ConsumerWidget {
              Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen(), settings: const RouteSettings(name: 'comparison')));
           } else if (route == 'news') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsListScreen(), settings: const RouteSettings(name: 'news')));
-          } else if (route == 'admin') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen(), settings: const RouteSettings(name: 'admin')));
           } else if (route == 'logout') {
              CustomSnackBar.show(context, message: 'Logging out...');
              // AuthGate will handle the UI switch automatically

@@ -27,9 +27,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       icon: LucideIcons.fingerprint,
     ),
     OnboardingContent(
-      title: 'Premium Concierge',
-      description: 'Skip the queues. Our premium service handles all applications for you physically.',
-      icon: LucideIcons.crown,
+      title: 'Identity Guidance',
+      description: 'Expert support for your applications. Our team provides professional guidance for all identification processes.',
+      icon: LucideIcons.shieldCheck,
     ),
     OnboardingContent(
       title: 'Secure & Private',

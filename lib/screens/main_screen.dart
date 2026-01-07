@@ -50,7 +50,7 @@ class _MainScreenState extends State<MainScreen> {
               // Central Action
               _buildScanButton(),
 
-              _buildNavItem(2, LucideIcons.crown, 'Pro'),
+              _buildNavItem(2, LucideIcons.shieldCheck, 'Status'),
               _buildNavItem(3, LucideIcons.user, 'Profile'),
             ],
           ),

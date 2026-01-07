@@ -199,7 +199,7 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            item.type == NewsType.premium ? 'PREMIUM' : (item.type == NewsType.promotion ? 'PROMOTION' : (item.type == NewsType.academy ? 'ACADEMY' : 'OFFICIAL')),
+                            item.type == NewsType.premium ? 'PRO BROADCAST' : (item.type == NewsType.promotion ? 'PROMOTION' : (item.type == NewsType.academy ? 'ACADEMY' : 'OFFICIAL')),
                             style: TextStyle(
                               color: item.type == NewsType.premium ? AppColors.accent : (item.type == NewsType.promotion ? Colors.orange : AppColors.primary),
                               fontSize: 10,
