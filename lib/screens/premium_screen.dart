@@ -76,38 +76,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
             
             const SizedBox(height: 32),
             
-            // --- USER ID SECTION ---
-            GlassCard(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Text('Your Unique Activation ID', style: TextStyle(color: AppColors.textDim, fontSize: 12, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          user?.uid ?? 'Not Logged In',
-                          style: const TextStyle(color: AppColors.textMain, fontSize: 14, fontFamily: 'monospace', fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: user?.uid ?? ''));
-                          CustomSnackBar.show(context, message: 'ID Copied! Provide this to Admin.');
-                        },
-                        icon: const Icon(LucideIcons.copy, color: AppColors.primary, size: 20),
-                        style: IconButton.styleFrom(
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            // ID Section hidden for "Pro" look - ID is handled background by requests
 
             const SizedBox(height: 40),
 
@@ -147,19 +116,23 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 64),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      shadowColor: AppColors.primary.withValues(alpha: 0.4),
+                      shadowColor: appUser.isPremium ? Colors.amber.withValues(alpha: 0.4) : AppColors.primary.withValues(alpha: 0.4),
                       elevation: 10,
                     ),
-                    onPressed: () async {
+                    onPressed: appUser.isPremium ? null : () async {
                       // 1. Notify Admin via DB (Command Center)
                       if (user != null) {
-                        await FirebaseDatabase.instance.ref('premium_requests/${user.uid}').set({
-                          'name': appUser.name,
-                          'email': user.email,
-                          'timestamp': ServerValue.timestamp,
-                        });
-                        if (context.mounted) {
-                          CustomSnackBar.show(context, message: 'Activation request sent to admin!');
+                        try {
+                          await FirebaseDatabase.instance.ref('premium_requests/${user.uid}').set({
+                            'name': appUser.name,
+                            'email': user.email,
+                            'timestamp': ServerValue.timestamp,
+                          });
+                          if (context.mounted) {
+                            CustomSnackBar.show(context, message: 'Activation request sent to admin!');
+                          }
+                        } catch (e) {
+                           debugPrint("DB Sync Error: $e");
                         }
                       }
 
@@ -169,8 +142,11 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
                         await launchUrl(url, mode: LaunchMode.externalApplication);
                       }
                     },
-                    icon: const Icon(LucideIcons.userCheck),
-                    label: const Text('Request Activation', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+                    icon: Icon(appUser.isPremium ? LucideIcons.checkCircle : LucideIcons.userCheck),
+                    label: Text(
+                      appUser.isPremium ? 'Verified Professional' : 'Request Activation', 
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const Text(

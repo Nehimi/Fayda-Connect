@@ -27,8 +27,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       icon: LucideIcons.fingerprint,
     ),
     OnboardingContent(
-      title: 'Professional Support',
-      description: 'Identity verified members get priority processing and administrative identity tools.',
+      title: 'Identity Guidance',
+      description: 'Expert support for your applications. Our team provides professional guidance for all identification processes.',
       icon: LucideIcons.shieldCheck,
     ),
     OnboardingContent(

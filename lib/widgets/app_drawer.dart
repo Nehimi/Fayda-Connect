@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:flutter/services.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
 import '../screens/home_screen.dart';
@@ -15,7 +14,6 @@ import '../theme/l10n.dart';
 import '../screens/academy_screen.dart';
 import '../screens/bank_comparison_screen.dart';
 import '../screens/scanner_screen.dart';
-import '../screens/admin_dashboard_screen.dart';
 import '../widgets/custom_snackbar.dart';
 import '../services/auth_service.dart';
 import '../screens/profile_edit_screen.dart';
@@ -79,6 +77,8 @@ class AppDrawer extends ConsumerWidget {
                             displayName,
                             style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
                           ),
+                          Row(
+                            children: [
                                Text(
                                 isPremium ? 'Verified Professional' : 'Standard Status',
                                 style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14, fontWeight: FontWeight.w600),
@@ -88,32 +88,6 @@ class AppDrawer extends ConsumerWidget {
                                 const Icon(LucideIcons.crown, color: Colors.amber, size: 16),
                               ],
                             ],
-                          ),
-                          const SizedBox(height: 12),
-                          InkWell(
-                            onTap: () {
-                              Clipboard.setData(ClipboardData(text: user?.uid ?? ''));
-                              CustomSnackBar.show(context, message: 'User ID copied to clipboard');
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'ID: ${user?.uid.substring(0, 8) ?? 'N/A'}...',
-                                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Icon(LucideIcons.copy, color: Colors.white.withValues(alpha: 0.5), size: 12),
-                                ],
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -129,7 +103,6 @@ class AppDrawer extends ConsumerWidget {
                    _DrawerItem(context, ref, LucideIcons.trendingUp, L10n.get(ref.watch(languageProvider), 'comparison'), route: 'comparison'),
                    _DrawerItem(context, ref, LucideIcons.history, L10n.get(ref.watch(languageProvider), 'order_history'), route: 'history'),
                    const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
-                   _DrawerItem(context, ref, LucideIcons.layoutDashboard, L10n.get(ref.watch(languageProvider), 'admin_panel'), route: 'admin', color: AppColors.accent),
                    _DrawerItem(context, ref, LucideIcons.settings, L10n.get(ref.watch(languageProvider), 'settings'), route: 'settings'),
                   _DrawerItem(context, ref, LucideIcons.helpCircle, L10n.get(ref.watch(languageProvider), 'help'), route: 'help'),
                   const SizedBox(height: 20),
@@ -176,8 +149,6 @@ class AppDrawer extends ConsumerWidget {
              Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen(), settings: const RouteSettings(name: 'comparison')));
           } else if (route == 'news') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsListScreen(), settings: const RouteSettings(name: 'news')));
-          } else if (route == 'admin') {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen(), settings: const RouteSettings(name: 'admin')));
           } else if (route == 'logout') {
              CustomSnackBar.show(context, message: 'Logging out...');
              // AuthGate will handle the UI switch automatically

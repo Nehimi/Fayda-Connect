@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -35,6 +36,15 @@ class AuthService {
     final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     if (credential.user != null) {
       await credential.user!.updateDisplayName(name);
+      
+      // Sync to Realtime Database for CMS usage
+      await FirebaseDatabase.instance.ref('users/${credential.user!.uid}').set({
+        'name': name,
+        'email': email,
+        'isPremium': false,
+        'createdAt': ServerValue.timestamp,
+      });
+
       // Send verification email immediately after signup
       await credential.user!.sendEmailVerification();
     }
