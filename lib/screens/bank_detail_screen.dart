@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import '../providers/user_provider.dart';
+import '../providers/checklist_provider.dart';
 
 class BankDetailScreen extends ConsumerWidget {
   final Bank bank;
@@ -118,9 +119,16 @@ class BankDetailScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 40),
                   _SectionHeader(title: L10n.get(lang, 'steps')),
+                  const SizedBox(height: 12),
+                  _ProgressHeader(serviceId: bank.id, totalSteps: bank.instructionSteps.length),
                   const SizedBox(height: 24),
                   ...bank.instructionSteps.asMap().entries.map((entry) {
-                    return _StepItem(index: entry.key, title: L10n.getLocalized(lang, entry.value), isLast: entry.key == bank.instructionSteps.length - 1);
+                    return _StepItem(
+                      serviceId: bank.id,
+                      index: entry.key, 
+                      title: L10n.getLocalized(lang, entry.value), 
+                      isLast: entry.key == bank.instructionSteps.length - 1
+                    );
                   }).toList(),
                   const SizedBox(height: 48),
                   ElevatedButton(
@@ -138,11 +146,11 @@ class BankDetailScreen extends ConsumerWidget {
                   if (user.isPremium)
                     GlassCard(
                       padding: const EdgeInsets.all(28),
+                      borderColor: Colors.amber.withValues(alpha: 0.4),
                       gradientColors: [
-                        Colors.amber.withValues(alpha: 0.1),
+                        Colors.amber.withValues(alpha: 0.15),
                         Colors.amber.withValues(alpha: 0.05),
                       ],
-                      borderColor: Colors.amber.withValues(alpha: 0.3),
                       child: Column(
                         children: [
                           const Icon(LucideIcons.crown, color: Colors.amber, size: 32),
@@ -154,10 +162,10 @@ class BankDetailScreen extends ConsumerWidget {
                           const SizedBox(height: 8),
                           Text(
                             lang == AppLanguage.english
-                                ? 'Personal guidance included. Our experts will handle the process.'
-                                : 'የባለሙያ መመሪያ ተካቷል። ባለሙያዎቻችን ሂደቱን ያስተናግዳሉ።',
+                                ? 'Exclusive Elite Support active. Our professionals handle your bank sync at no cost.'
+                                : 'ልዩ የላቀ ድጋፍ ንቁ ነው። ባለሙያዎቻችን የባንክ ትስስርዎን ያለ ምንም ክፍያ ያስተናግዳሉ።',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.7), fontSize: 13),
+                            style: TextStyle(color: AppColors.textMain.withValues(alpha: 0.8), fontSize: 13, height: 1.5),
                           ),
                           const SizedBox(height: 24),
                           ElevatedButton(
@@ -174,8 +182,8 @@ class BankDetailScreen extends ConsumerWidget {
                               }
                             },
                             child: Text(
-                              lang == AppLanguage.english ? 'Contact Agent (Support Included)' : 'ባለሙያ ያናግሩ (ድጋፍ ተካቷል)',
-                              style: const TextStyle(fontWeight: FontWeight.w800),
+                              lang == AppLanguage.english ? 'Contact Agent (Free Support)' : 'ባለሙያ ያናግሩ (ነፃ ድጋፍ)',
+                              style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.5),
                             ),
                           ),
                         ],
@@ -274,62 +282,118 @@ class _PremiumChip extends StatelessWidget {
   }
 }
 
-class _StepItem extends StatelessWidget {
+class _StepItem extends ConsumerWidget {
+  final String serviceId;
   final int index;
   final String title;
   final bool isLast;
 
-  const _StepItem({required this.index, required this.title, this.isLast = false});
+  const _StepItem({required this.serviceId, required this.index, required this.title, this.isLast = false});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isCompleted = ref.watch(checklistProvider.notifier).isStepCompleted(serviceId, index);
+
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    '${index + 1}',
-                    style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
+          GestureDetector(
+            onTap: () => ref.read(checklistProvider.notifier).toggleStep(serviceId, index),
+            child: Column(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isCompleted ? Colors.green : AppColors.primary,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: isCompleted ? [BoxShadow(color: Colors.green.withValues(alpha: 0.3), blurRadius: 8)] : null,
+                  ),
+                  child: Center(
+                    child: isCompleted 
+                        ? const Icon(LucideIcons.check, color: Colors.white, size: 16)
+                        : Text(
+                            '${index + 1}',
+                            style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
+                          ),
                   ),
                 ),
-              ),
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    color: AppColors.primary.withValues(alpha: 0.2),
+                if (!isLast)
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      color: isCompleted 
+                        ? Colors.green.withValues(alpha: 0.3)
+                        : AppColors.primary.withValues(alpha: 0.2),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(width: 20),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textMain,
-                  fontWeight: FontWeight.w500,
-                  height: 1.4,
+            child: GestureDetector(
+              onTap: () => ref.read(checklistProvider.notifier).toggleStep(serviceId, index),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isCompleted ? AppColors.textMain.withValues(alpha: 0.5) : AppColors.textMain,
+                    fontWeight: isCompleted ? FontWeight.normal : FontWeight.w500,
+                    decoration: isCompleted ? TextDecoration.lineThrough : null,
+                    height: 1.4,
+                  ),
                 ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ProgressHeader extends ConsumerWidget {
+  final String serviceId;
+  final int totalSteps;
+  const _ProgressHeader({required this.serviceId, required this.totalSteps});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final progress = ref.watch(checklistProvider.notifier).getProgress(serviceId, totalSteps);
+    final percentage = (progress * 100).toInt();
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'SYNC PROGRESS',
+              style: TextStyle(color: AppColors.textDim, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+            ),
+            Text(
+              '$percentage%',
+              style: TextStyle(color: progress == 1 ? Colors.green : AppColors.primary, fontWeight: FontWeight.w900, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progress,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            valueColor: AlwaysStoppedAnimation<Color>(progress == 1 ? Colors.green : AppColors.primary),
+            minHeight: 6,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import '../providers/user_provider.dart';
+import '../providers/checklist_provider.dart';
 
 class ServiceDetailScreen extends ConsumerWidget {
   final GeneralService service;
@@ -106,10 +107,13 @@ class ServiceDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 40),
                   _SectionHeader(title: lang == AppLanguage.english ? 'Process Guide' : 'የሂደት መመሪያ'),
                   const SizedBox(height: 12),
+                  _ProgressHeader(serviceId: service.id, totalSteps: service.instructionSteps.length),
+                  const SizedBox(height: 16),
                   _VoiceGuide(steps: service.instructionSteps, lang: lang),
                   const SizedBox(height: 24),
                   ...service.instructionSteps.asMap().entries.map((entry) {
                     return _StepItem(
+                      serviceId: service.id,
                       index: entry.key,
                       title: L10n.getLocalized(lang, entry.value),
                       isLast: entry.key == service.instructionSteps.length - 1,
@@ -277,62 +281,118 @@ class _PremiumChip extends StatelessWidget {
   }
 }
 
-class _StepItem extends StatelessWidget {
+class _StepItem extends ConsumerWidget {
+  final String serviceId;
   final int index;
   final String title;
   final bool isLast;
 
-  const _StepItem({required this.index, required this.title, this.isLast = false});
+  const _StepItem({required this.serviceId, required this.index, required this.title, this.isLast = false});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isCompleted = ref.watch(checklistProvider.notifier).isStepCompleted(serviceId, index);
+
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    '${index + 1}',
-                    style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
+          GestureDetector(
+            onTap: () => ref.read(checklistProvider.notifier).toggleStep(serviceId, index),
+            child: Column(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: isCompleted ? Colors.green : AppColors.primary,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: isCompleted ? [BoxShadow(color: Colors.green.withValues(alpha: 0.3), blurRadius: 8)] : null,
+                  ),
+                  child: Center(
+                    child: isCompleted 
+                        ? const Icon(LucideIcons.check, color: Colors.white, size: 16)
+                        : Text(
+                            '${index + 1}',
+                            style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.white),
+                          ),
                   ),
                 ),
-              ),
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    color: AppColors.primary.withValues(alpha: 0.2),
+                if (!isLast)
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      color: isCompleted 
+                        ? Colors.green.withValues(alpha: 0.3)
+                        : AppColors.primary.withValues(alpha: 0.2),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(width: 20),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textMain,
-                  fontWeight: FontWeight.w500,
-                  height: 1.4,
+            child: GestureDetector(
+              onTap: () => ref.read(checklistProvider.notifier).toggleStep(serviceId, index),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isCompleted ? AppColors.textMain.withValues(alpha: 0.5) : AppColors.textMain,
+                    fontWeight: isCompleted ? FontWeight.normal : FontWeight.w500,
+                    decoration: isCompleted ? TextDecoration.lineThrough : null,
+                    height: 1.4,
+                  ),
                 ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ProgressHeader extends ConsumerWidget {
+  final String serviceId;
+  final int totalSteps;
+  const _ProgressHeader({required this.serviceId, required this.totalSteps});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final progress = ref.watch(checklistProvider.notifier).getProgress(serviceId, totalSteps);
+    final percentage = (progress * 100).toInt();
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'ROADMAP PROGRESS',
+              style: TextStyle(color: AppColors.textDim, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+            ),
+            Text(
+              '$percentage%',
+              style: TextStyle(color: progress == 1 ? Colors.green : AppColors.primary, fontWeight: FontWeight.w900, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progress,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            valueColor: AlwaysStoppedAnimation<Color>(progress == 1 ? Colors.green : AppColors.primary),
+            minHeight: 6,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -369,9 +429,29 @@ class _VoiceGuideState extends State<_VoiceGuide> with SingleTickerProviderState
 
   Future<void> _initTts() async {
     await _flutterTts.awaitSpeakCompletion(true);
-    await _flutterTts.setLanguage("en-US"); // Default to English for now
-    await _flutterTts.setPitch(1.0);
+    await _flutterTts.setLanguage("en-US");
+    
+    // Try to find a male voice
+    try {
+      List<dynamic> voices = await _flutterTts.getVoices;
+      for (var voice in voices) {
+        if (voice is Map) {
+          String name = (voice["name"] ?? "").toString().toLowerCase();
+          if (name.contains("male") || name.contains("en-us-x-iom-local") || name.contains("guy")) {
+            await _flutterTts.setVoice({"name": voice["name"], "locale": voice["locale"]});
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error setting male voice: $e");
+    }
+
+    await _flutterTts.setSpeechRate(0.35); // Slow, professional advisory pace
+    await _flutterTts.setPitch(0.85); // Lower pitch for a natural male voice
+    await _flutterTts.setVolume(1.0);
   }
+
 
   @override
   void dispose() {
@@ -417,9 +497,9 @@ class _VoiceGuideState extends State<_VoiceGuide> with SingleTickerProviderState
       String text = L10n.getLocalized(widget.lang, widget.steps[i]);
       await _flutterTts.speak(text);
       
-      // Short pause between steps
+      // Professional pause for user to process advice
       if (_isPlaying) {
-        await Future.delayed(const Duration(milliseconds: 500));
+        await Future.delayed(const Duration(milliseconds: 1200));
       }
     }
 

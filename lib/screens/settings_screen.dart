@@ -200,7 +200,7 @@ class SettingsScreen extends ConsumerWidget {
         backgroundColor: AppColors.cardSurface,
         title: const Text('About Fayda Connect', style: TextStyle(color: AppColors.textMain)),
         content: const Text(
-          'Fayda Connect is your gateway to digital identity and services in Ethiopia. \n\nVersion: 1.0.4 Professional',
+          'Fayda Connect is your gateway to digital identity and services in Ethiopia. \n\nVersion: 1.0.4 Activation',
           style: TextStyle(color: AppColors.textDim),
         ),
         actions: [

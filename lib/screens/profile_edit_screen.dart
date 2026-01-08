@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/colors.dart';
 import '../widgets/glass_card.dart';
@@ -102,6 +104,15 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                 if (_nameController.text.isNotEmpty) {
                   try {
                     await ref.read(authServiceProvider).updateDisplayName(_nameController.text);
+                    
+                    // Sync to Realtime Database
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      await FirebaseDatabase.instance.ref('users/${user.uid}').update({
+                        'name': _nameController.text,
+                      });
+                    }
+
                     if (mounted) {
                       CustomSnackBar.show(context, message: 'Profile updated successfully!');
                       Navigator.pop(context);
