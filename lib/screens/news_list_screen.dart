@@ -11,6 +11,8 @@ import '../providers/language_provider.dart';
 import '../widgets/custom_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/news_item.dart';
+import '../providers/user_provider.dart';
+import 'premium_screen.dart';
 
 class NewsListScreen extends ConsumerWidget {
   const NewsListScreen({super.key});
@@ -167,7 +169,7 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
         child: InkWell(
           onTap: () {
             if (item.type == NewsType.premium) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PremiumScreen()));
             } else {
               setState(() => _isExpanded = !_isExpanded);
             }
@@ -318,7 +320,7 @@ class _NewsUpdateCardState extends State<_NewsUpdateCard> {
                       ),
                       onPressed: () async {
                         if (item.type == NewsType.premium && !widget.isUserPremium) {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const PremiumScreen()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => PremiumScreen()));
                           return;
                         }
                         String urlStr = item.externalLink!.trim();

@@ -1,12 +1,11 @@
-
 import 'package:flutter/material.dart';
-import '../../theme/colors.dart';
-import '../../widgets/glass_card.dart';
+import '../theme/colors.dart';
+import '../widgets/glass_card.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../screens/home_screen.dart';
-import '../../providers/user_provider.dart';
+import 'home_screen.dart';
+import '../providers/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../widgets/custom_snackbar.dart';
+import '../widgets/custom_snackbar.dart';
 import '../providers/auth_ui_provider.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -100,7 +99,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             Text(
                               _contents[index].title,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.textMain,
@@ -111,7 +110,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             Text(
                               _contents[index].description,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 color: AppColors.textDim,
                                 height: 1.5,
