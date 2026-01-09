@@ -57,10 +57,19 @@ class HelpSupportScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           Row(
             children: [
-              _buildContactButton(LucideIcons.send, 'Telegram', const Color(0xFF0088cc), 'https://t.me/faydaconnectbot'),
+              _buildContactButton(LucideIcons.send, 'Telegram', const Color(0xFF0088cc), 'https://t.me/NehimiG2'),
               const SizedBox(width: 16),
-              _buildContactButton(LucideIcons.mail, 'Email', AppColors.primary, 'mailto:support@faydaconnect.com'),
+              _buildContactButton(LucideIcons.mail, 'Email', AppColors.primary, 'mailto:faydaconnect@gmail.com'),
             ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'faydaconnect@gmail.com',
+            style: const TextStyle(
+              color: AppColors.textDim,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
