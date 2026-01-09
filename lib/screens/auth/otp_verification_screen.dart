@@ -8,6 +8,7 @@ import '../home_screen.dart';
 import '../../widgets/custom_snackbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive.dart';
 
 class OtpVerificationScreen extends ConsumerStatefulWidget {
   final String phoneNumber;
@@ -97,6 +98,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.responsive;
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       appBar: AppBar(
@@ -110,100 +112,106 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           : null,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-               const SizedBox(height: 20),
-               Container(
-                 padding: const EdgeInsets.all(24),
-                 decoration: BoxDecoration(
-                   color: AppColors.primary.withValues(alpha: 0.1),
-                   shape: BoxShape.circle,
-                 ),
-                 child: const Icon(LucideIcons.mail, size: 64, color: AppColors.primary),
-               ),
-               const SizedBox(height: 32),
-               const Text(
-                 'Verify Your Email',
-                 style: TextStyle(
-                   fontSize: 28,
-                   fontWeight: FontWeight.w900,
-                   color: AppColors.textMain,
-                   letterSpacing: -1,
-                 ),
-               ),
-               const SizedBox(height: 16),
-               RichText(
-                 textAlign: TextAlign.center,
-                 text: TextSpan(
-                   style: const TextStyle(color: AppColors.textDim, fontSize: 16, height: 1.5),
-                   children: [
-                     const TextSpan(text: 'We have sent a verification link to\n'),
-                     TextSpan(
-                       text: widget.phoneNumber,
-                       style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(r.getSpacing(20)),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                   SizedBox(height: r.getSpacing(20)),
+                   Container(
+                     padding: EdgeInsets.all(r.getSpacing(24)),
+                     decoration: BoxDecoration(
+                       color: AppColors.primary.withValues(alpha: 0.1),
+                       shape: BoxShape.circle,
                      ),
-                     const TextSpan(text: '.\nPlease check your inbox and click the link to continue.'),
-                   ],
-                 ),
-               ),
-               
-               const SizedBox(height: 48),
+                     child: Icon(LucideIcons.mail, size: r.getIconSize(64), color: AppColors.primary),
+                   ),
+                   SizedBox(height: r.getSpacing(28)),
+                   Text(
+                     'Verify Your Email',
+                     textAlign: TextAlign.center,
+                     style: TextStyle(
+                       fontSize: r.getFontSize(26),
+                       fontWeight: FontWeight.w900,
+                       color: AppColors.textMain,
+                       letterSpacing: -1,
+                     ),
+                   ),
+                   SizedBox(height: r.getSpacing(12)),
+                   RichText(
+                     textAlign: TextAlign.center,
+                     text: TextSpan(
+                       style: TextStyle(color: AppColors.textDim, fontSize: r.getFontSize(15), height: 1.5),
+                       children: [
+                         const TextSpan(text: 'We have sent a verification link to\n'),
+                         TextSpan(
+                           text: widget.phoneNumber,
+                           style: const TextStyle(color: AppColors.textMain, fontWeight: FontWeight.bold),
+                         ),
+                         const TextSpan(text: '.\nPlease check your inbox and click the link to continue.'),
+                       ],
+                     ),
+                   ),
+                   
+                   SizedBox(height: r.getSpacing(32)),
 
-               GlassCard(
-                 padding: const EdgeInsets.all(20),
-                 child: Row(
-                   children: [
-                     const SizedBox(
-                       width: 20,
-                       height: 20,
-                       child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                   GlassCard(
+                     padding: EdgeInsets.all(r.getSpacing(16)),
+                     child: Row(
+                       children: [
+                         SizedBox(
+                           width: r.getSpacing(20),
+                           height: r.getSpacing(20),
+                           child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                         ),
+                         SizedBox(width: r.getSpacing(12)),
+                         Expanded(
+                           child: Text(
+                             'Waiting for verification...',
+                             style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.w600, fontSize: r.getFontSize(14)),
+                           ),
+                         ),
+                       ],
                      ),
-                     const SizedBox(width: 16),
-                     const Expanded(
-                       child: Text(
-                         'Waiting for verification...',
-                         style: TextStyle(color: AppColors.textMain, fontWeight: FontWeight.w600),
-                       ),
+                   ),
+                   
+                   SizedBox(height: r.getSpacing(24)),
+                   
+                   ElevatedButton(
+                     onPressed: _checkVerificationStatus,
+                     style: ElevatedButton.styleFrom(
+                       backgroundColor: AppColors.primary,
+                       foregroundColor: Colors.white,
+                       minimumSize: Size(double.infinity, r.buttonHeight),
+                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                       elevation: 8,
+                       shadowColor: AppColors.primary.withValues(alpha: 0.5),
                      ),
-                   ],
-                 ),
-               ),
-               
-               const SizedBox(height: 32),
-               
-               ElevatedButton(
-                 onPressed: _checkVerificationStatus,
-                 style: ElevatedButton.styleFrom(
-                   backgroundColor: AppColors.primary,
-                   foregroundColor: Colors.white,
-                   minimumSize: const Size(double.infinity, 56),
-                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                   elevation: 8,
-                   shadowColor: AppColors.primary.withValues(alpha: 0.5),
-                 ),
-                 child: const Text('I Have Verified', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-               ),
-               
-               const Spacer(),
-               
-               Text(
-                 "Didn't receive the email?",
-                 style: TextStyle(color: AppColors.textDim.withValues(alpha: 0.7)),
-               ),
-               TextButton(
-                 onPressed: _handleResendEmail,
-                 child: const Text("Resend Verification Link", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-               ),
-               const SizedBox(height: 8),
-               TextButton(
-                 onPressed: () => ref.read(authServiceProvider).signOut(),
-                 child: Text("Cancel & Sign Out", style: TextStyle(color: Colors.redAccent.withValues(alpha: 0.8))),
-               ),
-               const SizedBox(height: 16),
-            ],
+                     child: Text('I Have Verified', style: TextStyle(fontSize: r.getFontSize(17), fontWeight: FontWeight.bold)),
+                   ),
+                   
+                   SizedBox(height: r.getSpacing(20)),
+                   
+                   Text(
+                     "Didn't receive the email?",
+                     style: TextStyle(color: AppColors.textDim.withValues(alpha: 0.7), fontSize: r.getFontSize(13)),
+                   ),
+                   TextButton(
+                     onPressed: _handleResendEmail,
+                     child: Text("Resend Verification Link", style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: r.getFontSize(14))),
+                   ),
+                   SizedBox(height: r.getSpacing(6)),
+                   TextButton(
+                     onPressed: () => ref.read(authServiceProvider).signOut(),
+                     child: Text("Cancel & Sign Out", style: TextStyle(color: Colors.redAccent.withValues(alpha: 0.8), fontSize: r.getFontSize(14))),
+                   ),
+                   SizedBox(height: r.getSpacing(12)),
+                ],
+              ),
+            ),
           ),
         ),
       ),

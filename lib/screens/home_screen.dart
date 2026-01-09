@@ -52,6 +52,7 @@ class HomeScreen extends ConsumerWidget {
     final dynamicNews = ref.watch(newsProvider);
     final showPartners = ref.watch(partnerVisibilityProvider).value ?? true;
     final hidePremiumNews = ref.watch(hidePremiumNewsProvider).value ?? false;
+    final r = context.responsive;
     
     final categories = [
       ServiceCategory(
@@ -100,239 +101,232 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.scaffold,
-      body: Column(
-        children: [
-          // Fixed Header
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              context.responsive.horizontalPadding, 
-              60, 
-              context.responsive.horizontalPadding, 
-              20
-            ),
-            child: Row(
-              children: [
-                _MenuButton(),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      userAsync.when(
-                        data: (user) => Text(
-                          user != null 
-                            ? '${_getGreetingPrefix(currentLang)}, ${user.displayName?.split(' ').first ?? 'User'}'
-                            : _getGreetingPrefix(currentLang),
-                          style: TextStyle(
-                            color: AppColors.textDim,
-                            fontSize: context.responsive.getFontSize(13),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        loading: () => Text('...', style: TextStyle(color: AppColors.textDim, fontSize: 13)),
-                        error: (_, __) => Text(_getGreetingPrefix(currentLang), style: TextStyle(color: AppColors.textDim, fontSize: 13)),
-                      ),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          _getAppName(currentLang),
-                          style: TextStyle(
-                            color: AppColors.textMain,
-                            fontSize: context.responsive.getFontSize(24),
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _SearchButton(),
-                const SizedBox(width: 8),
-                _NotificationBell(ref: ref),
-                const SizedBox(width: 4),
-                _LanguageToggle(),
-              ],
-            ),
-          ),
-          
-          // Scrolling Content
-          Expanded(
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.responsive.horizontalPadding, 
-                    vertical: 8
-                  ),
-                  child: dynamicNews.when(
-                    data: (news) {
-                      // 1. Check for active PREMIUM News (Priority)
-                      final latestPremium = news.where((n) => n.type == NewsType.premium).firstOrNull;
-                      if (latestPremium != null && !hidePremiumNews) {
-                        return _buildFeaturedNews(context, latestPremium, isPremium);
-                      }
-
-                      // 2. Check for latest non-promotion News (Alert, Standard, Partner)
-                      final latestOther = news.where((n) => n.type != NewsType.promotion && n.type != NewsType.academy).firstOrNull;
-                      if (latestOther != null) {
-                         return _buildFeaturedNews(context, latestOther, isPremium);
-                      }
-
-                      // 2. Fallback to Static PRO Promo (Controlled by Admin Bot)
-                      // We use async here, so we default to true to avoid flicker if loading
-                      final showPromo = ref.watch(promoVisibilityProvider).value ?? true;
-                      
-                      if (showPromo) {
-                        return _buildPremiumPromo(context, isPremium);
-                      } else {
-                        return const SizedBox.shrink(); // Admin hidden it
-                      }
-                    },
-                    loading: () => const SizedBox.shrink(), // Don't show anything while loading to avoid jump
-                    error: (_, __) => const SizedBox.shrink(),
-                  ),
-                ),
+      drawer: const AppDrawer(),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            // Fixed Header
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                r.horizontalPadding,
+                r.getSpacing(48),
+                r.horizontalPadding,
+                r.getSpacing(20),
               ),
-
-              if (showPartners) ...[
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      context.responsive.horizontalPadding, 
-                      context.responsive.getSpacing(40), 
-                      context.responsive.horizontalPadding, 
-                      0
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          L10n.get(currentLang, 'partner_benefits'),
-                          style: TextStyle(
-                            color: AppColors.textMain,
-                            fontSize: context.responsive.getFontSize(18),
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
-                          child: Text(
-                            L10n.get(currentLang, 'view_all'), 
-                            style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                SliverToBoxAdapter(
-                  child: dynamicBenefits.when(
-                    data: (benefits) {
-                      if (benefits.isEmpty) return const SizedBox.shrink();
-                      // Newest First
-                      final sortedBenefits = benefits.reversed.toList();
-                      return _BenefitsCarousel(benefits: sortedBenefits);
-                    },
-                    loading: () => const Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                    error: (e, _) => const SizedBox.shrink(),
-                  ),
-                ),
-              ],
-
-
-
-
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    context.responsive.horizontalPadding, 
-                    context.responsive.getSpacing(40), 
-                    context.responsive.horizontalPadding, 
-                    16
-                  ),
-                  child: Text(
-                    L10n.get(currentLang, 'explore'),
-                    style: TextStyle(
-                      color: AppColors.textMain,
-                      fontSize: context.responsive.getFontSize(20),
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-              ),
-
-              SliverPadding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: context.responsive.horizontalPadding
-                ),
-                sliver: SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: context.responsive.gridCrossAxisCount,
-                    crossAxisSpacing: context.responsive.getSpacing(16),
-                    mainAxisSpacing: context.responsive.getSpacing(16),
-                    childAspectRatio: context.responsive.isTablet ? 1.0 : 0.85,
-                  ),
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final category = categories[index];
-                      return CategoryCard(
-                        category: category,
-                        onTap: () {
-                          _handleNavigation(context, category);
-                        },
-                      );
-                    },
-                    childCount: categories.length,
-                  ),
-                ),
-              ),
-              
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Center(
+              child: Row(
+                children: [
+                  _MenuButton(),
+                  SizedBox(width: r.getSpacing(12)),
+                  Expanded(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(height: 40),
-                        Text(
-                          L10n.get(currentLang, 'indep_provider'),
-                          style: const TextStyle(color: AppColors.textDim, fontSize: 13, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
+                        userAsync.when(
+                          data: (user) => Text(
+                            user != null
+                                ? '${_getGreetingPrefix(currentLang)}, ${user.displayName?.split(' ').first ?? 'User'}'
+                                : _getGreetingPrefix(currentLang),
+                            style: TextStyle(
+                              color: AppColors.textDim,
+                              fontSize: r.getFontSize(13),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          loading: () => Text('...', style: TextStyle(color: AppColors.textDim, fontSize: 13)),
+                          error: (_, __) => Text(_getGreetingPrefix(currentLang), style: TextStyle(color: AppColors.textDim, fontSize: 13)),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          L10n.get(currentLang, 'not_affiliated'),
-                          style: TextStyle(color: AppColors.textDim.withValues(alpha: 0.8), fontSize: 11),
-                          textAlign: TextAlign.center,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            _getAppName(currentLang),
+                            style: TextStyle(
+                              color: AppColors.textMain,
+                              fontSize: r.getFontSize(24),
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: 120),
                       ],
                     ),
                   ),
-                ),
+                  SizedBox(width: r.getSpacing(8)),
+                  _SearchButton(),
+                  SizedBox(width: r.getSpacing(8)),
+                  _NotificationBell(ref: ref),
+                  SizedBox(width: r.getSpacing(4)),
+                  _LanguageToggle(),
+                ],
               ),
-            ],
-          ),
+            ),
+
+            // Scrolling Content
+            Expanded(
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: r.horizontalPadding,
+                        vertical: r.getSpacing(8),
+                      ),
+                      child: dynamicNews.when(
+                        data: (news) {
+                          final latestPremium = news.where((n) => n.type == NewsType.premium).firstOrNull;
+                          if (latestPremium != null && !hidePremiumNews) {
+                            return _buildFeaturedNews(context, latestPremium, isPremium);
+                          }
+
+                          final latestOther = news.where((n) => n.type != NewsType.promotion && n.type != NewsType.academy).firstOrNull;
+                          if (latestOther != null) {
+                            return _buildFeaturedNews(context, latestOther, isPremium);
+                          }
+
+                          final showPromo = ref.watch(promoVisibilityProvider).value ?? true;
+                          if (showPromo) {
+                            return _buildPremiumPromo(context, isPremium);
+                          } else {
+                            return const SizedBox.shrink();
+                          }
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (_, __) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
+
+                  if (showPartners) ...[
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          context.responsive.horizontalPadding,
+                          context.responsive.getSpacing(40),
+                          context.responsive.horizontalPadding,
+                          0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              L10n.get(currentLang, 'partner_benefits'),
+                              style: TextStyle(
+                                color: AppColors.textMain,
+                                fontSize: context.responsive.getFontSize(18),
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BankComparisonScreen())),
+                              child: const Text(
+                                'View All',
+                                style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SliverToBoxAdapter(
+                      child: dynamicBenefits.when(
+                        data: (benefits) {
+                          if (benefits.isEmpty) return const SizedBox.shrink();
+                          final sortedBenefits = benefits.reversed.toList();
+                          return _BenefitsCarousel(benefits: sortedBenefits);
+                        },
+                        loading: () => const Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                        error: (e, _) => const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
+
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        context.responsive.horizontalPadding,
+                        context.responsive.getSpacing(40),
+                        context.responsive.horizontalPadding,
+                        16,
+                      ),
+                      child: Text(
+                        L10n.get(currentLang, 'explore'),
+                        style: TextStyle(
+                          color: AppColors.textMain,
+                          fontSize: context.responsive.getFontSize(20),
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SliverPadding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.responsive.horizontalPadding,
+                    ),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: context.responsive.gridCrossAxisCount,
+                        crossAxisSpacing: context.responsive.getSpacing(16),
+                        mainAxisSpacing: context.responsive.getSpacing(16),
+                        childAspectRatio: context.responsive.isTablet ? 1.0 : 0.85,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final category = categories[index];
+                          return CategoryCard(
+                            category: category,
+                            onTap: () {
+                              _handleNavigation(context, category);
+                            },
+                          );
+                        },
+                        childCount: categories.length,
+                      ),
+                    ),
+                  ),
+
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(r.getSpacing(20)),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            SizedBox(height: r.getSpacing(40)),
+                            Text(
+                              L10n.get(currentLang, 'indep_provider'),
+                              style: TextStyle(color: AppColors.textDim, fontSize: r.getFontSize(13), fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: r.getSpacing(6)),
+                            Text(
+                              L10n.get(currentLang, 'not_affiliated'),
+                              style: TextStyle(color: AppColors.textDim.withValues(alpha: 0.8), fontSize: r.getFontSize(11)),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: r.getSpacing(120)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
-    drawer: const AppDrawer(),
-  );
+      ),
+    );
 }
 
 IconData _getIconFromName(String name) {

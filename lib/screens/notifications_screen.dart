@@ -13,6 +13,7 @@ import '../models/notification_model.dart';
 import '../providers/cms_provider.dart';
 import 'news_list_screen.dart';
 import 'academy_screen.dart';
+import '../utils/responsive.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -21,6 +22,7 @@ class NotificationsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notifications = ref.watch(notificationsProvider);
     final lang = ref.watch(languageProvider);
+    final r = context.responsive;
 
     final newsAsync = ref.watch(newsProvider);
 
@@ -55,12 +57,12 @@ class NotificationsScreen extends ConsumerWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.getSpacing(16)),
             itemCount: unifiedItems.length,
             itemBuilder: (context, index) {
               final item = unifiedItems[index];
               if (item is AppNotification) {
-                return _buildNotificationItem(item, ref);
+                return _buildNotificationItem(item, ref, r);
               } else {
                 return _buildNewsNotificationItem(context, item as NewsItem, ref);
               }
@@ -91,21 +93,21 @@ class NotificationsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildNotificationItem(AppNotification notification, WidgetRef ref) {
+  Widget _buildNotificationItem(AppNotification notification, WidgetRef ref, Responsive r) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: r.getSpacing(12)),
       child: GlassCard(
         padding: EdgeInsets.zero,
         child: InkWell(
           onTap: () => ref.read(notificationsProvider.notifier).markAsRead(notification.id),
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.getSpacing(14)),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(r.getSpacing(10)),
                   decoration: BoxDecoration(
                     color: notification.isRead ? Colors.grey.withValues(alpha: 0.1) : AppColors.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
@@ -113,10 +115,10 @@ class NotificationsScreen extends ConsumerWidget {
                   child: Icon(
                     LucideIcons.bell,
                     color: notification.isRead ? AppColors.textDim : AppColors.primary,
-                    size: 20,
+                    size: r.getIconSize(20),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: r.getSpacing(12)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,22 +132,22 @@ class NotificationsScreen extends ConsumerWidget {
                               style: TextStyle(
                                 color: AppColors.textMain,
                                 fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: r.getFontSize(15),
                               ),
                             ),
                           ),
                           Text(
                             _formatDate(notification.timestamp),
-                            style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+                            style: TextStyle(color: AppColors.textDim, fontSize: r.getFontSize(11)),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: r.getSpacing(4)),
                       Text(
                         notification.body,
                         style: TextStyle(
                           color: notification.isRead ? AppColors.textDim : AppColors.textMain,
-                          fontSize: 14,
+                          fontSize: r.getFontSize(14),
                         ),
                       ),
                     ],
@@ -160,8 +162,9 @@ class NotificationsScreen extends ConsumerWidget {
   }
 
   Widget _buildNewsNotificationItem(BuildContext context, NewsItem item, WidgetRef ref) {
+    final r = context.responsive;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: r.getSpacing(12)),
       child: GlassCard(
         padding: EdgeInsets.zero,
         child: InkWell(
@@ -176,12 +179,12 @@ class NotificationsScreen extends ConsumerWidget {
           },
           borderRadius: BorderRadius.circular(24),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(r.getSpacing(14)),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(r.getSpacing(10)),
                   decoration: BoxDecoration(
                     color: (item.type == NewsType.academy ? AppColors.primary : (item.type == NewsType.alert ? AppColors.error : AppColors.primary)).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
@@ -189,10 +192,10 @@ class NotificationsScreen extends ConsumerWidget {
                   child: Icon(
                     item.type == NewsType.academy ? LucideIcons.graduationCap : (item.type == NewsType.alert ? LucideIcons.alertCircle : LucideIcons.megaphone),
                     color: item.type == NewsType.academy ? AppColors.primary : (item.type == NewsType.alert ? AppColors.error : AppColors.primary),
-                    size: 20,
+                    size: r.getIconSize(20),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: r.getSpacing(12)),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,10 +209,10 @@ class NotificationsScreen extends ConsumerWidget {
                                 Flexible(
                                   child: Text(
                                     item.title,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textMain,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                      fontSize: r.getFontSize(15),
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -230,16 +233,16 @@ class NotificationsScreen extends ConsumerWidget {
                           ),
                           Text(
                             DateFormat('MMM d').format(item.date),
-                            style: const TextStyle(color: AppColors.textDim, fontSize: 12),
+                            style: TextStyle(color: AppColors.textDim, fontSize: r.getFontSize(11)),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: r.getSpacing(4)),
                       Text(
                         item.content,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: AppColors.textMain, fontSize: 14),
+                        style: TextStyle(color: AppColors.textMain, fontSize: r.getFontSize(14)),
                       ),
                     ],
                   ),

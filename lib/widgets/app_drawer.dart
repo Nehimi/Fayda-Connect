@@ -21,6 +21,7 @@ import '../screens/auth/login_screen.dart';
 import '../screens/emergency_screen.dart';
 import '../providers/user_provider.dart';
 import '../screens/news_list_screen.dart';
+import '../utils/responsive.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -32,6 +33,7 @@ class AppDrawer extends ConsumerWidget {
     final appUser = ref.watch(userProvider);
     final displayName = user?.displayName ?? appUser.name;
     final isPremium = appUser.isPremium;
+    final r = context.responsive;
     return Drawer(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -54,7 +56,7 @@ class AppDrawer extends ConsumerWidget {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileEditScreen()));
                     },
                     child: Container(
-                      padding: const EdgeInsets.fromLTRB(24, 80, 24, 40),
+                      padding: EdgeInsets.fromLTRB(24, r.getSpacing(64), 24, r.getSpacing(32)),
                       width: double.infinity,
                       decoration: const BoxDecoration(
                         gradient: AppColors.meshGradient,
@@ -63,29 +65,29 @@ class AppDrawer extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            width: 64,
-                            height: 64,
+                            width: r.getSpacing(64),
+                            height: r.getSpacing(64),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 4),
                             ),
-                            child: const Icon(LucideIcons.user, color: AppColors.primary, size: 32),
+                            child: Icon(LucideIcons.user, color: AppColors.primary, size: r.getIconSize(32)),
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: r.getSpacing(16)),
                           Text(
                             displayName,
-                            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+                            style: TextStyle(color: Colors.white, fontSize: r.getFontSize(22), fontWeight: FontWeight.w900, letterSpacing: -0.5),
                           ),
                           Row(
                             children: [
                                Text(
                                 isPremium ? 'Verified Professional' : 'Standard Status',
-                                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14, fontWeight: FontWeight.w600),
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: r.getFontSize(13), fontWeight: FontWeight.w600),
                               ),
                               if (isPremium) ...[
-                                const SizedBox(width: 8),
-                                const Icon(LucideIcons.crown, color: Colors.amber, size: 16),
+                                SizedBox(width: r.getSpacing(8)),
+                                Icon(LucideIcons.crown, color: Colors.amber, size: r.getIconSize(16)),
                               ],
                             ],
                           ),
@@ -93,7 +95,7 @@ class AppDrawer extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: r.getSpacing(16)),
                   _DrawerItem(context, ref, LucideIcons.home, L10n.get(ref.watch(languageProvider), 'home'), route: 'home'),
                    _DrawerItem(context, ref, LucideIcons.alertCircle, 'Emergency ID', route: 'emergency', color: Colors.redAccent),
                    _DrawerItem(context, ref, LucideIcons.shieldCheck, L10n.get(ref.watch(languageProvider), 'pro'), route: 'pro', color: Colors.amber),
@@ -105,12 +107,12 @@ class AppDrawer extends ConsumerWidget {
                    const Divider(color: AppColors.glassBorder, height: 40, indent: 24, endIndent: 24),
                    _DrawerItem(context, ref, LucideIcons.settings, L10n.get(ref.watch(languageProvider), 'settings'), route: 'settings'),
                   _DrawerItem(context, ref, LucideIcons.helpCircle, L10n.get(ref.watch(languageProvider), 'help'), route: 'help'),
-                  const SizedBox(height: 20),
+                  SizedBox(height: r.getSpacing(16)),
                 ],
               ),
             ),
              _DrawerItem(context, ref, LucideIcons.logOut, L10n.get(ref.watch(languageProvider), 'sign_out'), color: Colors.redAccent, route: 'logout'),
-             const SizedBox(height: 40),
+             SizedBox(height: r.getSpacing(32)),
            ],
         ),
       ),
@@ -122,8 +124,9 @@ class AppDrawer extends ConsumerWidget {
     // Check if it's the home screen or the current active route
     bool isActive = (route == 'home' && (currentRoute == '/' || currentRoute == null)) || (currentRoute == route);
 
+    final r = context.responsive;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: r.getSpacing(14), vertical: r.getSpacing(4)),
       child: ListTile(
         onTap: () {
           Navigator.pop(context); // Close drawer
@@ -156,13 +159,13 @@ class AppDrawer extends ConsumerWidget {
              ref.read(authServiceProvider).signOut();
           }
         },
-        leading: Icon(icon, color: color ?? (isActive ? AppColors.primary : AppColors.textDim), size: 22),
+        leading: Icon(icon, color: color ?? (isActive ? AppColors.primary : AppColors.textDim), size: r.getIconSize(22)),
         title: Text(
           label,
           style: TextStyle(
             color: color ?? (isActive ? AppColors.textMain : AppColors.textDim),
             fontWeight: isActive ? FontWeight.w900 : FontWeight.w600,
-            fontSize: 15,
+            fontSize: r.getFontSize(15),
           ),
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

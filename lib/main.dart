@@ -29,16 +29,18 @@ void main() async {
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
-class FaydaConnectApp extends ConsumerWidget {
+class FaydaConnectApp extends StatelessWidget {
   const FaydaConnectApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fayda Connect',
       navigatorKey: navigatorKey, // Use global key for stable navigation
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.dark,
       home: const AuthGate(),
     );
   }
