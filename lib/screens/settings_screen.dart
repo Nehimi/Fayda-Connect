@@ -16,14 +16,22 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lang = ref.watch(languageProvider);
+    final size = MediaQuery.sizeOf(context);
+    final width = size.width;
+    final isTablet = width >= 600;
+    final horizontalPadding = isTablet ? 32.0 : 24.0;
+    final verticalPadding = isTablet ? 28.0 : 24.0;
+    final cardPadding = EdgeInsets.all(isTablet ? 20 : 16);
+    final itemSpacing = isTablet ? 16.0 : 12.0;
+    final sectionSpacing = isTablet ? 36.0 : 32.0;
     return Scaffold(
-      backgroundColor: AppColors.scaffold,
+      backgroundColor: AppColors.scaffoldFor(context),
       appBar: AppBar(
         title: Text(L10n.get(lang, 'settings')),
         backgroundColor: Colors.transparent,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
         children: [
           _buildSection(L10n.get(lang, 'account')),
           _buildSettingItem(
@@ -32,6 +40,8 @@ class SettingsScreen extends ConsumerWidget {
             LucideIcons.user,
             L10n.get(lang, 'prof_info'),
             L10n.get(lang, 'prof_sub'),
+            cardPadding: cardPadding,
+            itemSpacing: itemSpacing,
             onTap: () {
               Navigator.push(
                 context,
@@ -40,9 +50,9 @@ class SettingsScreen extends ConsumerWidget {
             },
           ),
 
-          _buildSettingItem(context, ref, LucideIcons.lock, L10n.get(lang, 'security'), L10n.get(lang, 'sec_sub')),
+          _buildSettingItem(context, ref, LucideIcons.lock, L10n.get(lang, 'security'), L10n.get(lang, 'sec_sub'), cardPadding: cardPadding, itemSpacing: itemSpacing),
           
-          const SizedBox(height: 32),
+          SizedBox(height: sectionSpacing),
           _buildSection(L10n.get(lang, 'preferences')),
           _buildSettingItem(
             context,
@@ -50,11 +60,13 @@ class SettingsScreen extends ConsumerWidget {
             LucideIcons.languages,
             L10n.get(lang, 'language'),
             L10n.get(lang, 'lang_sub'),
+            cardPadding: cardPadding,
+            itemSpacing: itemSpacing,
             onTap: () => _showLanguageDialog(context, ref),
           ),
-          _buildSettingItem(context, ref, LucideIcons.bell, L10n.get(lang, 'notifications'), L10n.get(lang, 'notif_sub')),
+          _buildSettingItem(context, ref, LucideIcons.bell, L10n.get(lang, 'notifications'), L10n.get(lang, 'notif_sub'), cardPadding: cardPadding, itemSpacing: itemSpacing),
           
-          const SizedBox(height: 32),
+          SizedBox(height: sectionSpacing),
           _buildSection(L10n.get(lang, 'application')),
           _buildSettingItem(
             context,
@@ -62,6 +74,8 @@ class SettingsScreen extends ConsumerWidget {
             LucideIcons.info,
             L10n.get(lang, 'about_app'),
             L10n.get(lang, 'ver_sub'),
+            cardPadding: cardPadding,
+            itemSpacing: itemSpacing,
             onTap: () => _showAboutDialog(context),
           ),
           _buildSettingItem(
@@ -70,6 +84,8 @@ class SettingsScreen extends ConsumerWidget {
             LucideIcons.shield,
             L10n.get(lang, 'privacy'),
             L10n.get(lang, 'priv_sub'),
+            cardPadding: cardPadding,
+            itemSpacing: itemSpacing,
             onTap: () => _showPrivacyDialog(context),
           ),
 
@@ -81,6 +97,8 @@ class SettingsScreen extends ConsumerWidget {
             L10n.get(lang, 'emergency_qr'),
             L10n.get(lang, 'emergency_desc'),
             color: Colors.redAccent,
+            cardPadding: cardPadding,
+            itemSpacing: itemSpacing,
             onTap: () => _showEmergencyQR(context),
           ),
 
@@ -95,32 +113,39 @@ class SettingsScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: 16, left: 4),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.2),
+        style: TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+          letterSpacing: 1.2,
+        ),
       ),
     );
   }
 
-  Widget _buildSettingItem(BuildContext context, WidgetRef ref, IconData icon, String title, String subtitle, {Color? color, VoidCallback? onTap}) {
+  Widget _buildSettingItem(BuildContext context, WidgetRef ref, IconData icon, String title, String subtitle, {Color? color, VoidCallback? onTap, required EdgeInsets cardPadding, required double itemSpacing}) {
+    final brightness = Theme.of(context).brightness;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: itemSpacing),
       child: GlassCard(
-        padding: const EdgeInsets.all(16),
+        padding: cardPadding,
         child: InkWell(
           onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
           child: Row(
             children: [
-              Icon(icon, color: color ?? AppColors.textMain, size: 22),
+              Icon(icon, color: color ?? AppColors.textMainFor(context), size: 22),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: TextStyle(color: color ?? AppColors.textMain, fontWeight: FontWeight.w600, fontSize: 16)),
-                    Text(subtitle, style: const TextStyle(color: AppColors.textDim, fontSize: 12)),
+                    Text(title, style: TextStyle(color: color ?? AppColors.textMainFor(context), fontWeight: FontWeight.w600, fontSize: 16)),
+                    Text(subtitle, style: TextStyle(color: AppColors.textDimFor(context), fontSize: 12)),
                   ],
                 ),
               ),
-              const Icon(LucideIcons.chevronRight, color: AppColors.textDim, size: 18),
+              Icon(LucideIcons.chevronRight, color: AppColors.textDimFor(context), size: 18),
             ],
           ),
         ),

@@ -7,6 +7,7 @@ import '../providers/user_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/custom_snackbar.dart';
 import '../providers/auth_ui_provider.dart';
+import '../utils/responsive.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -39,6 +40,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final r = context.responsive;
     return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: Stack(
@@ -78,45 +80,51 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     itemCount: _contents.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: const EdgeInsets.all(40.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(32),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: r.getSpacing(28),
+                          vertical: r.getSpacing(24),
+                        ),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 520),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(r.getSpacing(28)),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.05),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                                ),
+                                child: Icon(
+                                  _contents[index].icon,
+                                  size: r.getIconSize(72),
+                                  color: _currentPage == 1 ? Colors.amber : AppColors.primary,
+                                ),
                               ),
-                              child: Icon(
-                                _contents[index].icon,
-                                size: 80,
-                                color: _currentPage == 1 ? Colors.amber : AppColors.primary,
+                              SizedBox(height: r.getSpacing(32)),
+                              Text(
+                                _contents[index].title,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: r.getFontSize(28),
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.textMain,
+                                  letterSpacing: -1,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 48),
-                            Text(
-                              _contents[index].title,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.textMain,
-                                letterSpacing: -1,
+                              SizedBox(height: r.getSpacing(12)),
+                              Text(
+                                _contents[index].description,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: r.getFontSize(15),
+                                  color: AppColors.textDim,
+                                  height: 1.5,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _contents[index].description,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: AppColors.textDim,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -125,52 +133,55 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 
                 // Indicators & Button
                 Padding(
-                  padding: const EdgeInsets.all(32.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          _contents.length,
-                          (index) => AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            height: 8,
-                            width: _currentPage == index ? 24 : 8,
-                            decoration: BoxDecoration(
-                              color: _currentPage == index ? AppColors.primary : Colors.white24,
-                              borderRadius: BorderRadius.circular(4),
+                  padding: EdgeInsets.all(r.getSpacing(24)),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 520),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            _contents.length,
+                            (index) => AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: EdgeInsets.symmetric(horizontal: r.getSpacing(4)),
+                              height: r.getSpacing(8),
+                              width: _currentPage == index ? r.getSpacing(20) : r.getSpacing(8),
+                              decoration: BoxDecoration(
+                                color: _currentPage == index ? AppColors.primary : Colors.white24,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (_currentPage == _contents.length - 1) {
-                            // Update state to show login screen
-                            ref.read(showLoginProvider.notifier).state = true;
-                          } else {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 60),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          elevation: 8,
-                          shadowColor: AppColors.primary.withValues(alpha: 0.5),
+                        SizedBox(height: r.getSpacing(24)),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (_currentPage == _contents.length - 1) {
+                              // Update state to show login screen
+                              ref.read(showLoginProvider.notifier).state = true;
+                            } else {
+                              _pageController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            minimumSize: Size(double.infinity, r.buttonHeight),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            elevation: 8,
+                            shadowColor: AppColors.primary.withValues(alpha: 0.5),
+                          ),
+                          child: Text(
+                            _currentPage == _contents.length - 1 ? 'Get Started' : 'Next',
+                            style: TextStyle(fontSize: r.getFontSize(18), fontWeight: FontWeight.bold),
+                          ),
                         ),
-                        child: Text(
-                          _currentPage == _contents.length - 1 ? 'Get Started' : 'Next',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
