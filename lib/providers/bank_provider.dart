@@ -8,9 +8,9 @@ final bankListProvider = Provider<List<Bank>>((ref) {
       name: 'Commercial Bank of Ethiopia (CBE)',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=CBE&backgroundColor=6366f1',
       type: BankType.online,
-      officialLink: 'https://kyc.cbe.com.et',
+      officialLink: 'https://cbefayda.cbe.com.et',
       instructionSteps: [
-        'Visit kyc.cbe.com.et',
+        'Visit cbefayda.cbe.com.et',
         'Enter your CBE Account Number',
         'Enter the OTP sent to your phone',
         'Enter your Fayda Identification Number (FIN)',
@@ -23,9 +23,9 @@ final bankListProvider = Provider<List<Bank>>((ref) {
       name: 'Bank of Abyssinia',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=BOA&backgroundColor=b6e3f4',
       type: BankType.online,
-      officialLink: 'https://faydaconnect.bankofabyssinia.com',
+      officialLink: 'https://cs.bankofabyssinia.com/fayda_connect/',
       instructionSteps: [
-        'Open the Abyssinia Fayda Connect portal',
+        'Visit cs.bankofabyssinia.com/fayda_connect/',
         'Provide your Account number',
         'Perform Liveness check if required',
         'Link your FIN to your account'
@@ -37,9 +37,9 @@ final bankListProvider = Provider<List<Bank>>((ref) {
       name: 'Dashen Bank',
       logo: 'https://api.dicebear.com/7.x/initials/png?seed=Dashen&backgroundColor=ffd5dc',
       type: BankType.online,
-      officialLink: 'https://fayda.dashenbanksc.com',
+      officialLink: 'https://dashensuperapp.com/dashen-fayda',
       instructionSteps: [
-        'Go to Dashen Fayda Portal',
+        'Visit dashensuperapp.com/dashen-fayda',
         'Enter your Mobile number linked to Amole',
         'Input the OTP received',
         'Link your Digital ID'

@@ -8,6 +8,8 @@ import '../providers/language_provider.dart';
 import '../theme/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'profile_edit_screen.dart';
+import '../widgets/custom_snackbar.dart';
+import '../utils/database_seeder.dart';
 
 
 class SettingsScreen extends ConsumerWidget {
@@ -89,6 +91,7 @@ class SettingsScreen extends ConsumerWidget {
             onTap: () => _showPrivacyDialog(context),
           ),
 
+
           _buildSection(lang == AppLanguage.english ? 'Safety & Support' : 'ደህንነት እና ድጋፍ'),
           _buildSettingItem(
             context,
@@ -101,6 +104,21 @@ class SettingsScreen extends ConsumerWidget {
             itemSpacing: itemSpacing,
             onTap: () => _showEmergencyQR(context),
           ),
+
+          if (true) ...[ // Always show for now, or hide behind a flag
+            SizedBox(height: sectionSpacing),
+            _buildSection('Developer Options'),
+            _buildSettingItem(
+              context,
+              ref,
+              LucideIcons.database,
+              'Seed Database',
+              'Reset/Populate default services to Firebase',
+              cardPadding: cardPadding,
+              itemSpacing: itemSpacing,
+              onTap: () => _handleSeedDatabase(context),
+            ),
+          ],
 
 
         ],
@@ -261,9 +279,23 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Future<void> _launchTelegram() async {
-    final Uri url = Uri.parse('https://t.me/faydaconnectbot');
+    final Uri url = Uri.parse('https://t.me/NehimiG2');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       debugPrint('Could not launch \$url'); 
+    }
+  }
+
+  Future<void> _handleSeedDatabase(BuildContext context) async {
+    try {
+      CustomSnackBar.show(context, message: 'Seeding database... please wait.', isError: false);
+      await DatabaseSeeder.seedServices();
+      if (context.mounted) {
+        CustomSnackBar.show(context, message: 'Database seeded successfully!');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        CustomSnackBar.show(context, message: 'Seeding failed: $e', isError: true);
+      }
     }
   }
 }
