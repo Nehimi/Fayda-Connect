@@ -120,7 +120,6 @@ class BankDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 40),
                   _SectionHeader(title: L10n.get(lang, 'steps')),
                   const SizedBox(height: 12),
-                  _ProgressHeader(serviceId: bank.id, totalSteps: bank.instructionSteps.length),
                   const SizedBox(height: 24),
                   ...bank.instructionSteps.asMap().entries.map((entry) {
                     return _StepItem(
@@ -176,7 +175,7 @@ class BankDetailScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
                             onPressed: () async {
-                              final url = Uri.parse('https://t.me/faydaconnectbot');
+                              final url = Uri.parse('https://t.me/NehimiG2');
                               if (await canLaunchUrl(url)) {
                                 await launchUrl(url, mode: LaunchMode.externalApplication);
                               }
@@ -220,7 +219,7 @@ class BankDetailScreen extends ConsumerWidget {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             ),
                             onPressed: () async {
-                              final url = Uri.parse('https://t.me/faydaconnectbot');
+                              final url = Uri.parse('https://t.me/NehimiG2');
                               if (await canLaunchUrl(url)) {
                                 await launchUrl(url, mode: LaunchMode.externalApplication);
                               }
@@ -358,42 +357,3 @@ class _StepItem extends ConsumerWidget {
   }
 }
 
-class _ProgressHeader extends ConsumerWidget {
-  final String serviceId;
-  final int totalSteps;
-  const _ProgressHeader({required this.serviceId, required this.totalSteps});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final progress = ref.watch(checklistProvider.notifier).getProgress(serviceId, totalSteps);
-    final percentage = (progress * 100).toInt();
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'SYNC PROGRESS',
-              style: TextStyle(color: AppColors.textDim, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-            ),
-            Text(
-              '$percentage%',
-              style: TextStyle(color: progress == 1 ? Colors.green : AppColors.primary, fontWeight: FontWeight.w900, fontSize: 12),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: progress,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-            valueColor: AlwaysStoppedAnimation<Color>(progress == 1 ? Colors.green : AppColors.primary),
-            minHeight: 6,
-          ),
-        ),
-      ],
-    );
-  }
-}
