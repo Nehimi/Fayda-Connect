@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Security - Bot administration files
+BOT_ADMIN_INTERNAL.md
+*BOT_ADMIN*
+*bot_admin*
+*_ADMIN_*
