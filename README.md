@@ -15,8 +15,6 @@
 ## 🚀 Premium Features
 
 ### 🔐 The Secure Vault
-- **🛡️ Biometric Protection:** Access your most sensitive data via Fingerprint or FaceID.
-- **📄 Digital Document Wallet:** Securely store and decrypt your Fayda ID, Passports, and Business licenses.
 - **☁️ Real-time Cloud Sync:** Never lose your data with encrypted Firebase backups.
 - **👤 Profile Management:** Edit and update your profile information with real-time sync across devices.
 - **🔒 Privacy-First Design:** User IDs are privatized and securely managed with Firebase Authentication.
